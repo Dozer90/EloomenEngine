@@ -2,5 +2,5 @@
 
 int main()
 {
-    return Game().run();
+    return ENGINE_NAMESPACE::Game().run();
 }

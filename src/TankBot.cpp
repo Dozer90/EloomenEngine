@@ -1,8 +1,8 @@
 #include "TankBot.h"
 
-#include "Math.h"
+#include "Maths.h"
 
-#include <EASTL/vector.h>
+using namespace ENGINE_NAMESPACE;
 
 void TankBot::setLeftTreadForce(double speed)
 {

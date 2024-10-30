@@ -1,10 +1,15 @@
 #pragma once
 
+#include <EASTL/type_traits.h>
+
 #include <cmath>
+
+namespace ENGINE_NAMESPACE
+{
 
 using ldouble = long double;
 
-#define NUMERIC_TEMPLATE template<typename T> std::enable_if<std::is_arithmetic<T>::value, T>::type
+#define NUMERIC_TEMPLATE template<typename T> eastl::enable_if<eastl::is_arithmetic<T>::value, T>::type
 
 namespace Math
 {
@@ -77,8 +82,8 @@ NUMERIC_TEMPLATE max(T value, T maxValue) { return value > maxValue ? maxValue :
 NUMERIC_TEMPLATE clamp(T value, T minValue, T maxValue)
 {
     return (value < minValue) ? minValue :
-           (value > maxValue) ? maxValue :
-            value;
+        (value > maxValue) ? maxValue :
+        value;
 }
 
 NUMERIC_TEMPLATE toRadians(T degrees) { return degrees * static_cast<T>(DegToRad_ld); }
@@ -105,4 +110,5 @@ inline ldouble mod(ldouble value, ldouble divisor) { return divisor != 0.0L ? st
 inline double mod(double value, double divisor) { return divisor != 0.0 ? std::fmod(value, divisor) : 0.0; }
 inline float mod(float value, float divisor) { return divisor != 0.0f ? std::fmod(value, divisor) : 0.0f; }
 #pragma endregion
+}
 }

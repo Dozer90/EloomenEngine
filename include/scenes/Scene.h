@@ -4,7 +4,7 @@
 #include <EASTL/string.h>
 #include <EASTL/vector.h>
 
-namespace Scenes
+namespace ENGINE_NAMESPACE::Scenes
 {
 	using SceneID = uint16_t;
 
@@ -22,5 +22,12 @@ namespace Scenes
 	private:
 		eastl::string mName;
 		eastl::vector<TransitionFunc> mTransitionConditions;
+	};
+
+
+
+	class MainMenuScene : public Scene
+	{
+	public:
 	};
 }

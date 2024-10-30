@@ -1,7 +1,7 @@
 #include "GameObject.h"
 
-namespace GameObjects
-{
+using namespace ENGINE_NAMESPACE;
+
 static GameObjectID gNextGameObjectID = 0;
 
 IGameObject::IGameObject()
@@ -12,5 +12,4 @@ IGameObject::IGameObject()
 IGameObject::~IGameObject()
 {
 
-}
 }

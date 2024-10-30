@@ -1,9 +1,13 @@
 #pragma once
 
+#include "Objects/GameObject.h"
+
 #include <EASTL/string.h>
 #include <EASTL/vector.h>
 #include <SFML/System.hpp>
 
+namespace ENGINE_NAMESPACE
+{
 constexpr double gTreadMaxSpeedPerSecond = 5.0;
 constexpr double gTurrentMaxTurnAngleDegreesPerSecond = 30.0;
 constexpr double gShotCooldownSeconds = 3.0;
@@ -11,7 +15,7 @@ constexpr double gTankTreadSeperation = 10.0;
 
 constexpr double gSensorRange = 50.0;
 
-class TankBot
+class TankBot : public IGameObject
 {
 public:
 	// Return the name of the bot
@@ -21,9 +25,9 @@ public:
 	virtual const eastl::string& getCreatorName() = 0;
 
 	// This is where the meat of the code will go
-	virtual void logicUpdate(const float deltaTime, eastl::vector<const TankBot&> detectedEnemies) = 0;
+	virtual void update(const double deltaTime) override;
 
-public:
+protected:
 	// Set the speed of the treads to move the tank
 	void setLeftTreadForce(double speed);
 	void setRightTreadForce(double speed);
@@ -53,3 +57,4 @@ private:
 	double mTurretRotationSpeed = 0.0;
 	double mShotCooldown = 0.0;
 };
+}
