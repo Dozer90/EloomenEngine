@@ -4,22 +4,22 @@
 
 #include <EASTL/vector.h>
 
-void TankBot::SetLeftTreadForce(double speed)
+void TankBot::setLeftTreadForce(double speed)
 {
 	mTreadVelocity.x = Math::clamp(speed, -gTreadMaxSpeedPerSecond, gTreadMaxSpeedPerSecond);
 }
 
-void TankBot::SetRightTreadForce(double speed)
+void TankBot::setRightTreadForce(double speed)
 {
 	mTreadVelocity.y = Math::clamp(speed, -gTreadMaxSpeedPerSecond, gTreadMaxSpeedPerSecond);
 }
 
-void TankBot::RotateTurret(double angleDegrees)
+void TankBot::rotateTurret(double angleDegrees)
 {
 	mTurretRotationSpeed = angleDegrees;
 }
 
-void TankBot::Update(const double deltaTime)
+void TankBot::update(const double deltaTime)
 {
 	// Calculate the new forward velocity
 	const double torque = (mTreadVelocity.y - mTreadVelocity.x) / gTankTreadSeperation;
@@ -43,9 +43,6 @@ void TankBot::Update(const double deltaTime)
 	for ()
 }
 
-
-
-	const sf::Vector2f GetPosition() const;
 
 	void Shoot() const;
 

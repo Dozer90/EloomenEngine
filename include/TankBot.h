@@ -15,30 +15,30 @@ class TankBot
 {
 public:
 	// Return the name of the bot
-	virtual const eastl::string& GetBotName() = 0;
+	virtual const eastl::string& getBotName() = 0;
 
 	// Return the name of the bot creator
-	virtual const eastl::string& GetCreatorName() = 0;
+	virtual const eastl::string& getCreatorName() = 0;
 
 	// This is where the meat of the code will go
-	virtual void LogicUpdate(const float deltaTime, eastl::vector<const TankBot&> detectedEnemies) = 0;
+	virtual void logicUpdate(const float deltaTime, eastl::vector<const TankBot&> detectedEnemies) = 0;
 
 public:
 	// Set the speed of the treads to move the tank
-	void SetLeftTreadForce(double speed);
-	void SetRightTreadForce(double speed);
+	void setLeftTreadForce(double speed);
+	void setRightTreadForce(double speed);
 
-	void RotateTurret(double angleDegrees);
+	void rotateTurret(double angleDegrees);
 
-	const sf::Vector2<double> GetPosition() const { return mTankPosition; }
-	const sf::Vector2<double> GetForwardVector() const { return mTankForward; }
-	const sf::Vector2<double> GetTurretForwardVector() const { return mTurretForward; }
+	const sf::Vector2<double> getPosition() const { return mTankPosition; }
+	const sf::Vector2<double> getForwardVector() const { return mTankForward; }
+	const sf::Vector2<double> getTurretForwardVector() const { return mTurretForward; }
 
-	void Shoot() const;
+	void shoot() const;
 
-	void TakeDamage(int damage, const sf::Vector2f& directionToImpact);
+	void takeDamage(int damage, const sf::Vector2f& directionToImpact);
 
-	void Update(const double deltaTime);
+	void update(const double deltaTime);
 
 private:
 	int mHealth = 100;

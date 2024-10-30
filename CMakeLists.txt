@@ -12,7 +12,7 @@ set(SOURCES
     "src/main.cpp"
     "src/Game.cpp"
     "src/TankBot.cpp"
-)
+ "src/GameObject.cpp")
 
 add_executable(TankWarz ${SOURCES})
 
