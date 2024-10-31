@@ -7,6 +7,42 @@
 namespace ENGINE_NAMESPACE
 {
 
+/// <summary>
+/// Simple class designed to make dealing with square root values easier. When accessed,
+/// the squared value of whatever was assigned is returned. To get the root value, use
+/// "root_value".
+/// </summary>
+/// <typeparam name="T">Numerical type that supports sqrt</typeparam>
+template <typename T>
+class sqr_t
+{
+	static_assert(
+		eastl::is_integral<T>::value ||
+		(eastl::is_floating_point<T>::value && eastl::type_not_equal<double, T>::value),
+		"Data type T is not supported by sqrt");
+
+public:
+	inline sqr_t() = default;
+	inline sqr_t(const sqr_t<T>& other) = default;
+	inline sqr_t(sqr_t<T>&& other) = default;
+	inline sqr_t(const T& other) = default;
+	inline sqr_t(T&& other) = default;
+
+	// This allows the value to be read as the square value
+	inline operator T() const { return root_value * root_value; }
+
+	inline sqr_t& operator=(const T& value) { this->root_value = value; return *this; }
+	inline sqr_t& operator=(const sqr_t<T>& rhs) { this->root_value = rhs.root_value; return *this; }
+	inline sqr_t& operator=(T&& value) noexcept { this->root_value = value; return *this; }
+	inline sqr_t& operator=(sqr_t<T>&& rhs) noexcept { *this = eastl::move(rhs); return *this; }
+
+	inline bool operator==(const sqr_t<T>& rhs) const { return this->root_value == rhs.root_value; }
+	inline bool operator!=(const sqr_t<T>& rhs) const { return this->root_value != rhs.root_value; }
+
+public:
+	T root_value;
+};
+
 using ldouble = long double;
 
 #define NUMERIC_TEMPLATE template<typename T> eastl::enable_if<eastl::is_arithmetic<T>::value, T>::type
