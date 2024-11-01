@@ -4,7 +4,7 @@
 
 #include <cmath>
 
-namespace ENGINE_NAMESPACE
+namespace TankWarz
 {
 
 /// <summary>
@@ -23,10 +23,10 @@ class sqr_t
 
 public:
 	inline sqr_t() = default;
-	inline sqr_t(const sqr_t<T>& other) = default;
-	inline sqr_t(sqr_t<T>&& other) = default;
-	inline sqr_t(const T& other) = default;
-	inline sqr_t(T&& other) = default;
+	inline sqr_t(const sqr_t<T>& other) { *this = other; }
+	inline sqr_t(sqr_t<T>&& other) { *this = other; }
+	inline sqr_t(const T& other) { *this = other; }
+	inline sqr_t(T&& other) { *this = other; }
 
 	// This allows the value to be read as the square value
 	inline operator T() const { return root_value * root_value; }
@@ -71,7 +71,7 @@ constexpr ldouble Tau_ld = PI_ld + PI_ld;
 constexpr double Tau = static_cast<double>(Tau_ld);
 constexpr float Tau_f = static_cast<float>(Tau_ld);
 constexpr ldouble TwoPI_ld = Tau_ld;
-constexpr double TwoPI = Tau_d;
+constexpr double TwoPI = Tau;
 constexpr float TwoPI_f = Tau_f;
 
 // Half PI

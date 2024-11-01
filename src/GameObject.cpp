@@ -1,15 +1,15 @@
-#include "GameObject.h"
+#include "Objects/GameObject.h"
 
-using namespace ENGINE_NAMESPACE;
+using namespace TankWarz;
 
 static GameObjectID gNextGameObjectID = 0;
 
-IGameObject::IGameObject()
-	: mGameObjectID(gNextGameObjectID++)
-{
-}
-
-IGameObject::~IGameObject()
-{
-
-}
+//IGameObject::IGameObject()
+//	: mGameObjectID(gNextGameObjectID++)
+//{
+//}
+//
+//IGameObject::~IGameObject()
+//{
+//
+//}

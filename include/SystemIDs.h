@@ -1,6 +1,6 @@
 #pragma once
 
-namespace ENGINE_NAMESPACE
+namespace TankWarz
 {
 enum class SystemID
 {

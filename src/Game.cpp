@@ -1,15 +1,17 @@
 #include "Game.h"
 
-#include "Objects/ObjectManager.h"
+#include "Events/EventSystem.h"
 #include "Scenes/SceneManager.h"
+#include "Objects/ObjectManager.h"
 #include "TankBot.h"
 
 #include <SFML/Graphics.hpp>
 #include <EASTL/chrono.h>
 #include <EASTL/vector.h>
 
-using namespace ENGINE_NAMESPACE;
+using namespace TankWarz;
 
+Events::EventSystem Game::gEventSystem;
 ObjectManager Game::gObjectManager;
 Scenes::SceneManager Game::gSceneManager;
 
@@ -18,7 +20,10 @@ Game::Game()
 	gObjectManager.registerObjectType<TankBot>();
 
 	// Do initilization stuff here
-	Scenes::SceneID mainMenuSceneID = gSceneManager.registerScene<Scenes::MainMenuScene>();
+	//Scenes::SceneID mainMenuSceneID = gSceneManager.registerScene<Scenes::MainMenuScene>();
+
+	Events::CollisionEvent evt;
+	gEventSystem.broadcast(eastl::move(evt));
 }
 
 int Game::run()

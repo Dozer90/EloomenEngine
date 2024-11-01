@@ -4,7 +4,7 @@
 #include <EASTL/string.h>
 #include <EASTL/vector.h>
 
-namespace ENGINE_NAMESPACE::Scenes
+namespace TankWarz::Scenes
 {
 	using SceneID = uint16_t;
 

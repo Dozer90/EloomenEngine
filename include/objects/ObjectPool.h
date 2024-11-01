@@ -7,7 +7,7 @@
 #include <EASTL/unique_ptr.h>
 #include <EASTL/utility.h>
 
-namespace ENGINE_NAMESPACE
+namespace TankWarz
 {
 
 /// <summary>
@@ -26,7 +26,7 @@ protected:
     const size_t mMaxStorageSize;
 };
 
-template <typename TObject> class ObjectPool : public IPool;
+template <typename TObject> class ObjectPool;
 
 
 /// <summary>
@@ -42,10 +42,10 @@ public:
         : mObjectPool(objectPool)
     {}
 
-    void operator()(TObject* obj) const
+    void operator()(eastl::unique_ptr<TObject, ObjectPoolDeleter<TObject>>&& obj) const
     {
-        obj->onRelease();
-        mObjectPool->release(eastl::unique_ptr<TObject>(obj));
+        obj->cleanup();
+        mObjectPool->release(eastl::forward(obj));
     }
 
 private:
@@ -60,7 +60,7 @@ private:
 template <typename TObject>
 class ObjectPool : public IPool
 {
-    static_assert(eastl::is_base_of<IGameObject, T>::value, "TObject must derive from IGameObject");
+    static_assert(eastl::is_base_of<IGameObject, TObject>::value, "TObject must derive from IGameObject");
 
 public:
     using ObjectPtr = eastl::unique_ptr<TObject, ObjectPoolDeleter<TObject>>;
@@ -69,6 +69,7 @@ public:
     ObjectPool(size_t maxStorageSize)
         : IPool(maxStorageSize)
     {
+        mObjects.reserve(maxStorageSize);
     }
 
     ObjectPtr acquire()
@@ -97,7 +98,7 @@ public:
     }
 
 private:
-    static GameObjectID mIDCounter = 0;
-    eastl::fixed_vector<ObjectPtr> mObjects;
+    static GameObjectID mIDCounter;
+    eastl::vector<ObjectPtr> mObjects;
 };
 }

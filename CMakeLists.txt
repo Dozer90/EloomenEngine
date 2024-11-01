@@ -13,7 +13,7 @@ set(SOURCES
     "src/Game.cpp"
     "src/TankBot.cpp"
     "src/GameObject.cpp"
-)
+ "src/EventSystem.cpp")
 
 add_executable(TankWarz ${SOURCES})
 
@@ -42,8 +42,9 @@ target_link_libraries(TankWarz PRIVATE EASTL)
 
 ###########################################
 
-target_compile_features(TankWarz PRIVATE cxx_std_17)
-target_compile_definitions(TankWarz PUBLIC ENGINE_NAMESPACE=tempname)
+target_compile_features(TankWarz PRIVATE cxx_std_20)
+
+#target_compile_definitions(TankWarz PUBLIC TankWarz=tempname)
 
 if(WIN32)
     add_custom_command(

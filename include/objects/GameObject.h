@@ -1,13 +1,11 @@
 #pragma once
 
-#include "GameEvents.h"
+#include "Generic/TypeAliases.h"
 
 #include <SFML/Window.hpp>
 
-namespace ENGINE_NAMESPACE
+namespace TankWarz
 {
-using GameObjectID = uint32_t;
-
 class IGameObject
 {
 private:
@@ -21,10 +19,9 @@ public:
 	virtual void init() = 0;
 
 	/// <summary>
-	/// Process an event and return if it is consumed
+	/// Perform any cleanup required when the object is no longer in use
 	/// </summary>
-	/// <param name="event">Event triggered</param>
-	virtual void onEvent(const Event& event) {};
+	virtual void cleanup() = 0;
 
 	/// <summary>
 	/// Update the game object

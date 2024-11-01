@@ -2,7 +2,7 @@
 
 #include "Maths.h"
 
-using namespace ENGINE_NAMESPACE;
+using namespace TankWarz;
 
 void TankBot::setLeftTreadForce(double speed)
 {
@@ -40,18 +40,18 @@ void TankBot::update(const double deltaTime)
 
 	// Check for other tanks
 	eastl::vector<TankBot*> foundBots;
-	for ()
+	//for ()
 }
 
 
-	void Shoot() const;
-
-	void TakeDamage(int damage);
-
-private:
-	int mHealth = 100;
-	sf::Vector2f mPosition;
-	sf::Vector2f mTreadVelocity;
-	float mTurretDirection = 0.0f;
-	float mShotCooldown = 0.0f;
-};
+//	void Shoot() const;
+//
+//	void TakeDamage(int damage);
+//
+//private:
+//	int mHealth = 100;
+//	sf::Vector2f mPosition;
+//	sf::Vector2f mTreadVelocity;
+//	float mTurretDirection = 0.0f;
+//	float mShotCooldown = 0.0f;
+//};

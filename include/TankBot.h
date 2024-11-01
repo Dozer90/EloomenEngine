@@ -6,7 +6,7 @@
 #include <EASTL/vector.h>
 #include <SFML/System.hpp>
 
-namespace ENGINE_NAMESPACE
+namespace TankWarz
 {
 constexpr double gTreadMaxSpeedPerSecond = 5.0;
 constexpr double gTurrentMaxTurnAngleDegreesPerSecond = 30.0;
@@ -41,8 +41,6 @@ protected:
 	void shoot() const;
 
 	void takeDamage(int damage, const sf::Vector2f& directionToImpact);
-
-	void update(const double deltaTime);
 
 private:
 	int mHealth = 100;

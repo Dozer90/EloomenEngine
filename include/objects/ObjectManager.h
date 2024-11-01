@@ -4,7 +4,7 @@
 
 #include <EASTL/unordered_map.h>
 
-namespace ENGINE_NAMESPACE
+namespace TankWarz
 {
 /// <summary>
 /// Central hub that allows the game to register and create new

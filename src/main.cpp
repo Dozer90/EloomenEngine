@@ -2,5 +2,5 @@
 
 int main()
 {
-    return ENGINE_NAMESPACE::Game().run();
+    return TankWarz::Game().run();
 }

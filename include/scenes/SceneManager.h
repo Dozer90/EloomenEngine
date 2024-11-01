@@ -5,7 +5,7 @@
 #include <EASTL/set.h>
 #include <EASTL/unique_ptr.h>
 
-namespace ENGINE_NAMESPACE::Scenes
+namespace TankWarz::Scenes
 {
 class SceneManager
 {
