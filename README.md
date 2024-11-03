@@ -1,3 +1,3 @@
-# EloomenateEngine!
+# Eloomen Engine!
 
-A basic template for a tank fighting game!
+A 2D WIP game engine created with data-oriented design (DOD) principles in mind.
