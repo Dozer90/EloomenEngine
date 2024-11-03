@@ -5,7 +5,7 @@
 #include <EASTL/set.h>
 #include <EASTL/unique_ptr.h>
 
-namespace TankWarz::Scenes
+namespace eloo::Scenes
 {
 class SceneManager
 {

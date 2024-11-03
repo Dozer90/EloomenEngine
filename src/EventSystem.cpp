@@ -2,7 +2,7 @@
 
 #include <EASTL/optional.h>
 
-namespace TankWarz::Events
+namespace eloo::Events
 {
 
 void EventSystem::poll()

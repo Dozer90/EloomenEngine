@@ -4,7 +4,7 @@
 #include <EASTL/string.h>
 #include <EASTL/vector.h>
 
-namespace TankWarz::Scenes
+namespace eloo::Scenes
 {
 	using SceneID = uint16_t;
 

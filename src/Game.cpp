@@ -9,26 +9,41 @@
 #include <EASTL/chrono.h>
 #include <EASTL/vector.h>
 
-using namespace TankWarz;
+using namespace eloo;
 
 Events::EventSystem Game::gEventSystem;
-ObjectManager Game::gObjectManager;
 Scenes::SceneManager Game::gSceneManager;
 
 Game::Game()
+	: mObjectPool(1000)
 {
-	gObjectManager.registerObjectType<TankBot>();
+	auto& obj = createGameObject<TankBot>();
+}
 
-	// Do initilization stuff here
-	//Scenes::SceneID mainMenuSceneID = gSceneManager.registerScene<Scenes::MainMenuScene>();
+void Game::deleteGameObject(GameObjectID id)
+{
+	if (mGameObjects.empty())
+	{
+		return;
+	}
 
-	Events::CollisionEvent evt;
-	gEventSystem.broadcast(eastl::move(evt));
+	constexpr auto condition = [&](const GameObjectPtr& obj, GameObjectID id)
+	{
+		return obj->getID() < id;
+	};
+	GameObjectPtr* found = eastl::lower_bound(mGameObjects.begin(), mGameObjects.end(), id, condition);
+	if (found == mGameObjects.end() || (*found)->getID() != id)
+	{
+		return;
+	}
+
+	(*found)->cleanup();
+	mGameObjects.erase(found);
 }
 
 int Game::run()
 {
-	auto window = sf::RenderWindow({ 1920u, 1080u }, "Playside TankWarz!");
+	auto window = sf::RenderWindow({ 1920u, 1080u }, "Playside EloomenateEngine!");
 	window.setFramerateLimit(144);
 
 	eastl::chrono::high_resolution_clock clock;

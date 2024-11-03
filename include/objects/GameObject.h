@@ -4,24 +4,27 @@
 
 #include <SFML/Window.hpp>
 
-namespace TankWarz
+#include <EASTL/unique_ptr.h>
+
+namespace eloo
 {
-class IGameObject
+class GameObject
 {
 private:
-	IGameObject(GameObjectID id);
+	virtual ~GameObject();
 
 public:
 	/// <summary>
-	/// Initilize the object. This will be called when the object is first
-	/// created OR recycled from the managing object pool
+	/// Called when the object is first created. It will also call onInit
+	/// to allow derived classes to initilize anything they need to
 	/// </summary>
-	virtual void init() = 0;
+	void init(GameObjectID id);
 
 	/// <summary>
-	/// Perform any cleanup required when the object is no longer in use
+	/// Called when the object is deleted. It will also call onCleanup
+	/// to allow derived classes to clean up anything they need to
 	/// </summary>
-	virtual void cleanup() = 0;
+	void cleanup();
 
 	/// <summary>
 	/// Update the game object
@@ -35,23 +38,28 @@ public:
 	/// <param name="window">The current window being rendered</param>
 	virtual void draw(sf::Window& window) {};
 
-public:
 	/// <summary>
 	/// Get the game object's unique ID
 	/// </summary>
 	inline GameObjectID getID() const { return mGameObjectID; }
 
+protected:
 	/// <summary>
-	/// Called when the object is pulled from the pool. Used to reset the object
-	/// so it can be used fresh
+	/// Called when init() is fired. Override this to add any initial setup
+	/// for your game object
 	/// </summary>
-	void onAcquire(GameObjectID newID)
-	{
-		mGameObjectID = newID;
-		init();
-	}
+	virtual void onInit() {}
+
+	/// <summary>
+	/// Called when cleanup() is fired. Override this to add any additional
+	/// clean up for your game object
+	/// </summary>
+	virtual void onCleanup() {}
 
 private:
-	GameObjectID mGameObjectID;
+	bool mIsInitilized = false;
+	GameObjectID mGameObjectID = 0;
 };
+
+using GameObjectPtr = eastl::unique_ptr<GameObject>;
 }

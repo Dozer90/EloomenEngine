@@ -2,5 +2,5 @@
 
 int main()
 {
-    return TankWarz::Game().run();
+    return eloo::Game().run();
 }

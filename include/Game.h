@@ -1,22 +1,15 @@
 #pragma once
 
-#include "TankBot.h"
+#include "Objects/ObjectPool.h"
 
 #include <EASTL/vector.h>
 #include <EASTL/unordered_map.h>
 #include <EASTL/unique_ptr.h>
 
-namespace TankWarz
+namespace eloo
 {
-namespace Events
-{
-class EventSystem;
-}
-namespace Scenes
-{
-class SceneManager;
-}
-class ObjectManager;
+namespace Events { class EventSystem; }
+namespace Scenes { class SceneManager; }
 
 class Game
 {
@@ -25,17 +18,26 @@ public:
 
 	int run();
 
-	bool registerBot(TankBot&& tankBot);
+	template <typename TGameObject, ENABLE_TEMPLATE_IF_BASE_OF(GameObject, TGameObject)>
+	TGameObject& createGameObject()
+	{
+		eastl::unique_ptr<TGameObject> obj = mObjectPool.acquire<TGameObject>();
+		static_cast<GameObject*>(obj.get())->init();
+
+		mGameObjects.push_back(eastl::move(obj));
+		return *(mGameObjects.end() - 1);
+	}
+
+	void deleteGameObject(GameObjectID id);
 
 	static inline Events::EventSystem& getEventSystem() { return gEventSystem; }
-	static inline ObjectManager& getObjectManager() { return gObjectManager; }
 	static inline Scenes::SceneManager& getSceneManager() { return gSceneManager; }
 
 private:
 	static Events::EventSystem gEventSystem;
-	static ObjectManager gObjectManager;
 	static Scenes::SceneManager gSceneManager;
 
-	eastl::vector<eastl::unique_ptr<TankBot>> mTankBots;
+	ObjectPool<GameObject> mObjectPool;
+	eastl::vector<GameObjectPtr> mGameObjects;
 };
 }

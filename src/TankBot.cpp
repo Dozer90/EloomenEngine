@@ -2,7 +2,7 @@
 
 #include "Maths.h"
 
-using namespace TankWarz;
+using namespace eloo;
 
 void TankBot::setLeftTreadForce(double speed)
 {

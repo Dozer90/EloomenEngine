@@ -5,7 +5,7 @@
 #include <SFML/System/Vector2.hpp>
 #include <EASTL/functional.h>
 
-namespace TankWarz::Events
+namespace eloo::Events
 {
 ///>=====================================================================
 /// Base event

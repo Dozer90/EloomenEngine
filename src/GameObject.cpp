@@ -1,15 +1,25 @@
 #include "Objects/GameObject.h"
 
-using namespace TankWarz;
+using namespace eloo;
 
-static GameObjectID gNextGameObjectID = 0;
+void GameObject::init(GameObjectID id)
+{
+    if (mIsInitilized)
+    {
+        return;
+    }
+    mGameObjectID = id;
+    onInit();
+    mIsInitilized = true;
+}
 
-//IGameObject::IGameObject()
-//	: mGameObjectID(gNextGameObjectID++)
-//{
-//}
-//
-//IGameObject::~IGameObject()
-//{
-//
-//}
+void GameObject::cleanup()
+{
+    if (!mIsInitilized)
+    {
+        return;
+    }
+    onCleanup();
+    mGameObjectID = 0;
+    mIsInitilized = false;
+}

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace TankWarz
+namespace eloo
 {
 enum class SystemID
 {

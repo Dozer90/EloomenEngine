@@ -6,7 +6,7 @@
 #include <EASTL/vector.h>
 #include <SFML/System.hpp>
 
-namespace TankWarz
+namespace eloo
 {
 constexpr double gTreadMaxSpeedPerSecond = 5.0;
 constexpr double gTurrentMaxTurnAngleDegreesPerSecond = 30.0;
@@ -15,7 +15,7 @@ constexpr double gTankTreadSeperation = 10.0;
 
 constexpr double gSensorRange = 50.0;
 
-class TankBot : public IGameObject
+class TankBot : public GameObject
 {
 public:
 	// Return the name of the bot

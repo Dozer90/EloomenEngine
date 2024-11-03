@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameEvents.h"
+#include "Generic/Utilities.h"
 
 #include <EASTL/unique_ptr.h>
 #include <EASTL/functional.h>
@@ -11,9 +12,7 @@
 #include <mutex>
 #include <condition_variable>
 
-#define TEMPLATE_ENSURE_IS_EVENT typename = eastl::enable_if_t<eastl::is_base_of<IEvent, TEvent>::value>
-
-namespace TankWarz::Events
+namespace eloo::Events
 {
 class EventSystem
 {
@@ -25,7 +24,7 @@ private:
     };
 
 public:
-    template <typename TEvent, TEMPLATE_ENSURE_IS_EVENT>
+    template <typename TEvent, ENABLE_TEMPLATE_IF_BASE_OF(IEvent, TEvent)>
     inline void subscribe(EventCallback callback)
     {
         const size_t hash = std::type_index(typeid(TEvent)).hash_code();
@@ -33,7 +32,7 @@ public:
         mSubscribedCallbacks[hash].push_back(callback);
     }
 
-    template <typename TEvent, typename TTarget, TEMPLATE_ENSURE_IS_EVENT>
+    template <typename TEvent, typename TTarget, ENABLE_TEMPLATE_IF_BASE_OF(IEvent, TEvent)>
     inline void subscribe(TTarget* target, void(TTarget::*func)(const TEvent&))
     {
         EventCallback callback = [target, func](const TEvent& evt)
@@ -43,7 +42,7 @@ public:
         subscribe<TEvent>(callback);
     }
 
-    template <typename TEvent, TEMPLATE_ENSURE_IS_EVENT>
+    template <typename TEvent, ENABLE_TEMPLATE_IF_BASE_OF(IEvent, TEvent)>
     inline bool unsubscribe(EventCallback callback)
     {
         std::unique_lock<std::mutex> lock(mMutex);
@@ -58,7 +57,7 @@ public:
         return true;
     }
 
-    template <typename TEvent, typename TTarget, TEMPLATE_ENSURE_IS_EVENT>
+    template <typename TEvent, typename TTarget, ENABLE_TEMPLATE_IF_BASE_OF(IEvent, TEvent)>
     inline bool unsubscribe(TTarget* target, void(TTarget::*func)(const TEvent&))
     {
         EventCallback callback = [target, func](const TEvent& evt)
@@ -68,7 +67,7 @@ public:
         return unsubscribe<TEvent>(callback);
     }
 
-    template <typename TEvent, TEMPLATE_ENSURE_IS_EVENT>
+    template <typename TEvent, ENABLE_TEMPLATE_IF_BASE_OF(IEvent, TEvent)>
     inline void broadcast(TEvent&& evt)
     {
         std::unique_lock<std::mutex> lock(mMutex);
@@ -78,7 +77,7 @@ public:
         );
     }
 
-    template <typename TEvent, TEMPLATE_ENSURE_IS_EVENT>
+    template <typename TEvent, ENABLE_TEMPLATE_IF_BASE_OF(IEvent, TEvent)>
     inline void broadcast()
     {
         std::unique_lock<std::mutex> lock(mMutex);
@@ -100,5 +99,3 @@ private:
     std::condition_variable mThreadSleepCondition;
 };
 }
-
-#undef TEMPLATE_ENSURE_IS_EVENT

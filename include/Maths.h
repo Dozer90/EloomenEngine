@@ -4,7 +4,7 @@
 
 #include <cmath>
 
-namespace TankWarz
+namespace eloo
 {
 
 /// <summary>
