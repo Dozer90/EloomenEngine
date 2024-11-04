@@ -2,40 +2,48 @@
 
 #include <EASTL/optional.h>
 
-namespace eloo::Events
+using namespace eloo::Events;
+
+EventSystem::EventSystem(size_t initialEventReservationSize)
 {
+    mHashQueueWrite.reserve(initialEventReservationSize);
+    mHashQueueRead.reserve(initialEventReservationSize);
+    mEventQueueWrite.reserve(initialEventReservationSize);
+    mEventQueueRead.reserve(initialEventReservationSize);
+}
 
 void EventSystem::poll()
 {
-    auto waitConditionPredecate = [this]() { return mHasEvents || !mEventQueue.empty(); };
+    auto waitConditionPredecate = [this]() { return mHasEvents || !mEventQueueWrite.empty(); };
+
+    eastl::unordered_map<EventHash, EventPtr> batchedEvents;
     while (true)
     {
-        eastl::optional<QueuedEvent> queuedEvent = eastl::nullopt;
         {
             std::unique_lock<std::mutex> lock(mMutex);
-
             mThreadSleepCondition.wait(lock, waitConditionPredecate);
-            if (mEventQueue.empty())
+            mHashQueueWrite.swap(mHashQueueRead);
+            mEventQueueWrite.swap(mEventQueueRead);
+            mHasEvents = false;
+        }
+
+        for (size_t index = 0; index < mEventQueueRead.size(); ++index)
+        {
+            batchedEvents[mHashQueueRead[index]].push_back(eastl::move(mEventQueueRead[index]));
+        }
+        mHashQueueRead.clear();
+        mEventQueueRead.clear();
+
+        for (auto& [hash, events] : batchedEvents)
+        {
+            auto& callbacks = mSubscribedCallbacks[hash];
+            for (auto& event : events)
             {
-                continue;
+                for (auto& [_, callback] : callbacks)
+                {
+                    callback(*event.get());
+                }
             }
-
-            queuedEvent = eastl::move(mEventQueue.front());
-            mEventQueue.pop();
-            mHasEvents = !mEventQueue.empty();
-        }
-
-        if (!queuedEvent.has_value())
-        {
-            continue;
-        }
-
-        auto& callbacks = mSubscribedCallbacks[queuedEvent->hash];
-        for (auto& callback : callbacks)
-        {
-            callback(*queuedEvent->event.get());
         }
     }
-}
-
 }

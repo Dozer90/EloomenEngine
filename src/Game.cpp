@@ -2,7 +2,6 @@
 
 #include "Events/EventSystem.h"
 #include "Scenes/SceneManager.h"
-#include "Objects/ObjectManager.h"
 #include "TankBot.h"
 
 #include <SFML/Graphics.hpp>
@@ -16,9 +15,7 @@ Scenes::SceneManager Game::gSceneManager;
 
 Game::Game()
 	: mObjectPool(1000)
-{
-	auto& obj = createGameObject<TankBot>();
-}
+{}
 
 void Game::deleteGameObject(GameObjectID id)
 {

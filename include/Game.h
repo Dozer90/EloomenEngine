@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Objects/ObjectPool.h"
+#include "Events/GameEvents.h"
 
 #include <EASTL/vector.h>
 #include <EASTL/unordered_map.h>
