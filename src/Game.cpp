@@ -1,7 +1,8 @@
 #include "Game.h"
 
 #include "Events/EventSystem.h"
-#include "Scenes/SceneManager.h"
+#include "States/StateMachine.h"
+#include "Logging.h"
 #include "TankBot.h"
 
 #include <SFML/Graphics.hpp>
@@ -11,11 +12,11 @@
 using namespace eloo;
 
 Events::EventSystem Game::gEventSystem;
-Scenes::SceneManager Game::gSceneManager;
 
 Game::Game()
 	: mObjectPool(1000)
-{}
+{
+}
 
 void Game::deleteGameObject(GameObjectID id)
 {

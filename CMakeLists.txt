@@ -33,7 +33,9 @@ set(SOURCES
     "src/TankBot.cpp"
     "src/GameObject.cpp"
     "src/EventSystem.cpp"
-    "src/PhysicsSystem.cpp")
+    "src/PhysicsSystem.cpp"
+    "src/StateMachine.cpp"
+    "src/Utilities.cpp" "src/Logging.cpp")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     #list(APPEND SOURCES)
@@ -99,12 +101,14 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     #list(APPEND PRIVATE_DEFINES)
     list(APPEND PUBLIC_DEFINES
         DEBUG_BUILD
+        ASSERTS_ENABLED
         IMGUI_IS_ENABLED
     )
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
     #list(APPEND PRIVATE_DEFINES)
     list(APPEND PUBLIC_DEFINES
         RELEASE_BUILD
+        ASSERTS_ENABLED
     )
 endif()
 

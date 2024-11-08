@@ -10,7 +10,6 @@
 namespace eloo
 {
 namespace Events { class EventSystem; }
-namespace Scenes { class SceneManager; }
 
 class Game
 {
@@ -32,11 +31,9 @@ public:
 	void deleteGameObject(GameObjectID id);
 
 	static inline Events::EventSystem& getEventSystem() { return gEventSystem; }
-	static inline Scenes::SceneManager& getSceneManager() { return gSceneManager; }
 
 private:
 	static Events::EventSystem gEventSystem;
-	static Scenes::SceneManager gSceneManager;
 
 	ObjectPool<GameObject> mObjectPool;
 	eastl::vector<GameObjectPtr> mGameObjects;
