@@ -15,8 +15,7 @@ Events::EventSystem Game::gEventSystem;
 
 Game::Game()
 	: mObjectPool(1000)
-{
-}
+{}
 
 void Game::deleteGameObject(GameObjectID id)
 {
@@ -41,7 +40,7 @@ void Game::deleteGameObject(GameObjectID id)
 
 int Game::run()
 {
-	auto window = sf::RenderWindow({ 1920u, 1080u }, "Playside EloomenateEngine!");
+	auto window = sf::RenderWindow({ 1920u, 1080u }, "Eloomenate Engine!");
 	window.setFramerateLimit(144);
 
 	eastl::chrono::high_resolution_clock clock;

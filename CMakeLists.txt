@@ -29,13 +29,15 @@ include_directories(${INCLUDE_DIRECTORIES})
 
 set(SOURCES
     "src/main.cpp"
-    "src/Game.cpp"
+    "src/Engine.cpp"
     "src/TankBot.cpp"
     "src/GameObject.cpp"
     "src/EventSystem.cpp"
     "src/PhysicsSystem.cpp"
     "src/StateMachine.cpp"
-    "src/Utilities.cpp" "src/Logging.cpp")
+    "src/Utilities.cpp"
+    "src/Logging.cpp"
+    "src/Game.cpp")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     #list(APPEND SOURCES)

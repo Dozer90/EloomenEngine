@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Generic/Generic.h"
+//#include "Generic/Generic.h"
 #include "Generic/TypeAliases.h"
 
 #include <SFML/System/Vector2.hpp>

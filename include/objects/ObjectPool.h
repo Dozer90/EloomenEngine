@@ -13,7 +13,7 @@ namespace eloo
 /// <summary>
 /// Object pool to recycle unused game objects
 /// </summary>
-template <typename TObject>
+template <typename TObject, ENABLE_TEMPLATE_IF_BASE_OF(GameObject, TObject)>
 class ObjectPool
 {
     using ObjectPtr = eastl::unique_ptr<TObject>;

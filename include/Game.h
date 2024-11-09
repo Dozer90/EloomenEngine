@@ -9,15 +9,9 @@
 
 namespace eloo
 {
-namespace Events { class EventSystem; }
-
 class Game
 {
 public:
-	Game();
-
-	int run();
-
 	template <typename TGameObject, ENABLE_TEMPLATE_IF_BASE_OF(GameObject, TGameObject)>
 	TGameObject& createGameObject()
 	{
