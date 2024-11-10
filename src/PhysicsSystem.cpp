@@ -3,6 +3,28 @@
 namespace eloo::Physics
 {
 
+PhysicsSystem::Chunk::Chunk(uint8_t allocSize)
+	: size(allocSize)
+{
+	inUse = eastl::make_unique<bool[]>(size);
+	xPosition = eastl::make_unique<double[]>(size);
+	yPosition = eastl::make_unique<double[]>(size);
+	xVelocity = eastl::make_unique<double[]>(size);
+	yVelocity = eastl::make_unique<double[]>(size);
+	xAcceleration = eastl::make_unique<double[]>(size);
+	yAcceleration = eastl::make_unique<double[]>(size);
+	xAngularVelocity = eastl::make_unique<double[]>(size);
+	yAngularVelocity = eastl::make_unique<double[]>(size);
+	xForce = eastl::make_unique<double[]>(size);
+	yForce = eastl::make_unique<double[]>(size);
+	mass = eastl::make_unique<double[]>(size);
+
+	for (uint8_t index = 0; index < size; ++index)
+	{
+		inUse[index] = false;
+	}
+}
+
 PhysicsSystem::PhysicsSystem(uint8_t chunkAllocSize, uint8_t initialChunkReserveCount)
 	: mChunkSize(chunkAllocSize)
 {
@@ -17,14 +39,22 @@ GameObjectID PhysicsSystem::requestID()
 	DataIndex dataIndex = getDataIndex(id);
 	Chunk& chunk = mChunks[chunkIndex];
 
+	// Ensure the data is not set to garbage
+	chunk.xPosition[dataIndex] = chunk.yPosition[dataIndex] = 0.0;
+	chunk.xVelocity[dataIndex] = chunk.yVelocity[dataIndex] = 0.0;
+	chunk.xAcceleration[dataIndex] = chunk.yAcceleration[dataIndex] = 0.0;
+	chunk.xAngularVelocity[dataIndex] = chunk.yAngularVelocity[dataIndex] = 0.0;
+	chunk.xForce[dataIndex] = chunk.yForce[dataIndex] = 0.0;
+	chunk.mass[dataIndex] = 1.0;
+
 	// Set this index to in use and see if it's now full
 	chunk.inUse[dataIndex] = true;
-	chunk.isFull = ++chunk.indicesInUse == ChunkSize;
+	chunk.isFull = ++chunk.indicesInUse == mChunkSize;
 
 	// If this chunk still has space, we need to find the next available index
 	if (!chunk.isFull) [[likely]]
 	{
-		while (++dataIndex < ChunkSize)
+		while (++dataIndex < mChunkSize)
 		{
 			if (chunk.inUse[dataIndex])
 			{
@@ -33,14 +63,14 @@ GameObjectID PhysicsSystem::requestID()
 
 			// We've found an unused index
 			chunk.firstUnusedIndex = dataIndex;
-			mFirstUnusedID = chunkIndex * ChunkSize + dataIndex;
+			mFirstUnusedID = chunkIndex * mChunkSize + dataIndex;
 			return id;
 		}
 	}
 
 	// This chunk is full, check for a free space in any others we have
 	// allocated after this one
-	chunk.firstUnusedIndex = ChunkSize;
+	chunk.firstUnusedIndex = mChunkSize;
 	while (++chunkIndex < mChunks.size())
 	{
 		if (mChunks[chunkIndex].isFull)
@@ -49,13 +79,13 @@ GameObjectID PhysicsSystem::requestID()
 		}
 
 		// Found a chunk with an unused index
-		mFirstUnusedID = chunkIndex * ChunkSize + mChunks[chunkIndex].firstUnusedIndex;
+		mFirstUnusedID = chunkIndex * mChunkSize + mChunks[chunkIndex].firstUnusedIndex;
 		return id;
 	}
 
 	// We have filled up all allocated chunks, we need a new one
-	mChunks.emplace_back();
-	mFirstUnusedID = chunkIndex * ChunkSize;
+	mChunks.emplace_back(mChunkSize);
+	mFirstUnusedID = chunkIndex * mChunkSize;
 	return id;
 }
 
@@ -65,15 +95,7 @@ void PhysicsSystem::retireID(GameObjectID id)
 	const DataIndex dataIndex = getDataIndex(id);
 	Chunk& chunk = mChunks[chunkIndex];
 
-	// Clear the data for this ID
 	chunk.inUse[dataIndex] = false;
-	chunk.xPosition[dataIndex] = chunk.yPosition[dataIndex] = 0.0;
-	chunk.xVelocity[dataIndex] = chunk.yVelocity[dataIndex] = 0.0;
-	chunk.xAcceleration[dataIndex] = chunk.yAcceleration[dataIndex] = 0.0;
-	chunk.xAngularVelocity[dataIndex] = chunk.yAngularVelocity[dataIndex] = 0.0;
-	chunk.xForce[dataIndex] = chunk.yForce[dataIndex] = 0.0;
-	chunk.mass[dataIndex] = 0.0;
-
 	chunk.isFull = false;
 	--chunk.indicesInUse;
 
@@ -82,7 +104,7 @@ void PhysicsSystem::retireID(GameObjectID id)
 	{
 		chunk.firstUnusedIndex = dataIndex;
 	}
-	const GameObjectID id = chunkIndex * ChunkSize + dataIndex;
+	const GameObjectID id = chunkIndex * mChunkSize + dataIndex;
 	if (mFirstUnusedID > id)
 	{
 		mFirstUnusedID = id;

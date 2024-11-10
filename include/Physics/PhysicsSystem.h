@@ -26,6 +26,7 @@ private:
 	struct Chunk
 	{
 		Chunk(uint8_t allocSize);
+
 		const uint8_t size;
 		DataIndex indicesInUse = 0;
 		DataIndex firstUnusedIndex = 0;
