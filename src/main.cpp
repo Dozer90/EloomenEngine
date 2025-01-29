@@ -1,6 +1,5 @@
 #include <Game.h>
 
-int main()
-{
+int main() {
     return eloo::Game().run();
 }

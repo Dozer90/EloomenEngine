@@ -3,11 +3,9 @@
 namespace std { class ofstream; }
 namespace std::filesystem { class path; }
 
-namespace eloo::Logging
-{
+namespace eloo::Logging {
 
-enum class LogType
-{
+enum class LogType {
     Debug,      // Debug messages
     Info,       // General information
     Trace,      // Detailed information
@@ -16,8 +14,7 @@ enum class LogType
     Fatal,      // Fatal errors
 };
 
-class Logger
-{
+class Logger {
 public:
     Logger(const std::filesystem::path& directory, const char* filename);
     ~Logger();

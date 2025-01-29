@@ -7,8 +7,7 @@
 
 using namespace eloo::Events;
 
-EventSystem::EventSystem(size_t initialEventReservationSize)
-{
+EventSystem::EventSystem(size_t initialEventReservationSize) {
     mHashQueueWrite.reserve(initialEventReservationSize);
     mHashQueueRead.reserve(initialEventReservationSize);
     mEventQueueWrite.reserve(initialEventReservationSize);
@@ -18,8 +17,7 @@ EventSystem::EventSystem(size_t initialEventReservationSize)
     mNotifyThread = std::thread(&EventSystem::notify, this);
 }
 
-EventSystem::~EventSystem()
-{
+EventSystem::~EventSystem() {
     {
         std::unique_lock<std::mutex> lock(mWriteMutex);
         mShutdown = true;
@@ -27,12 +25,10 @@ EventSystem::~EventSystem()
 
     mThreadWaitForUpdates.notify_all();
 
-    if (mNotifyThread.joinable())
-    {
+    if (mNotifyThread.joinable()) {
         mNotifyThread.join();
     }
-    if (mPollThread.joinable())
-    {
+    if (mPollThread.joinable()) {
         mPollThread.join();
     }
 
@@ -40,17 +36,14 @@ EventSystem::~EventSystem()
     // were not cleaned up properly
 }
 
-void EventSystem::poll()
-{
+void EventSystem::poll() {
     auto waitConditionPredecate = [this]() { return mShutdown || mHasEvents || !mEventQueueWrite.empty(); };
 
-    while (!mShutdown)
-    {
+    while (!mShutdown) {
         {
             std::unique_lock<std::mutex> uniqueLock(mWriteMutex);
             mThreadWaitForUpdates.wait(uniqueLock, waitConditionPredecate);
-            if (mShutdown)
-            {
+            if (mShutdown) {
                 return;
             }
 
@@ -66,24 +59,20 @@ void EventSystem::poll()
     }
 }
 
-void EventSystem::notify()
-{
+void EventSystem::notify() {
     auto waitConditionPredecate = [this]() { return mShutdown || !mEventQueueRead.empty(); };
 
-    while (!mShutdown)
-    {
+    while (!mShutdown) {
         eastl::unordered_map<EventHash, EventQueue> batchedEvents;
         {
             std::unique_lock<std::mutex> uniqueLock(mReadMutex);
             mThreadWaitForUpdates.wait(uniqueLock, waitConditionPredecate);
-            if (mShutdown)
-            {
+            if (mShutdown) {
                 return;
             }
 
             // Batch events
-            for (size_t index = 0; index < mEventQueueRead.size(); ++index)
-            {
+            for (size_t index = 0; index < mEventQueueRead.size(); ++index) {
                 batchedEvents[mHashQueueRead[index]].push_back(eastl::move(mEventQueueRead[index]));
             }
             mHashQueueRead.clear();
@@ -91,18 +80,14 @@ void EventSystem::notify()
         }
 
         // Call the subscribed events
-        for (auto& [hash, eventQueue] : batchedEvents)
-        {
+        for (auto& [hash, eventQueue] : batchedEvents) {
             auto& idsAndCallbacks = mSubscribedCallbacks[hash];
-            if (eventQueue.empty() || idsAndCallbacks.empty())
-            {
+            if (eventQueue.empty() || idsAndCallbacks.empty()) {
                 continue;
             }
 
-            for (auto& event : eventQueue)
-            {
-                for (auto& [_, callback] : idsAndCallbacks)
-                {
+            for (auto& event : eventQueue) {
+                for (auto& [_, callback] : idsAndCallbacks) {
                     callback(*event.get());
                 }
             }

@@ -1,12 +1,10 @@
 #pragma once
 
-namespace eloo
-{
-class Engine
-{
+namespace eloo {
+class Engine {
 public:
-	Engine();
+    Engine();
 
-	int run();
+    int run();
 };
 }

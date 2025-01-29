@@ -2,10 +2,8 @@
 
 using namespace eloo;
 
-void GameObject::init(GameObjectID id)
-{
-    if (mIsInitilized)
-    {
+void GameObject::init(GameObjectID id) {
+    if (mIsInitilized) {
         return;
     }
     mGameObjectID = id;
@@ -13,10 +11,8 @@ void GameObject::init(GameObjectID id)
     mIsInitilized = true;
 }
 
-void GameObject::cleanup()
-{
-    if (!mIsInitilized)
-    {
+void GameObject::cleanup() {
+    if (!mIsInitilized) {
         return;
     }
     onCleanup();

@@ -37,7 +37,7 @@ set(SOURCES
     "src/StateMachine.cpp"
     "src/Utilities.cpp"
     "src/Logging.cpp"
-    "src/Game.cpp")
+    "src/Game.cpp" "src/Easing.cpp" "src/ImGuiEx.cpp" "src/Maths/Matrix3x3.cpp")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     #list(APPEND SOURCES)

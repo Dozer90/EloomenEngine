@@ -14,48 +14,39 @@ using namespace eloo;
 Events::EventSystem Game::gEventSystem;
 
 Game::Game()
-	: mObjectPool(1000)
-{}
+    : mObjectPool(1000) {}
 
-void Game::deleteGameObject(GameObjectID id)
-{
-	if (mGameObjects.empty())
-	{
-		return;
-	}
+void Game::deleteGameObject(GameObjectID id) {
+    if (mGameObjects.empty()) {
+        return;
+    }
 
-	constexpr auto condition = [&](const GameObjectPtr& obj, GameObjectID id)
-	{
-		return obj->getID() < id;
-	};
-	GameObjectPtr* found = eastl::lower_bound(mGameObjects.begin(), mGameObjects.end(), id, condition);
-	if (found == mGameObjects.end() || (*found)->getID() != id)
-	{
-		return;
-	}
+    constexpr auto condition = [&](const GameObjectPtr& obj, GameObjectID id) {
+        return obj->getID() < id;
+    };
+    GameObjectPtr* found = eastl::lower_bound(mGameObjects.begin(), mGameObjects.end(), id, condition);
+    if (found == mGameObjects.end() || (*found)->getID() != id) {
+        return;
+    }
 
-	(*found)->cleanup();
-	mGameObjects.erase(found);
+    (*found)->cleanup();
+    mGameObjects.erase(found);
 }
 
-int Game::run()
-{
-	auto window = sf::RenderWindow({ 1920u, 1080u }, "Eloomenate Engine!");
-	window.setFramerateLimit(144);
+int Game::run() {
+    auto window = sf::RenderWindow({ 1920u, 1080u }, "Eloomenate Engine!");
+    window.setFramerateLimit(144);
 
-	eastl::chrono::high_resolution_clock clock;
+    eastl::chrono::high_resolution_clock clock;
 
-	while (window.isOpen())
-	{
-		for (auto event = sf::Event(); window.pollEvent(event);)
-		{
-			if (event.type == sf::Event::Closed)
-			{
-				window.close();
-			}
-		}
+    while (window.isOpen()) {
+        for (auto event = sf::Event(); window.pollEvent(event);) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            }
+        }
 
-		window.clear();
-		window.display();
-	}
+        window.clear();
+        window.display();
+    }
 }
