@@ -46,10 +46,22 @@ public:
     inline static Matrix4x4& rotate(float radians, const Vector3& axis, Matrix4x4& mat) { return (mat *= createRotation(radians, axis)); }
     inline static Matrix4x4& rotate(const Vector3& euler, Matrix4x4& mat)               { return (mat *= createRotation(euler)); }
 
+    static Matrix4x4 createView(const Vector3& viewOrigin, const Vector3& viewForward, const Vector3& worldUp);
     static Matrix4x4 createOrthographicProjection(const Vector3& boundMin, const Vector3& boundMax);
     static Matrix4x4 createPerspectiveProjection(float fov, float aspectRatio, float nearClip, float farClip);
     static Matrix4x4 createLookAt(const Vector3& from, const Vector3& to, const Vector3& upAxis);
     static Matrix4x4 createViewportTransformation();
+
+	inline MatrixRow getRow(uint8_t row) { return (*this)[row]; }
+	inline ConstMatrixRow getRow(uint8_t row) const { return (*this)[row]; }
+	inline MatrixRow getColumn(uint8_t col) {
+		ASSERT(col < 4, "Index out of range: Trying to access non-existant column %i in Matrix4x4", col);
+		return MatrixRow(&mData[col], 4);
+	}
+	inline ConstMatrixRow getColumn(uint8_t col) const {
+		ASSERT(col < 4, "Index out of range: Trying to access non-existant column %i in Matrix4x4", col);
+		return ConstMatrixRow(&mData[col], 4);
+	}
 
     inline float& get(uint8_t row, uint8_t col)             { return mData[row * 4 + col]; }
     inline const float& get(uint8_t row, uint8_t col) const { return mData[row * 4 + col]; }

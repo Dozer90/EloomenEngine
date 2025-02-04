@@ -71,6 +71,7 @@ const Matrix4x4& Matrix4x4::identity() {
 
 Matrix4x4 Matrix4x4::createTranslation(const Vector3& translation) {
     Matrix4x4 mat;
+    MatrixRow mRow = mat[0];
     mat[0][3] = translation.x;
     mat[1][3] = translation.y;
     mat[2][3] = translation.z;
@@ -107,6 +108,17 @@ Matrix4x4 Matrix4x4::createRotation(const Vector3& euler) {
         s.z,        c.z * c.x,  -s.x,       0.0f,
         -s.y,       s.x,        c.y * c.x,  0.0f,
         0.0f,       0.0f,       0.0f,       1.0f };
+}
+
+Matrix4x4 Matrix4x4::createView(const Vector3& viewOrigin, const Vector3& viewForward, const Vector3& worldUp) {
+	const Vector3& f = viewForward;
+	const Vector3 r = Vector3::normalize(Vector3::cross(f, worldUp));
+	const Vector3 u = Vector3::cross(r, f);
+	return {
+		r.x, u.x, -f.x, -Vector3::dot(viewOrigin, r),
+		r.y, u.y, -f.y, -Vector3::dot(viewOrigin, u),
+		r.z, u.z, -f.z, -Vector3::dot(viewOrigin, f),
+		0.0f, 0.0f, 0.0f, 1.0f };
 }
 
 Matrix4x4 Matrix4x4::createOrthographicProjection(const Vector3& boundMin, const Vector3& boundMax) {

@@ -5,14 +5,59 @@
 
 using namespace ImGuiEx;
 
+void Shapes::Line::Draw(Canvas& canvas) const {
+	if (mP1 == mP2 || mStyle.mBorderThickness <= 0.0f || Color(mStyle.mBorderColour).a <= 0.0f) {
+		return;
+	}
+
+	ImDrawList* drawList = canvas.GetDrawList();
+	ImVec2 offset = canvas.GetPosition();
+	drawList->AddLine(offset + mP1, offset + mP2, mStyle.mBorderColour, mStyle.mBorderThickness);
+}
+
+void Shapes::Path::Draw(Canvas& canvas) const {
+	if (mPoints.size() < 2 || mStyle.mBorderThickness <= 0.0f || Color(mStyle.mBorderColour).a <= 0.0f) {
+		return;
+	}
+
+	ImDrawList* drawList = canvas.GetDrawList();
+	ImVec2 offset = canvas.GetPosition();
+
+	for (eastl_size_t i = 0; i < mPoints.size() - 1; ++i) {
+		drawList->AddLine(offset + mPoints[i], offset + mPoints[i + 1], mStyle.mBorderColour, mStyle.mBorderThickness);
+	}
+}
+
 void Shapes::Triangle::Draw(Canvas& canvas) const {
 	ImDrawList* drawList = canvas.GetDrawList();
 	ImVec2 offset = canvas.GetPosition();
+	if (Color(mStyle.mFillColour).a > 0.0f) {
+		drawList->AddTriangleFilled(offset + mPoints[0], offset + mPoints[1], offset + mPoints[2], mStyle.mFillColour);
+	}
 	if (mStyle.mBorderThickness > 0.0f && Color(mStyle.mBorderColour).a > 0.0f) {
 		drawList->AddTriangle(offset + mPoints[0], offset + mPoints[1], offset + mPoints[2], mStyle.mBorderColour, mStyle.mBorderThickness);
 	}
+}
+
+void Shapes::Rectangle::Draw(Canvas& canvas) const {
+	ImDrawList* drawList = canvas.GetDrawList();
+	ImVec2 offset = canvas.GetPosition();
 	if (Color(mStyle.mFillColour).a > 0.0f) {
-		drawList->AddTriangleFilled(offset + mPoints[0], offset + mPoints[1], offset + mPoints[2], mStyle.mFillColour);
+		drawList->AddRectFilled(offset + mMin, offset + mMax, mStyle.mFillColour);
+	}
+	if (mStyle.mBorderThickness > 0.0f && Color(mStyle.mBorderColour).a > 0.0f) {
+		drawList->AddRectFilled(offset + mMin, offset + mMax, mStyle.mBorderColour, mStyle.mBorderThickness);
+	}
+}
+
+void Shapes::Ellipse::Draw(Canvas& canvas) const {
+	ImDrawList* drawList = canvas.GetDrawList();
+	ImVec2 offset = canvas.GetPosition();
+	if (Color(mStyle.mFillColour).a > 0.0f) {
+		drawList->AddEllipseFilled(offset + mMin, offset + mMax, mStyle.mFillColour);
+	}
+	if (mStyle.mBorderThickness > 0.0f && Color(mStyle.mBorderColour).a > 0.0f) {
+		drawList->AddRectFilled(offset + mMin, offset + mMax, mStyle.mBorderColour, mStyle.mBorderThickness);
 	}
 }
 

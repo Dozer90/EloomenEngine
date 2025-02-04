@@ -37,7 +37,7 @@ set(SOURCES
     "src/StateMachine.cpp"
     "src/Utilities.cpp"
     "src/Logging.cpp"
-    "src/Game.cpp" "src/Easing.cpp" "src/ImGuiEx.cpp" "src/Maths/Matrix3x3.cpp" "src/Maths/Vector2.cpp" "src/Maths/Vector3.cpp" "src/Maths/Quaternion.cpp" "src/Maths/Transform2D.cpp" "src/Maths/Matrix4x4.cpp" "src/Maths/Matrix2x2.cpp" "src/Maths/Transform3D.cpp")
+    "src/Game.cpp" "src/Easing.cpp" "src/ImGuiEx.cpp" "src/Maths/Matrix3x3.cpp" "src/Maths/Vector2.cpp" "src/Maths/Vector3.cpp" "src/Maths/Quaternion.cpp" "src/Maths/Transform2D.cpp" "src/Maths/Matrix4x4.cpp" "src/Maths/Matrix2x2.cpp" "src/Maths/Transform3D.cpp" "src/Camera.cpp")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     #list(APPEND SOURCES)

@@ -62,4 +62,41 @@ private:
     const float* const mValueStart;
     const uint8_t mLength;
 };
+
+
+struct MatrixColumn {
+	inline explicit MatrixColumn(float* firstColumnValue, uint8_t length) : mValueStart(firstColumnValue), mLength(length) {}
+	inline float& operator[](uint8_t index) {
+		ASSERT(index < mLength, "Index out of range: Trying to access non-existant row %i in a MatrixColumn", index);
+		return mValueStart[index * mLength];
+	}
+
+	// Swizzles
+	SWIZZLER_SET_1;
+	SWIZZLER_SET_2;
+	SWIZZLER_SET_3;
+	SWIZZLER_SET_4;
+
+private:
+	float* const mValueStart;
+	const uint8_t mLength;
+};
+
+struct ConstMatrixColumn {
+	inline explicit ConstMatrixColumn(const float* firstColumnValue, uint8_t length) : mValueStart(firstColumnValue), mLength(length) {}
+	inline const float& operator[](uint8_t index) const {
+		ASSERT(index < mLength, "Index out of range: Trying to access non-existant row %i in a MatrixColumn", index);
+		return mValueStart[index * mLength];
+	}
+
+	// Swizzles
+	SWIZZLER_SET_1;
+	SWIZZLER_SET_2;
+	SWIZZLER_SET_3;
+	SWIZZLER_SET_4;
+
+private:
+	const float* const mValueStart;
+	const uint8_t mLength;
+};
 } // eloo::Math
