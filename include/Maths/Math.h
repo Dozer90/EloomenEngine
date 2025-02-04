@@ -91,6 +91,13 @@ float fastSqrt(float v, uint16_t itterations = 1) {
 
 #pragma region Functions
 
+bool isEqual(ldouble lhs, ldouble rhs) { return abs(lhs - rhs) <= Consts::ld::Epsilon; }
+bool isEqual(double lhs, double rhs) { return abs(lhs - rhs) <= Consts::d::Epsilon; }
+bool isEqual(float lhs, float rhs) { return abs(lhs - rhs) <= Consts::f::Epsilon; }
+bool isZero(ldouble value) { return isEqual(value, 0.0L); }
+bool isZero(double value) { return isEqual(value, 0.0); }
+bool isZero(float value) { return isEqual(value, 0.0f); }
+
 NUMERIC_TEMPLATE abs(T value) { return std::abs(value); }
 
 NUMERIC_TEMPLATE log(T value) { return std::abs(value); }

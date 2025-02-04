@@ -1,6 +1,8 @@
 #include <Maths/Matrix3x3.h>
 
-#include <Maths/Maths.h>
+#include <Maths/Math.h>
+#include <Maths/Matrix2x2.h>
+#include <Maths/Matrix4x4.h>
 #include <Maths/Vector2.h>
 #include <Maths/Vector3.h>
 
@@ -9,146 +11,94 @@
 using namespace eloo::Math;
 
 namespace {
-const Matrix3x3 gZeroMatrix3x3 = Matrix3x3() * 0;
+static constexpr Matrix3x3 gZero(0.0f);
+static constexpr Matrix3x3 gOne(1.0f);
+static constexpr Matrix3x3 gIdentity;
 }
 
-Matrix3x3::Matrix3x3(const Vector2& scalar, float rotRadians, const Vector2& translation) {
-    scale(scalar.x, scalar.y, *this);
-    rotate(rotRadians, *this);
-    translate(translation, *this);
-}
-
-Matrix3x3::Matrix3x3(std::initializer_list<float> data) {
-    if (data.size() == 1) {
-        eastl::fill(mData.begin(), mData.end(), *data.begin());
-        return;
+Matrix3x3::Matrix3x3(const Matrix4x4& m, uint8_t row, uint8_t col) {
+    uint8_t i = 0;
+    for (uint8_t r = 0; r < 4; ++r) {
+        if (r == row) continue;
+        for (uint8_t c = 0; c < 4; ++c) {
+            if (c == col) continue;
+            mData[i++] = m[r][c];
+        }
     }
-    if (data.size() == 9) {
-        eastl::copy(data.begin(), data.end(), mData.begin());
-        return;
+}
+
+Matrix3x3 Matrix3x3::transpose(const Matrix3x3& mat) {
+    return {
+        mat[0][0], mat[1][0], mat[2][0],
+        mat[0][1], mat[1][1], mat[2][1],
+        mat[0][2], mat[1][2], mat[2][2],
+    };
+}
+
+float Matrix3x3::determinant() const {
+    return get(0,0) * (get(1,1) * get(2,2) - get(1,2) * get(2,1)) -
+           get(0,1) * (get(1,0) * get(2,2) - get(1,2) * get(2,0)) +
+           get(0,2) * (get(1,0) * get(2,1) - get(1,1) * get(2,0));
+}
+
+Matrix3x3 Matrix3x3::cofactor() const {
+    Matrix3x3 cofactorMatrix;
+    for (uint8_t r = 0; r < 3; ++r) {
+        for (uint8_t c = 0; c < 3; ++c) {
+            cofactorMatrix[r][c] = Matrix2x2(*this, r, c).determinant();
+        }
     }
-    ASSERT_FALSE("Initilizer list for 'Matrix3x3' is not 1 or 9 in length. Cannot set values properly.");
+    return cofactorMatrix;
 }
 
-constexpr Matrix3x3 Matrix3x3::zero() {
-    return Matrix3x3()
+Matrix3x3 Matrix3x3::adjugate() const {
+    return transpose(cofactor());
 }
 
-Matrix3x3 Matrix3x3::createTranslation(float x, float y) {
+Matrix3x3 Matrix3x3::inverse(const Matrix3x3& mat) {
+    const float det = mat.determinant();
+    if (isEqual(det, 0.0f)) {
+        return gZero;
+    }
+    return mat.adjugate() * (1.0f / det);
+}
+
+const Matrix3x3& Matrix3x3::zero() {
+    return gZero;
+}
+
+const Matrix3x3& Matrix3x3::one() {
+    return gOne;
+}
+
+const Matrix3x3& Matrix3x3::identity() {
+    return gIdentity;
+}
+
+Matrix3x3 Matrix3x3::createTranslation(const Vector2& translation) {
     Matrix3x3 mat;
-    mat.m13 = x;
-    mat.m23 = y;
+    mat[0][2] = translation.x;
+    mat[1][2] = translation.y;
     return mat;
 }
 
-Matrix3x3 Matrix3x3::createScale(float x, float y) {
+Matrix3x3 Matrix3x3::createScale(const Vector2& scales) {
     Matrix3x3 mat;
-    mat.m11 = x;
-    mat.m22 = y;
+    mat[0][0] = scales.x;
+    mat[1][1] = scales.y;
     return mat;
 }
 
 Matrix3x3 Matrix3x3::createRotation(float radians) {
     Matrix3x3 mat;
-    mat.m11 = cos(radians);  mat.m12 = -sin(radians);
-    mat.m21 = sin(radians);  mat.m22 = cos(radians);
+    mat[0][0] = cos(radians);  mat[0][1] = -sin(radians);
+    mat[1][0] = sin(radians);  mat[1][1] = cos(radians);
     return mat;
 }
 
-Matrix3x3 Matrix3x3::createShear(float x, float y) {
+Matrix3x3 Matrix3x3::createShear(const Vector2& shearing) {
     Matrix3x3 mat;
-    mat.m12 = x;
-    mat.m21 = y;
+    mat[0][1] = shearing.x;
+    mat[1][0] = shearing.y;
     return mat;
-}
-
-bool Matrix3x3::operator!=(const Matrix3x3& lhs, const Matrix3x3& rhs) {
-    static constexpr size_t sizeOfFloat = sizeof(float);
-    for (size_t i = 0; i < sizeOfFloat * 9; i += sizeOfFloat) {
-        if (abs(*(&lhs.m11 + i) - *(&rhs.m11 + i)) > FLT_EPSILON) {
-            return true;
-        }
-    }
-    return false;
-}
-
-Matrix3x3 Matrix3x3::operator*(const Matrix3x3& lhs, const Matrix3x3& rhs) {
-    Matrix3x3 mat = lhs;
-    mat.m11 *= rhs.m11; mat.m12 *= rhs.m12; mat.m13 *= rhs.m13;
-    mat.m21 *= rhs.m21; mat.m22 *= rhs.m22; mat.m23 *= rhs.m23;
-    mat.m31 *= rhs.m31; mat.m32 *= rhs.m32; mat.m33 *= rhs.m33;
-    return mat;
-}
-
-Matrix3x3 Matrix3x3::operator*(const Matrix3x3& mat, float scalar) {
-    Matrix3x3 matOut = mat;
-    if (scalar == 0) {
-        return zero();
-    }
-    if (scalar == 1) {
-        return matOut;
-    }
-    matOut.m11 *= scalar; matOut.m12 *= scalar; matOut.m13 *= scalar;
-    matOut.m21 *= scalar; matOut.m22 *= scalar; matOut.m23 *= scalar;
-    matOut.m31 *= scalar; matOut.m32 *= scalar; matOut.m33 *= scalar;
-    return matOut;
-}
-
-Matrix3x3 Matrix3x3::operator*(const Matrix3x3& mat, int scalar) {
-    Matrix3x3 matOut = mat;
-    if (scalar == 0) {
-        return zero();
-    }
-    if (scalar == 1) {
-        return matOut;
-    }
-    matOut.m11 *= scalar; matOut.m12 *= scalar; matOut.m13 *= scalar;
-    matOut.m21 *= scalar; matOut.m22 *= scalar; matOut.m23 *= scalar;
-    matOut.m31 *= scalar; matOut.m32 *= scalar; matOut.m33 *= scalar;
-    return matOut;
-}
-
-Vector2 Matrix3x3::operator*(const Vector2& v, const Matrix3x3& mat) {
-    Vector2 vOut;
-    vOut.x = mat.m11 * v.x + mat.m12 * v.y + mat.m13;
-    vOut.y = mat.m21 * v.x + mat.m22 * v.y + mat.m23;
-    return v;
-}
-
-Vector3 Matrix3x3::operator*(const Vector3& v, const Matrix3x3& mat) {
-    Vector3 vOut;
-    vOut.x = mat.m11 * v.x + mat.m12 * v.y + mat.m13;
-    vOut.y = mat.m21 * v.x + mat.m22 * v.y + mat.m23;
-    vOut.z = mat.m31 * v.x + mat.m32 * v.y + mat.m33;
-    return v;
-}
-
-Matrix3x3 Matrix3x3::operator+(const Matrix3x3& rhs) {
-    Matrix3x3 mat;
-    mat.m11 = m11 + rhs.m11;  mat.m12 = m12 + rhs.m12;  mat.m13 = m13 + rhs.m13;
-    mat.m21 = m21 + rhs.m21;  mat.m22 = m22 + rhs.m22;  mat.m23 = m23 + rhs.m23;
-    mat.m31 = m31 + rhs.m31;  mat.m32 = m32 + rhs.m32;  mat.m33 = m33 + rhs.m33;
-    return mat;
-}
-
-Matrix3x3& Matrix3x3::operator+=(const Matrix3x3& rhs) {
-    m11 += rhs.m11;  m12 += rhs.m12;  m13 += rhs.m13;
-    m21 += rhs.m21;  m22 += rhs.m22;  m23 += rhs.m23;
-    m31 += rhs.m31;  m32 += rhs.m32;  m33 += rhs.m33;
-    return *this;
-}
-
-Matrix3x3 Matrix3x3::operator-(const Matrix3x3& rhs) {
-    Matrix3x3 mat;
-    mat.m11 = m11 - rhs.m11;  mat.m12 = m12 - rhs.m12;  mat.m13 = m13 - rhs.m13;
-    mat.m21 = m21 - rhs.m21;  mat.m22 = m22 - rhs.m22;  mat.m23 = m23 - rhs.m23;
-    mat.m31 = m31 - rhs.m31;  mat.m32 = m32 - rhs.m32;  mat.m33 = m33 - rhs.m33;
-    return mat;
-}
-
-Matrix3x3& Matrix3x3::operator-=(const Matrix3x3& rhs) {
-    m11 -= rhs.m11;  m12 -= rhs.m12;  m13 -= rhs.m13;
-    m21 -= rhs.m21;  m22 -= rhs.m22;  m23 -= rhs.m23;
-    m31 -= rhs.m31;  m32 -= rhs.m32;  m33 -= rhs.m33;
-    return *this;
 }

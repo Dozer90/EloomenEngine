@@ -57,20 +57,25 @@ public:
     // =========================================================================================
     // Operation overloads
 
-    inline bool operator!=(const Vector3& rhs) const { return x != rhs.x || y != rhs.y || z != rhs.z; }
-    inline bool operator==(const Vector3& rhs) const { return !(*this != rhs); }
+    inline friend bool operator!=(const Vector3& lhs, const Vector3& rhs)    { return lhs.x != rhs.x && lhs.y != lhs.y && lhs.z != rhs.z; }
+    inline friend bool operator==(const Vector3& lhs, const Vector3& rhs)    { return !(lhs != rhs); }
 
-    inline Vector3 operator-() const { return { -x, -y, -z }; }
+    inline friend Vector3 operator-(const Vector3& v)                        { return { -v.x, -v.y, -v.z }; }
 
-    inline Vector3 operator+(const Vector3& rhs) const { return { x + rhs.x, y + rhs.y, z + rhs.z }; }
-    inline Vector3 operator-(const Vector3& rhs) const { return { x - rhs.x, y - rhs.y, z - rhs.z }; }
-    inline Vector3 operator*(const float scalar) const { return { x * scalar, y * scalar, z * scalar }; }
-    inline Vector3 operator/(const float scalar) const { return { x / scalar, y / scalar, z / scalar }; }
+    inline friend Vector3 operator-(const Vector3& lhs, const Vector3& rhs)  { return { lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z }; }
+    inline friend Vector3 operator-(const Vector3& lhs, float value)         { return { lhs.x - value, lhs.y - value, lhs.z - value }; }
+    inline friend Vector3 operator+(const Vector3& lhs, const Vector3& rhs)  { return { lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z }; }
+    inline friend Vector3 operator+(const Vector3& lhs, float value)         { return { lhs.x + value, lhs.y + value, lhs.z + value }; }
+    inline friend Vector3 operator*(const Vector3& lhs, const Vector3& rhs)  { return { lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z }; }
+    inline friend Vector3 operator*(const Vector3& lhs, float value)         { return { lhs.x * value, lhs.y * value, lhs.z * value }; }
+    inline friend Vector3 operator/(const Vector3& lhs, const Vector3& rhs)  { return { lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z }; }
+    inline friend Vector3 operator/(const Vector3& lhs, float value)         { return { lhs.x / value, lhs.y / value, lhs.z / value }; }
 
-    inline Vector3& operator+=(const Vector3& rhs) { return (*this = *this + rhs); }
-    inline Vector3& operator-=(const Vector3& rhs) { return (*this = *this - rhs); }
-    inline Vector3& operator*=(const float scalar) { return (*this = *this * scalar); }
-    inline Vector3& operator/=(const float scalar) { return (*this = *this / scalar); }
+    inline Vector3& operator-()                                              { return (*this = { -x, -y, -z }); }
+    inline Vector3& operator+=(const Vector3& rhs)                           { return (*this = *this + rhs); }
+    inline Vector3& operator-=(const Vector3& rhs)                           { return (*this = *this - rhs); }
+    inline Vector3& operator*=(float value)                                  { return (*this = *this * value); }
+    inline Vector3& operator/=(float value)                                  { return (*this = *this / value); }
 
 public:
     float x, y, z;

@@ -50,20 +50,25 @@ public:
     // =========================================================================================
     // Operation overloads
 
-    inline bool operator!=(const Vector2& rhs) const { return x != rhs.x || y != rhs.y; }
-    inline bool operator==(const Vector2& rhs) const { return !(*this != rhs); }
+    inline friend bool operator!=(const Vector2& lhs, const Vector2& rhs)    { return lhs.x != rhs.x && lhs.y != lhs.y; }
+    inline friend bool operator==(const Vector2& lhs, const Vector2& rhs)    { return !(lhs != rhs); }
 
-    inline Vector2 operator-() const { return { -x, -y }; }
+    inline friend Vector2 operator-(const Vector2& v)                        { return { -v.x, -v.y }; }
 
-    inline Vector2 operator+(const Vector2& rhs) const { return { x + rhs.x, y + rhs.y }; }
-    inline Vector2 operator-(const Vector2& rhs) const { return { x - rhs.x, y - rhs.y }; }
-    inline Vector2 operator*(const float scalar) const { return { x * scalar, y * scalar }; }
-    inline Vector2 operator/(const float scalar) const { return { x / scalar, y / scalar }; }
+    inline friend Vector2 operator-(const Vector2& lhs, const Vector2& rhs)  { return { lhs.x - rhs.x, lhs.y - rhs.y }; }
+    inline friend Vector2 operator-(const Vector2& lhs, float value)         { return { lhs.x - value, lhs.y - value }; }
+    inline friend Vector2 operator+(const Vector2& lhs, const Vector2& rhs)  { return { lhs.x + rhs.x, lhs.y + rhs.y }; }
+    inline friend Vector2 operator+(const Vector2& lhs, float value)         { return { lhs.x + value, lhs.y + value }; }
+    inline friend Vector2 operator*(const Vector2& lhs, const Vector2& rhs)  { return { lhs.x * rhs.x, lhs.y * rhs.y }; }
+    inline friend Vector2 operator*(const Vector2& lhs, float value)         { return { lhs.x * value, lhs.y * value }; }
+    inline friend Vector2 operator/(const Vector2& lhs, const Vector2& rhs)  { return { lhs.x / rhs.x, lhs.y / rhs.y }; }
+    inline friend Vector2 operator/(const Vector2& lhs, float value)         { return { lhs.x / value, lhs.y / value }; }
 
-    inline Vector2& operator+=(const Vector2& rhs) { return (*this = *this + rhs); }
-    inline Vector2& operator-=(const Vector2& rhs) { return (*this = *this - rhs); }
-    inline Vector2& operator*=(const float scalar) { return (*this = *this * scalar); }
-    inline Vector2& operator/=(const float scalar) { return (*this = *this / scalar); }
+    inline Vector2& operator-()                                              { return (*this = { -x, -y }); }
+    inline Vector2& operator+=(const Vector2& rhs)                           { return (*this = *this + rhs); }
+    inline Vector2& operator-=(const Vector2& rhs)                           { return (*this = *this - rhs); }
+    inline Vector2& operator*=(float value)                                  { return (*this = *this * value); }
+    inline Vector2& operator/=(float value)                                  { return (*this = *this / value); }
 
 public:
     float x, y;

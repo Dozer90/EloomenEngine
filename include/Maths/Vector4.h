@@ -70,6 +70,6 @@ public:
     inline Vector4& operator/=(const float scalar) { return (*this = *this / scalar); }
 
 public:
-    float x, y, z;
+    float x, y, z, w;
 };
 }; // namespace Math
