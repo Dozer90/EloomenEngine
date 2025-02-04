@@ -5,6 +5,42 @@
 #else
 #define IMGUI_MUTABLE
 
+#define IM_VEC2_CLASS_EXTRA \
+inline friend ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs) { return { lhs.x + rhs.x, lhs.y + rhs.y }; } \
+inline friend ImVec2 operator-(const ImVec2& lhs, const ImVec2& rhs) { return { lhs.x - rhs.x, lhs.y - rhs.y }; } \
+inline friend ImVec2 operator*(const ImVec2& lhs, const ImVec2& rhs) { return { lhs.x * rhs.x, lhs.y * rhs.y }; } \
+inline friend ImVec2 operator/(const ImVec2& lhs, const ImVec2& rhs) { return { lhs.x / rhs.x, lhs.y / rhs.y }; } \
+inline friend ImVec2 operator+(const ImVec2& v, float f) { return { v.x + f, v.y + f }; } \
+inline friend ImVec2 operator-(const ImVec2& v, float f) { return { v.x - f, v.y - f }; } \
+inline friend ImVec2 operator*(const ImVec2& v, float f) { return { v.x * f, v.y * f }; } \
+inline friend ImVec2 operator/(const ImVec2& v, float f) { return { v.x / f, v.y / f }; } \
+inline ImVec2& operator+=(const ImVec2& v) { return (*this = *this + v); } \
+inline ImVec2& operator-=(const ImVec2& v) { return (*this = *this - v); } \
+inline ImVec2& operator*=(const ImVec2& v) { return (*this = *this * v); } \
+inline ImVec2& operator/=(const ImVec2& v) { return (*this = *this / v); } \
+inline ImVec2& operator+=(float f) { return (*this = *this + f); } \
+inline ImVec2& operator-=(float f) { return (*this = *this - f); } \
+inline ImVec2& operator*=(float f) { return (*this = *this * f); } \
+inline ImVec2& operator/=(float f) { return (*this = *this / f); }
+
+#define IM_VEC4_CLASS_EXTRA \
+inline friend ImVec4 operator+(const ImVec4& lhs, const ImVec4& rhs) { return { lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, lhs.w + rhs.w }; } \
+inline friend ImVec4 operator-(const ImVec4& lhs, const ImVec4& rhs) { return { lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, lhs.w - rhs.w }; } \
+inline friend ImVec4 operator*(const ImVec4& lhs, const ImVec4& rhs) { return { lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z, lhs.w * rhs.w }; } \
+inline friend ImVec4 operator/(const ImVec4& lhs, const ImVec4& rhs) { return { lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z, lhs.w / rhs.w }; } \
+inline friend ImVec4 operator+(const ImVec4& v, float f) { return { v.x + f, v.y + f, v.z + f, v.w + f }; } \
+inline friend ImVec4 operator-(const ImVec4& v, float f) { return { v.x - f, v.y - f, v.z - f, v.w - f }; } \
+inline friend ImVec4 operator*(const ImVec4& v, float f) { return { v.x * f, v.y * f, v.z * f, v.w * f }; } \
+inline friend ImVec4 operator/(const ImVec4& v, float f) { return { v.x / f, v.y / f, v.z / f, v.w / f }; } \
+inline ImVec4& operator+=(const ImVec4& v) { return (*this = *this + v); } \
+inline ImVec4& operator-=(const ImVec4& v) { return (*this = *this - v); } \
+inline ImVec4& operator*=(const ImVec4& v) { return (*this = *this * v); } \
+inline ImVec4& operator/=(const ImVec4& v) { return (*this = *this / v); } \
+inline ImVec4& operator+=(float f) { return (*this = *this + f); } \
+inline ImVec4& operator-=(float f) { return (*this = *this - f); } \
+inline ImVec4& operator*=(float f) { return (*this = *this * f); } \
+inline ImVec4& operator/=(float f) { return (*this = *this / f); }
+
 #include "imgui.h"
 
 #include "EASTL/array.h"
@@ -56,6 +92,19 @@ void Tooltip(const char* fmt, ...);
 void DisplayTooltip(const char* fmt, ...);
 
 void DrawTooltipNotification();
+
+constexpr float ONE_DIV_TWO_FIFTY_FIVE = 1.0f / 255.0f;
+
+struct Color {
+    Color(ImU32 imguiColor)
+		: r(static_cast<float>((imguiColor >> IM_COL32_R_SHIFT) & 0xFF) * ONE_DIV_TWO_FIFTY_FIVE)
+		, g(static_cast<float>((imguiColor >> IM_COL32_G_SHIFT) & 0xFF) * ONE_DIV_TWO_FIFTY_FIVE)
+		, b(static_cast<float>((imguiColor >> IM_COL32_B_SHIFT) & 0xFF) * ONE_DIV_TWO_FIFTY_FIVE)
+		, a(static_cast<float>((imguiColor >> IM_COL32_A_SHIFT) & 0xFF) * ONE_DIV_TWO_FIFTY_FIVE) {}
+    float r, g, b, a;
+};
+
+
 
 /// <summary>
 /// Helper class designed to prevent duplicated IDs when working with ImGui elements. The ID
@@ -140,12 +189,31 @@ public:
 
     virtual void CheckIntersection(const ImVec2& point, bool inclusive) const = 0;
 
+protected:
     virtual void Update(const float deltaTime) {}
-    virtual void Draw() const = 0;
+    virtual void Draw(Canvas& canvas) const = 0;
 
-private:
+protected:
     Style mStyle;
     Transform mTransform;
+};
+
+// ==================================================
+//  Canvas
+// ==================================================
+class Canvas {
+public:
+	explicit Canvas(ImVec2 size) : mPos(ImGui::GetCursorScreenPos()), mSize(size) {}
+
+	inline ImDrawList* GetDrawList() const { return ImGui::GetWindowDrawList(); }
+	inline const ImVec2& GetPosition() const { return mPos; }
+
+	void Update(const float deltaTime);
+	void Draw() const;
+
+private:
+	ImVec2 mPos, mSize;
+	eastl::vector<Shape> mShapes;
 };
 
 // ==================================================
@@ -165,8 +233,9 @@ public:
 
     virtual void CheckIntersection(const ImVec2& point, bool inclusive) const override;
 
+protected:
     virtual void Update(const float deltaTime) override;
-    virtual void Draw() const override;
+    virtual void Draw(Canvas& canvas) const override;
 
 private:
     ImVec2 mP1, mP2;
@@ -193,8 +262,9 @@ public:
 
     virtual void CheckIntersection(const ImVec2& point, bool inclusive) const override;
 
+protected:
     virtual void Update(const float deltaTime) override;
-    virtual void Draw() const override;
+    virtual void Draw(Canvas& canvas) const override;
 
 private:
     eastl::vector<ImVec2> mPoints;
@@ -205,23 +275,25 @@ private:
 // ==================================================
 class Triangle : public Shape {
 public:
-    Triangle() : mP1(0.0f, 0.0f), mP2(0.0f, 0.0f) {}
-    Triangle(const ImVec2& p1, const ImVec2& p2) : mP1(p1), mP2(p2) {}
+    inline Triangle() : mPoints({ImVec2{ 0.0f, 0.0f }}) {}
+    inline Triangle(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3) : mPoints({p1, p2, p3}){}
 
-    void SetPoints(const ImVec2& p1, const ImVec2& p2);
-    inline void SetPoint1(const ImVec2& p) { mP1 = p; }
-    inline void SetPoint2(const ImVec2& p) { mP2 = p; }
+    inline void SetPoints(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3) { mPoints = { p1, p2, p3 }; }
+    inline void SetPoint1(const ImVec2& p) { mPoints[0] = p; }
+	inline void SetPoint2(const ImVec2& p) { mPoints[1] = p; }
+	inline void SetPoint3(const ImVec2& p) { mPoints[2] = p; }
 
 public:
     inline virtual Type GetType() const override { return Type::Line; }
 
     virtual void CheckIntersection(const ImVec2& point, bool inclusive) const override;
 
+protected:
     virtual void Update(const float deltaTime) override;
-    virtual void Draw() const override;
+    virtual void Draw(Canvas& canvas) const override;
 
 private:
-    ImVec2 mP1, mP2;
+    eastl::array<ImVec2, 3> mPoints;
 };
 
 // ==================================================
@@ -242,8 +314,9 @@ public:
 
     virtual void CheckIntersection(const ImVec2& point, bool inclusive) const override;
 
+protected:
     virtual void Update(const float deltaTime) override;
-    virtual void Draw() const override;
+    virtual void Draw(Canvas& canvas) const override;
 
 private:
     ImVec2 mMin = ImVec2(0.0f, 0.0f);
@@ -264,33 +337,17 @@ public:
 
     virtual void CheckIntersection(const ImVec2& point, bool inclusive) const override;
 
+protected:
     virtual void Update(const float deltaTime) override;
-    virtual void Draw() const override;
+    virtual void Draw(Canvas& canvas) const override;
 
 private:
     ImVec2 mSize = ImVec2(0.0f, 0.0f);
     ImVec2 mOrigin = ImVec2(0.0f, 0.0f);
 };
 
-
-class Canvas {
-public:
-    explicit Canvas(ImVec2 size)
-        : mSize(size) {}
-
-
-
-    void Update(const float deltaTime);
-    //ImDrawList* drawList = ImGui::GetWindowDrawList();
-    void Draw() const;
-
-private:
-    ImVec2 mSize;
-    eastl::vector<Shape> mShapes;
-};
-
-
-
+#pragma region Old code
+#if 0
 /*
 All shapes will need to derive from ShapeBase. It holds a basic set of functions for defining a
 boundary box, setting/getting the size, scaling, and checking if a point is within it. There
@@ -715,6 +772,8 @@ protected:
         Ellipse::DrawBorderImpl(pDrawList, visualMin, visualMax);
     }
 };
+#endif
+#pragma endregion
 }
 }
 #endif

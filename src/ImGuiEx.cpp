@@ -1,9 +1,23 @@
 #include "Generic/ImGuiEx.h"
 
 #if defined(IMGUI_IS_ENABLED)
-#include "EASTL/vector.h"
+#include <EASTL/vector.h>
 
-namespace ImGuiEx {
+using namespace ImGuiEx;
+
+void Shapes::Triangle::Draw(Canvas& canvas) const {
+	ImDrawList* drawList = canvas.GetDrawList();
+	ImVec2 offset = canvas.GetPosition();
+	if (mStyle.mBorderThickness > 0.0f && Color(mStyle.mBorderColour).a > 0.0f) {
+		drawList->AddTriangle(offset + mPoints[0], offset + mPoints[1], offset + mPoints[2], mStyle.mBorderColour, mStyle.mBorderThickness);
+	}
+	if (Color(mStyle.mFillColour).a > 0.0f) {
+		drawList->AddTriangleFilled(offset + mPoints[0], offset + mPoints[1], offset + mPoints[2], mStyle.mFillColour);
+	}
+}
+
+#pragma region Old code
+#if 0
 namespace {
 constexpr float TOOLTIP_TEXT_WRAP_PADDING = 10.f;
 
@@ -504,5 +518,7 @@ bool Shapes::Ellipse::Contains(const ImVec2& point, bool inclusiveCheck) const {
 	}
 	return (x2 / (r.x * r.x)) + (y2 / (r.y * r.y)) < 1.f;
 }
-}
+#endif
+#pragma endregion
+
 #endif // defined(FXS_ENABLE_IMGUI)
