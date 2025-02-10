@@ -1,28 +1,25 @@
 #pragma once
 
+#include <Maths/float3.h>
 #include <Maths/Quaternion.h>
 
 namespace eloo::Math {
-class Vector3;
-class Quaternion;
-class Matrix4x4;
-
 class Transform3D {
 public:
-	Vector3 forward() const;
-	Vector3 right() const;
-	Vector3 up() const;
+	float3 forward() const;
+	float3 right() const;
+	float3 up() const;
 
-	Vector3& position() { return mPosition; }
-	Quaternion& rotation() { return mRotation; }
-	Vector3& scale() { return mScale; }
-	const Vector3& position() const { return mPosition; }
-	const Quaternion& rotation() const { return mRotation; }
-	const Vector3& scale() const { return mScale; }
+	float3& position()                 { return mPosition; }
+	const float3& position() const     { return mPosition; }
+	Quaternion& rotation()              { return mRotation; }
+	const Quaternion& rotation() const  { return mRotation; }
+	float3& scale()                    { return mScale; }
+	const float3& scale() const        { return mScale; }
 
 private:
-    Vector3 mPosition;
+    float3 mPosition;
     Quaternion mRotation;
-    Vector3 mScale;
+    float3 mScale;
 };
 } // eloo::Math

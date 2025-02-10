@@ -3,7 +3,7 @@
 //#include "Generic/Generic.h"
 #include "Generic/TypeAliases.h"
 
-#include <SFML/System/Vector2.hpp>
+#include <SFML/System/float2.hpp>
 
 #include <EASTL/array.h>
 #include <EASTL/vector.h>
@@ -60,23 +60,23 @@ public:
 
     void update(const double deltaTime);
 
-    sf::Vector2<double> getPosition(GameObjectID id) const;
-    sf::Vector2<double> getVelocity(GameObjectID id) const;
-    sf::Vector2<double> getAcceleration(GameObjectID id) const;
+    sf::float2<double> getPosition(GameObjectID id) const;
+    sf::float2<double> getVelocity(GameObjectID id) const;
+    sf::float2<double> getAcceleration(GameObjectID id) const;
     double getMass(GameObjectID id) const;
 
-    void setPosition(GameObjectID id, const sf::Vector2<double>& position);
-    void setVelocity(GameObjectID id, const sf::Vector2<double>& velocity);
-    void setAcceleration(GameObjectID id, const sf::Vector2<double>& acceleration);
+    void setPosition(GameObjectID id, const sf::float2<double>& position);
+    void setVelocity(GameObjectID id, const sf::float2<double>& velocity);
+    void setAcceleration(GameObjectID id, const sf::float2<double>& acceleration);
     void setMass(GameObjectID id, double mass);
 
-    void applyForce(GameObjectID id, const sf::Vector2<double>& force);
+    void applyForce(GameObjectID id, const sf::float2<double>& force);
     void clearForce(GameObjectID id);
-    void applyImpulse(GameObjectID id, const sf::Vector2<double>& impulse);
+    void applyImpulse(GameObjectID id, const sf::float2<double>& impulse);
     void applyDamping(GameObjectID id, double dampingStrength);
 
     double getKineticEnergy(GameObjectID id) const;
-    sf::Vector2<double> getMomentum(GameObjectID id) const;
+    sf::float2<double> getMomentum(GameObjectID id) const;
 
 private:
     inline ChunkIndex getChunkIndex(GameObjectID id) const {

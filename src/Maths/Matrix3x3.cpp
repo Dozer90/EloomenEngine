@@ -3,16 +3,16 @@
 #include <Maths/Math.h>
 #include <Maths/Matrix2x2.h>
 #include <Maths/Matrix4x4.h>
-#include <Maths/Vector2.h>
-#include <Maths/Vector3.h>
+#include <Maths/float2.h>
+#include <Maths/float3.h>
 
 #include <Generic/Utilities.h>
 
 using namespace eloo::Math;
 
 namespace {
-static constexpr Matrix3x3 gZero(0.0f);
-static constexpr Matrix3x3 gOne(1.0f);
+static constexpr Matrix3x3 gZero({ 0.0f }, { 0.0f }, { 0.0f });
+static constexpr Matrix3x3 gOne({ 1.0f }, { 1.0f }, { 1.0f });
 static constexpr Matrix3x3 gIdentity;
 }
 
@@ -22,23 +22,31 @@ Matrix3x3::Matrix3x3(const Matrix4x4& m, uint8_t row, uint8_t col) {
         if (r == row) continue;
         for (uint8_t c = 0; c < 4; ++c) {
             if (c == col) continue;
-            mData[i++] = m[r][c];
+            data[i++] = m[r][c];
         }
     }
 }
 
-Matrix3x3 Matrix3x3::transpose(const Matrix3x3& mat) {
-    return {
-        mat[0][0], mat[1][0], mat[2][0],
-        mat[0][1], mat[1][1], mat[2][1],
-        mat[0][2], mat[1][2], mat[2][2],
-    };
+const Matrix3x3& Matrix3x3::zero() {
+    return gZero;
+}
+
+const Matrix3x3& Matrix3x3::one() {
+    return gOne;
+}
+
+const Matrix3x3& Matrix3x3::identity() {
+    return gIdentity;
+}
+
+Matrix3x3 Matrix3x3::transpose(const Matrix3x3& m) {
+    return { m.getColumn(0), m.getColumn(1), m.getColumn(2) };
 }
 
 float Matrix3x3::determinant() const {
-    return get(0,0) * (get(1,1) * get(2,2) - get(1,2) * get(2,1)) -
-           get(0,1) * (get(1,0) * get(2,2) - get(1,2) * get(2,0)) +
-           get(0,2) * (get(1,0) * get(2,1) - get(1,1) * get(2,0));
+    return a11 * (a22 * a33 - a23 * a32) -
+           a12 * (a21 * a33 - a23 * a31) +
+           a13 * (a21 * a32 - a22 * a31);
 }
 
 Matrix3x3 Matrix3x3::cofactor() const {
@@ -63,26 +71,14 @@ Matrix3x3 Matrix3x3::inverse(const Matrix3x3& mat) {
     return mat.adjugate() * (1.0f / det);
 }
 
-const Matrix3x3& Matrix3x3::zero() {
-    return gZero;
-}
-
-const Matrix3x3& Matrix3x3::one() {
-    return gOne;
-}
-
-const Matrix3x3& Matrix3x3::identity() {
-    return gIdentity;
-}
-
-Matrix3x3 Matrix3x3::createTranslation(const Vector2& translation) {
+Matrix3x3 Matrix3x3::createTranslation(const float2& translation) {
     Matrix3x3 mat;
     mat[0][2] = translation.x;
     mat[1][2] = translation.y;
     return mat;
 }
 
-Matrix3x3 Matrix3x3::createScale(const Vector2& scales) {
+Matrix3x3 Matrix3x3::createScale(const float2& scales) {
     Matrix3x3 mat;
     mat[0][0] = scales.x;
     mat[1][1] = scales.y;
@@ -96,7 +92,7 @@ Matrix3x3 Matrix3x3::createRotation(float radians) {
     return mat;
 }
 
-Matrix3x3 Matrix3x3::createShear(const Vector2& shearing) {
+Matrix3x3 Matrix3x3::createShear(const float2& shearing) {
     Matrix3x3 mat;
     mat[0][1] = shearing.x;
     mat[1][0] = shearing.y;

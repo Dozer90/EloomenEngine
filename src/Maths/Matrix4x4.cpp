@@ -1,8 +1,8 @@
 #include <Maths/Matrix4x4.h>
 
 #include <Maths/Math.h>
-#include <Maths/Vector3.h>
-#include <Maths/Vector4.h>
+#include <Maths/float3.h>
+#include <Maths/float4.h>
 #include <Maths/Matrix3x3.h>
 #include <Maths/Quaternion.h>
 
@@ -11,25 +11,32 @@
 using namespace eloo::Math;
 
 namespace {
-static constexpr Matrix4x4 gZero(0.0f);
-static constexpr Matrix4x4 gOne(1.0f);
+static constexpr Matrix4x4 gZero({ 0.0f }, { 0.0f }, { 0.0f }, { 0.0f });
+static constexpr Matrix4x4 gOne({ 1.0f }, { 1.0f }, { 1.0f }, { 1.0f });
 static constexpr Matrix4x4 gIdentity;
 }
 
-Matrix4x4 Matrix4x4::transpose(const Matrix4x4& mat) {
-    return {
-        mat[0][0], mat[1][0], mat[2][0], mat[3][0],
-        mat[0][1], mat[1][1], mat[2][1], mat[3][1],
-        mat[0][2], mat[1][2], mat[2][2], mat[3][2],
-        mat[0][3], mat[1][3], mat[2][3], mat[3][3]
-    };
+Matrix4x4 Matrix4x4::transpose(const Matrix4x4& m) {
+    return { m.getColumn(0), m.getColumn(1), m.getColumn(2), m.getColumn(3) };
+}
+
+const Matrix4x4& Matrix4x4::zero() {
+    return gZero;
+}
+
+const Matrix4x4& Matrix4x4::one() {
+    return gOne;
+}
+
+const Matrix4x4& Matrix4x4::identity() {
+    return gIdentity;
 }
 
 float Matrix4x4::determinant() const {
     float det = 0.0f;
     for (uint8_t r = 0; r < 4; ++r) {
         const int sign = 1 - (r % 2) * 2;
-        det += get(r,0) * Matrix3x3(*this, r, 0).determinant() * sign;
+        det += cell[r][0] * Matrix3x3(*this, r, 0).determinant() * sign;
     }
     return det;
 }
@@ -57,28 +64,15 @@ Matrix4x4 Matrix4x4::inverse(const Matrix4x4& mat) {
     return mat.adjugate() * (1.0f / det);
 }
 
-const Matrix4x4& Matrix4x4::zero() {
-    return gZero;
-}
-
-const Matrix4x4& Matrix4x4::one() {
-    return gOne;
-}
-
-const Matrix4x4& Matrix4x4::identity() {
-    return gIdentity;
-}
-
-Matrix4x4 Matrix4x4::createTranslation(const Vector3& translation) {
+Matrix4x4 Matrix4x4::createTranslation(const float3& translation) {
     Matrix4x4 mat;
-    MatrixRow mRow = mat[0];
     mat[0][3] = translation.x;
     mat[1][3] = translation.y;
     mat[2][3] = translation.z;
     return mat;
 }
 
-Matrix4x4 Matrix4x4::createScale(const Vector3& scales) {
+Matrix4x4 Matrix4x4::createScale(const float3& scales) {
     Matrix4x4 mat;
     mat[0][0] = scales.x;
     mat[1][1] = scales.y;
@@ -86,8 +80,8 @@ Matrix4x4 Matrix4x4::createScale(const Vector3& scales) {
     return mat;
 }
 
-Matrix4x4 Matrix4x4::createRotation(float radians, const Vector3& axis) {
-    const Vector3 a = Vector3::normalize(axis);
+Matrix4x4 Matrix4x4::createRotation(float radians, const float3& axis) {
+    const float3 a = normalize(axis);
     const float c = cos(radians);
     const float o = 1.0f - c;
     const float s = sin(radians);
@@ -99,10 +93,10 @@ Matrix4x4 Matrix4x4::createRotation(float radians, const Vector3& axis) {
         0.0f,                       0.0f,                       0.0f,                       1.0f };
 }
 
-Matrix4x4 Matrix4x4::createRotation(const Vector3& euler) {
+Matrix4x4 Matrix4x4::createRotation(const float3& euler) {
     // Intrinsic ZYX multiplication
-    const Vector3 c = { cos(euler.x), cos(euler.y), cos(euler.z) };
-    const Vector3 s = { sin(euler.x), sin(euler.y), sin(euler.z) };
+    const float3 c = { cos(euler.x), cos(euler.y), cos(euler.z) };
+    const float3 s = { sin(euler.x), sin(euler.y), sin(euler.z) };
     return {
         c.z * c.y,  -s.z,       s.y,        0.0f,
         s.z,        c.z * c.x,  -s.x,       0.0f,
@@ -110,18 +104,62 @@ Matrix4x4 Matrix4x4::createRotation(const Vector3& euler) {
         0.0f,       0.0f,       0.0f,       1.0f };
 }
 
-Matrix4x4 Matrix4x4::createView(const Vector3& viewOrigin, const Vector3& viewForward, const Vector3& worldUp) {
-	const Vector3& f = viewForward;
-	const Vector3 r = Vector3::normalize(Vector3::cross(f, worldUp));
-	const Vector3 u = Vector3::cross(r, f);
+Matrix4x4 Matrix4x4::createRotation(const Quaternion& rotation) {
+    const float& w = rotation.w;
+    const float& x = rotation.x;
+    const float& y = rotation.y;
+    const float& z = rotation.z;
+    return {
+        1.0f - 2.0f * (y * y + z * z),  2.0f * (x * y - z * w),         2.0f * (x * z + y * w),         0.0f,
+        2.0f * (x * y - z + w),         1.0f - 2.0f * (x * x + z * z),  2.0f * (y * z - x * w),         0.0f,
+        2.0f * (x * z - y * w),         2.0f * (y * z + x * w),         1.0f - 2.0f * (x * x + y * y),  0.0f,
+        0.0f,                           0.0f,                           0.0f,                           1.0f };
+}
+
+Matrix4x4 Matrix4x4::createShearX(float shearing) {
+    Matrix4x4 mat;
+    mat[1][0] = shearing;
+    mat[2][0] = shearing;
+    return mat;
+}
+
+Matrix4x4 Matrix4x4::createShearY(float shearing) {
+    Matrix4x4 mat;
+    mat[0][1] = shearing;
+    mat[2][1] = shearing;
+    return mat;
+}
+
+Matrix4x4 Matrix4x4::createShearZ(float shearing) {
+    Matrix4x4 mat;
+    mat[0][2] = shearing;
+    mat[1][2] = shearing;
+    return mat;
+}
+
+Matrix4x4 Matrix4x4::createShear(float shearing, const float3& axis) {
+    const float3 perpendicular = abs(axis.x) < 0.9f ? float3::right() : float3::up();
+    const float4 plane = float4(normalize(cross(axis, perpendicular)), 1.0f);
+
+    Matrix4x4 mat;
+    mat.r1 += plane * axis.x * shearing;
+    mat.r2 += plane * axis.y * shearing;
+    mat.r3 += plane * axis.z * shearing;
+    return mat;
+}
+
+Matrix4x4 Matrix4x4::createView(const float3& viewOrigin, const float3& viewForward, const float3& worldUp) {
+	const float3& f = viewForward;
+	const float3 r = normalize(cross(f, worldUp));
+	const float3 u = cross(r, f);
 	return {
-		r.x, u.x, -f.x, -Vector3::dot(viewOrigin, r),
-		r.y, u.y, -f.y, -Vector3::dot(viewOrigin, u),
-		r.z, u.z, -f.z, -Vector3::dot(viewOrigin, f),
+		r.x, u.x, -f.x, -dot(viewOrigin, r),
+		r.y, u.y, -f.y, -dot(viewOrigin, u),
+		r.z, u.z, -f.z, -dot(viewOrigin, f),
 		0.0f, 0.0f, 0.0f, 1.0f };
 }
 
-Matrix4x4 Matrix4x4::createOrthographicProjection(const Vector3& boundMin, const Vector3& boundMax) {
+Matrix4x4 Matrix4x4::createOrthographicProjection(const float3& boundMin, const float3& boundMax) {
     Matrix4x4 mat;
     const float bw = boundMax.x - boundMin.x;
     const float bh = boundMax.y - boundMin.y;
@@ -142,14 +180,14 @@ Matrix4x4 Matrix4x4::createPerspectiveProjection(float fov, float aspectRatio, f
     mat[3][2] = -1.0f;
 }
 
-Matrix4x4 Matrix4x4::createLookAt(const Vector3& from, const Vector3& to, const Vector3& up) {
-    const Vector3 f = Vector3::normalize(to - from);
-    const Vector3 r = Vector3::normalize(Vector3::cross(f, up));
-    const Vector3 u = Vector3::cross(r, f);
+Matrix4x4 Matrix4x4::createLookAt(const float3& from, const float3& to, const float3& up) {
+    const float3 f = normalize(to - from);
+    const float3 r = normalize(cross(f, up));
+    const float3 u = cross(r, f);
     return {
-        r.x,  r.y,  r.z,  Vector3::dot(-r, from),
-        u.x,  u.y,  u.z,  Vector3::dot(-u, from),
-        -f.x, -f.y, -f.z, Vector3::dot(f, from),
+        r.x,  r.y,  r.z,  dot(-r, from),
+        u.x,  u.y,  u.z,  dot(-u, from),
+        -f.x, -f.y, -f.z, dot(f, from),
         0.0f, 0.0f, 0.0f, 1.0f };
 }
 

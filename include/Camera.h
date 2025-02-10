@@ -2,7 +2,7 @@
 
 #include <Maths/Transform3D.h>
 #include <Maths/Matrix4x4.h>
-#include <Maths/Vector2.h>
+#include <Maths/float2.h>
 
 namespace eloo {
 
@@ -15,7 +15,7 @@ public:
 private:
 	Math::Transform3D mTransform;
 	float mFOV = 70.0f;
-	Math::Vector2 mViewSize;
-	Math::Vector2 mClippingPlanes;
+	Math::float2 mViewSize;
+	Math::float2 mClippingPlanes;
 };
 }

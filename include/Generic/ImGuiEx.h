@@ -7,43 +7,43 @@
 
 #define IM_VEC2_CLASS_EXTRA \
 inline friend bool operator!=(const ImVec2& lhs, const ImVec2& rhs) { return lhs.x != rhs.x || lhs.y != rhs.y; } \
-inline friend bool operator==(const ImVec2& lhs, const ImVec2& rhs) { return !(lhs.x != rhs); } \
-inline friend ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs) { return { lhs.x + rhs.x, lhs.y + rhs.y }; } \
-inline friend ImVec2 operator-(const ImVec2& lhs, const ImVec2& rhs) { return { lhs.x - rhs.x, lhs.y - rhs.y }; } \
-inline friend ImVec2 operator*(const ImVec2& lhs, const ImVec2& rhs) { return { lhs.x * rhs.x, lhs.y * rhs.y }; } \
-inline friend ImVec2 operator/(const ImVec2& lhs, const ImVec2& rhs) { return { lhs.x / rhs.x, lhs.y / rhs.y }; } \
-inline friend ImVec2 operator+(const ImVec2& v, float f) { return { v.x + f, v.y + f }; } \
-inline friend ImVec2 operator-(const ImVec2& v, float f) { return { v.x - f, v.y - f }; } \
-inline friend ImVec2 operator*(const ImVec2& v, float f) { return { v.x * f, v.y * f }; } \
-inline friend ImVec2 operator/(const ImVec2& v, float f) { return { v.x / f, v.y / f }; } \
-inline ImVec2& operator+=(const ImVec2& v) { return (*this = *this + v); } \
-inline ImVec2& operator-=(const ImVec2& v) { return (*this = *this - v); } \
-inline ImVec2& operator*=(const ImVec2& v) { return (*this = *this * v); } \
-inline ImVec2& operator/=(const ImVec2& v) { return (*this = *this / v); } \
-inline ImVec2& operator+=(float f) { return (*this = *this + f); } \
-inline ImVec2& operator-=(float f) { return (*this = *this - f); } \
-inline ImVec2& operator*=(float f) { return (*this = *this * f); } \
-inline ImVec2& operator/=(float f) { return (*this = *this / f); }
+inline friend bool operator == (const ImVec2& lhs, const ImVec2& rhs) { return !(lhs.x != rhs); } \
+inline friend ImVec2 operator + (const ImVec2& lhs, const ImVec2& rhs) { return { lhs.x + rhs.x, lhs.y + rhs.y }; } \
+inline friend ImVec2 operator - (const ImVec2& lhs, const ImVec2& rhs) { return { lhs.x - rhs.x, lhs.y - rhs.y }; } \
+inline friend ImVec2 operator * (const ImVec2& lhs, const ImVec2& rhs) { return { lhs.x * rhs.x, lhs.y * rhs.y }; } \
+inline friend ImVec2 operator / (const ImVec2& lhs, const ImVec2& rhs) { return { lhs.x / rhs.x, lhs.y / rhs.y }; } \
+inline friend ImVec2 operator + (const ImVec2& v, float f) { return { v.x + f, v.y + f }; } \
+inline friend ImVec2 operator - (const ImVec2& v, float f) { return { v.x - f, v.y - f }; } \
+inline friend ImVec2 operator * (const ImVec2& v, float f) { return { v.x * f, v.y * f }; } \
+inline friend ImVec2 operator / (const ImVec2& v, float f) { return { v.x / f, v.y / f }; } \
+inline ImVec2& operator += (const ImVec2& v) { return (*this = *this + v); } \
+inline ImVec2& operator -= (const ImVec2& v) { return (*this = *this - v); } \
+inline ImVec2& operator *= (const ImVec2& v) { return (*this = *this * v); } \
+inline ImVec2& operator /= (const ImVec2& v) { return (*this = *this / v); } \
+inline ImVec2& operator += (float f) { return (*this = *this + f); } \
+inline ImVec2& operator -= (float f) { return (*this = *this - f); } \
+inline ImVec2& operator *= (float f) { return (*this = *this * f); } \
+inline ImVec2& operator /= (float f) { return (*this = *this / f); }
 
 #define IM_VEC4_CLASS_EXTRA \
 inline friend bool operator!=(const ImVec4& lhs, const ImVec4& rhs) { return lhs.x != rhs.x || lhs.y != rhs.y || lhs.z != rhs.z || lhs.w != rhs.w; } \
-inline friend bool operator==(const ImVec4& lhs, const ImVec4& rhs) { return !(lhs.x != rhs); } \
-inline friend ImVec4 operator+(const ImVec4& lhs, const ImVec4& rhs) { return { lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, lhs.w + rhs.w }; } \
-inline friend ImVec4 operator-(const ImVec4& lhs, const ImVec4& rhs) { return { lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, lhs.w - rhs.w }; } \
-inline friend ImVec4 operator*(const ImVec4& lhs, const ImVec4& rhs) { return { lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z, lhs.w * rhs.w }; } \
-inline friend ImVec4 operator/(const ImVec4& lhs, const ImVec4& rhs) { return { lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z, lhs.w / rhs.w }; } \
-inline friend ImVec4 operator+(const ImVec4& v, float f) { return { v.x + f, v.y + f, v.z + f, v.w + f }; } \
-inline friend ImVec4 operator-(const ImVec4& v, float f) { return { v.x - f, v.y - f, v.z - f, v.w - f }; } \
-inline friend ImVec4 operator*(const ImVec4& v, float f) { return { v.x * f, v.y * f, v.z * f, v.w * f }; } \
-inline friend ImVec4 operator/(const ImVec4& v, float f) { return { v.x / f, v.y / f, v.z / f, v.w / f }; } \
-inline ImVec4& operator+=(const ImVec4& v) { return (*this = *this + v); } \
-inline ImVec4& operator-=(const ImVec4& v) { return (*this = *this - v); } \
-inline ImVec4& operator*=(const ImVec4& v) { return (*this = *this * v); } \
-inline ImVec4& operator/=(const ImVec4& v) { return (*this = *this / v); } \
-inline ImVec4& operator+=(float f) { return (*this = *this + f); } \
-inline ImVec4& operator-=(float f) { return (*this = *this - f); } \
-inline ImVec4& operator*=(float f) { return (*this = *this * f); } \
-inline ImVec4& operator/=(float f) { return (*this = *this / f); }
+inline friend bool operator == (const ImVec4& lhs, const ImVec4& rhs) { return !(lhs.x != rhs); } \
+inline friend ImVec4 operator + (const ImVec4& lhs, const ImVec4& rhs) { return { lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, lhs.w + rhs.w }; } \
+inline friend ImVec4 operator - (const ImVec4& lhs, const ImVec4& rhs) { return { lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, lhs.w - rhs.w }; } \
+inline friend ImVec4 operator * (const ImVec4& lhs, const ImVec4& rhs) { return { lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z, lhs.w * rhs.w }; } \
+inline friend ImVec4 operator / (const ImVec4& lhs, const ImVec4& rhs) { return { lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z, lhs.w / rhs.w }; } \
+inline friend ImVec4 operator + (const ImVec4& v, float f) { return { v.x + f, v.y + f, v.z + f, v.w + f }; } \
+inline friend ImVec4 operator - (const ImVec4& v, float f) { return { v.x - f, v.y - f, v.z - f, v.w - f }; } \
+inline friend ImVec4 operator * (const ImVec4& v, float f) { return { v.x * f, v.y * f, v.z * f, v.w * f }; } \
+inline friend ImVec4 operator / (const ImVec4& v, float f) { return { v.x / f, v.y / f, v.z / f, v.w / f }; } \
+inline ImVec4& operator += (const ImVec4& v) { return (*this = *this + v); } \
+inline ImVec4& operator -= (const ImVec4& v) { return (*this = *this - v); } \
+inline ImVec4& operator *= (const ImVec4& v) { return (*this = *this * v); } \
+inline ImVec4& operator /= (const ImVec4& v) { return (*this = *this / v); } \
+inline ImVec4& operator += (float f) { return (*this = *this + f); } \
+inline ImVec4& operator -= (float f) { return (*this = *this - f); } \
+inline ImVec4& operator *= (float f) { return (*this = *this * f); } \
+inline ImVec4& operator /= (float f) { return (*this = *this / f); }
 
 #include "imgui.h"
 

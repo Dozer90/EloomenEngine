@@ -4,19 +4,29 @@
 
 using namespace eloo::Math;
 
-Quaternion::Quaternion(const Vector3& euler) {
-    const Quaternion qx = { cos(euler.x * 0.5f), sin(euler.x * 0.5f), 0.0f, 0.0f };
-    const Quaternion qy = { cos(euler.y * 0.5f), 0.0f, sin(euler.y * 0.5f), 0.0f };
-    const Quaternion qz = { cos(euler.z * 0.5f), 0.0f, 0.0f, sin(euler.z * 0.5f) };
-    *this = qz * qy * qx;
+void Quaternion::set(float w, float x, float y, float z) {
+    this->w = w;
+    this->x = x;
+    this->y = y;
+    this->z = z;
 }
 
-Quaternion::Quaternion(const Vector3& axis, float radians) {
-    const float sinVal = sin(radians * 0.5f);
+void Quaternion::set(const float3& euler) {
+    const float cx = cos(euler.x * 0.5f), sx = sin(euler.x * 0.5f);
+    const float cy = cos(euler.y * 0.5f), sy = sin(euler.y * 0.5f);
+    const float cz = cos(euler.z * 0.5f), sz = sin(euler.z * 0.5f);
+    w = cx * cy * cz + sx * sy * sz;
+    x = sx * cy * cz - cx * sy * sz;
+    y = cx * sy * cz + sx * cy * sz;
+    z = cx * cy * sz - sx * sy * cz;
+}
+
+void Quaternion::set(float radians, const float3& axis) {
+    const float s = sin(radians * 0.5f);
     w = cos(radians * 0.5f);
-    x = axis.x * sinVal;
-    y = axis.y * sinVal;
-    z = axis.z * sinVal;
+    x = axis.x * s;
+    y = axis.y * s;
+    z = axis.z * s;
 }
 
 float Quaternion::magnitudeSqr() const {

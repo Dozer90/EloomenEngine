@@ -32,9 +32,9 @@ protected:
 
     void rotateTurret(double angleDegrees);
 
-    const sf::Vector2<double> getPosition() const { return mTankPosition; }
-    const sf::Vector2<double> getForwardVector() const { return mTankForward; }
-    const sf::Vector2<double> getTurretForwardVector() const { return mTurretForward; }
+    const sf::float2<double> getPosition() const { return mTankPosition; }
+    const sf::float2<double> getForwardVector() const { return mTankForward; }
+    const sf::float2<double> getTurretForwardVector() const { return mTurretForward; }
 
     void shoot() const;
 
@@ -42,11 +42,11 @@ protected:
 
 private:
     int mHealth = 100;
-    sf::Vector2<double> mPosition;
-    sf::Vector2<double> mTreadVelocity;
-    sf::Vector2<double> mTankForward;
-    sf::Vector2<double> mTurretForward;
-    sf::Vector2<double> mTankPosition;
+    sf::float2<double> mPosition;
+    sf::float2<double> mTreadVelocity;
+    sf::float2<double> mTankForward;
+    sf::float2<double> mTurretForward;
+    sf::float2<double> mTankPosition;
     double mMovementSpeed = 0.0;
     double mTankRotation = 0.0;
     double mTurretRotation = 0.0;

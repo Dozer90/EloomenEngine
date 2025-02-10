@@ -1,38 +1,35 @@
 #pragma once
 
-#include "LayerMasks.h"
-#include "Vector3.h"
+#include <Maths/float3.h>
 
-namespace eloo::Math {
+#include <EASTL/optional.h>
 
-class Ray {
-public:
+namespace eloo {
+
+struct Ray {
     struct HitInfo {
-        bool hit = false;
-        Math::Vector3 position;
+        eastl::optional<float3> hitPosition = eastl::nullopt;
     };
 
-public:
-    Ray() {}
-    Ray(const Math::Vector3& position, const Math::Vector3& direction, float length);
+    float3 origin;
+    float3 direction;
+    float length = 0.0f;
 
-    inline void setPosition(const Math::Vector3& position) { mPosition = position; }
+    HitInfo castPlane(const float3& origin, const float3& normal) const;
+    HitInfo castQuad(const float3& origin, const float3& normal) const;
+    HitInfo castTri(const float3& vertex1, const float3& vertex2, const float3& vertex3) const;
+    HitInfo castAABB(const float3& minValues, const float3& maxValues) const;
+    HitInfo castSphere(const float3& origin, float radius) const;
+    HitInfo castEllipsoid(const float3& origin, const float3& radii) const;
+    HitInfo castCapsule(const float3& top, const float3& bottom, float radius) const;
 
-    void setDirection(float degrees);
-    inline void setDirection(const Math::Vector3& direction) { mDirection = direction; }
-
-    inline void setLength(float length) { mLength = length; }
-
-    inline const Math::Vector3& getPosition() const { return mPosition; }
-    inline const Math::Vector3& getDirection() const { return mDirection; }
-    inline const float getLength() const { return mLength; }
-
-    HitInfo cast(LayerMask mask) const;
-    HitInfo navmeshCast() const;
-
-private:
-    Math::Vector3 mPosition;
-    Math::Vector3 mDirection;
-    float mLength;
+    HitInfo sphereCastPlane(float castRadius, const float3& origin, const float3& normal) const;
+    HitInfo sphereCastQuad(float castRadius, const float3& origin, const float3& normal) const;
+    HitInfo sphereCastTri(float castRadius, const float3& vertex1, const float3& vertex2, const float3& vertex3) const;
+    HitInfo sphereCastAABB(float castRadius, const float3& minValues, const float3& maxValues) const;
+    HitInfo sphereCastSphere(float castRadius, const float3& origin, float radius) const;
+    HitInfo sphereCastEllipsoid(float castRadius, const float3& origin, const float3& radii) const;
+    HitInfo sphereCastCapsule(float castRadius, const float3& top, const float3& bottom, float radius) const;
 };
+
 }; // namespace Math

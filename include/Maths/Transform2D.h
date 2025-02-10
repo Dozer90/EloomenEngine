@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Maths/Vector2.h>
+#include <Maths/float2.h>
 #include <Maths/Matrix3x3.h>
 
 namespace eloo::Math {
@@ -12,8 +12,8 @@ public:
 
 
 private:
-    Vector2 mPosition;
+    float2 mPosition;
     float mRotation;
-    Vector2 mScale;
+    float2 mScale;
 };
 } // eloo::Math

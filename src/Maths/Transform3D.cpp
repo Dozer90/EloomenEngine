@@ -1,19 +1,15 @@
 #include <Maths/Transform3D.h>
 
-#include <Maths/Matrix4x4.h>
-#include <Maths/Quaternion.h>
-#include <Maths/Vector3.h>
-
 using namespace eloo::Math;
 
-Vector3 Transform3D::forward() const {
-	return Vector3::forward() * mRotation;
+float3 Transform3D::forward() const {
+	return float3::forward() * mRotation;
 }
 
-Vector3 Transform3D::right() const {
-	return Vector3::right() * mRotation;
+float3 Transform3D::right() const {
+	return float3::right() * mRotation;
 }
 
-Vector3 Transform3D::up() const {
-	return Vector3::up() * mRotation;
+float3 Transform3D::up() const {
+	return float3::up() * mRotation;
 }

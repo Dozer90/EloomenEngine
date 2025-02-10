@@ -3,7 +3,7 @@
 #include "Generic/TypeAliases.h"
 #include "Generic/Utilities.h"
 
-#include <SFML/System/Vector2.hpp>
+#include <Maths/float2.h>
 
 #include <EASTL/unordered_map.h>
 #include <EASTL/functional.h>
@@ -28,8 +28,8 @@ struct CollisionEvent : public IEvent
 {
     GameObjectID firstID;           // First object involved
     GameObjectID secondID;          // Second object involved
-    sf::Vector2<double> location;   // Where the collision detected
-    sf::Vector2<double> overlap;    // How much overlap there was
+    Math::float2 location;          // Where the collision detected
+    Math::float2 overlap;           // How much overlap there was
 };
 
 ///>=====================================================================

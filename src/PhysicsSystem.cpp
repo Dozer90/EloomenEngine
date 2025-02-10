@@ -99,28 +99,28 @@ void PhysicsSystem::retireID(GameObjectID id) {
     }
 }
 
-sf::Vector2<double> PhysicsSystem::getPosition(GameObjectID id) const {
+sf::float2<double> PhysicsSystem::getPosition(GameObjectID id) const {
     const DataIndex index = getDataIndex(id);
     const Chunk& chunk = getChunk(id);
-    return sf::Vector2<double>{
+    return sf::float2<double>{
         chunk.xPosition[index],
             chunk.yPosition[index]
     };
 }
 
-sf::Vector2<double> PhysicsSystem::getVelocity(GameObjectID id) const {
+sf::float2<double> PhysicsSystem::getVelocity(GameObjectID id) const {
     const DataIndex index = getDataIndex(id);
     const Chunk& chunk = getChunk(id);
-    return sf::Vector2<double>{
+    return sf::float2<double>{
         chunk.xVelocity[index],
             chunk.yVelocity[index]
     };
 }
 
-sf::Vector2<double> PhysicsSystem::getAcceleration(GameObjectID id) const {
+sf::float2<double> PhysicsSystem::getAcceleration(GameObjectID id) const {
     const DataIndex index = getDataIndex(id);
     const Chunk& chunk = getChunk(id);
-    return sf::Vector2<double>{
+    return sf::float2<double>{
         chunk.xAcceleration[index],
             chunk.yAcceleration[index]
     };
@@ -132,21 +132,21 @@ double PhysicsSystem::getMass(GameObjectID id) const {
     return chunk.mass[index];
 }
 
-void PhysicsSystem::setPosition(GameObjectID id, const sf::Vector2<double>& position) {
+void PhysicsSystem::setPosition(GameObjectID id, const sf::float2<double>& position) {
     const DataIndex index = getDataIndex(id);
     Chunk& chunk = getChunk(id);
     chunk.xPosition[index] = position.x;
     chunk.yPosition[index] = position.y;
 }
 
-void PhysicsSystem::setVelocity(GameObjectID id, const sf::Vector2<double>& velocity) {
+void PhysicsSystem::setVelocity(GameObjectID id, const sf::float2<double>& velocity) {
     const DataIndex index = getDataIndex(id);
     Chunk& chunk = getChunk(id);
     chunk.xVelocity[index] = velocity.x;
     chunk.yVelocity[index] = velocity.y;
 }
 
-void PhysicsSystem::setAcceleration(GameObjectID id, const sf::Vector2<double>& acceleration) {
+void PhysicsSystem::setAcceleration(GameObjectID id, const sf::float2<double>& acceleration) {
     const DataIndex index = getDataIndex(id);
     Chunk& chunk = getChunk(id);
     chunk.xAcceleration[index] = acceleration.x;
@@ -159,7 +159,7 @@ void PhysicsSystem::setMass(GameObjectID id, double mass) {
     chunk.mass[index] = mass;
 }
 
-void PhysicsSystem::applyForce(GameObjectID id, const sf::Vector2<double>& force) {
+void PhysicsSystem::applyForce(GameObjectID id, const sf::float2<double>& force) {
     const DataIndex index = getDataIndex(id);
     Chunk& chunk = getChunk(id);
     chunk.xForce[index] += force.x;
@@ -173,7 +173,7 @@ void PhysicsSystem::clearForce(GameObjectID id) {
     chunk.yForce[index] = 0.0;
 }
 
-void PhysicsSystem::applyImpulse(GameObjectID id, const sf::Vector2<double>& impulse) {
+void PhysicsSystem::applyImpulse(GameObjectID id, const sf::float2<double>& impulse) {
     const DataIndex index = getDataIndex(id);
     Chunk& chunk = getChunk(id);
     chunk.xVelocity[index] += impulse.x / chunk.mass[index];
@@ -196,10 +196,10 @@ double PhysicsSystem::getKineticEnergy(GameObjectID id) const {
     return 0.5 * chunk.mass[index] * velocitySqrMagnitude;
 }
 
-sf::Vector2<double> PhysicsSystem::getMomentum(GameObjectID id) const {
+sf::float2<double> PhysicsSystem::getMomentum(GameObjectID id) const {
     const DataIndex index = getDataIndex(id);
     const Chunk& chunk = getChunk(id);
-    return sf::Vector2<double>{
+    return sf::float2<double>{
         chunk.xVelocity[index] * chunk.mass[index],
             chunk.yVelocity[index] * chunk.mass[index]
     };
