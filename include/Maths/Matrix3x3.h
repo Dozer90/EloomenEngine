@@ -1,9 +1,5 @@
 #pragma once
 
-#include <Maths/Math.h>
-#include <Maths/float2.h>
-#include <Maths/float3.h>
-
 #include <EASTL/array.h>
 
 // ROW MAJOR
@@ -11,24 +7,33 @@
 // Operations are left to right
 // mat = trans * rot * scale
 
-namespace eloo::Math {
+namespace eloo {
+
+class float2;
+class float3;
+class float4;
+
+namespace Math {
+
+class Quaternion;
+class Matrix2x2;
 class Matrix4x4;
+
 class Matrix3x3 {
 public:
-    constexpr Matrix3x3()
-        : r1({ 1.0f, 0.0f, 0.0f })
-        , r2({ 0.0f, 1.0f, 0.0f })
-        , r3({ 0.0f, 0.0f, 1.0f }) {}
-    constexpr Matrix3x3(const float3& r1,
-                        const float3& r2,
-                        const float3& r3)
-        : r1(r1), r2(r2), r3(r3) {}
+    constexpr Matrix3x3() :
+        data({1.0f, 0.0f, 0.0f,
+              0.0f, 1.0f, 0.0f,
+              0.0f, 0.0f, 1.0f}) {}
+
     constexpr Matrix3x3(float v11, float v12, float v13,
                         float v21, float v22, float v23,
                         float v31, float v32, float v33)
         : data({v11, v12, v13,
                 v21, v22, v23,
                 v31, v32, v33}) {}
+
+    Matrix3x3(const float3& r1, const float3& r2, const float3& r3);
     Matrix3x3(const Matrix4x4& m, uint8_t row, uint8_t col);
 
     static const Matrix3x3& zero();
@@ -103,12 +108,9 @@ private:
             float a21, a22, a23;
             float a31, a32, a33;
         };
-        struct {
-            float3 r1, r2, r3;
-        };
-        eastl::array<float3> row;
         eastl::array<eastl::array<float, 3>, 3> cell;
         eastl::array<float, 9> data;
     };
 };
 } // namespace Math
+} // namespace eloo

@@ -1,21 +1,6 @@
 #pragma once
 
-#include <Generic/Utilities.h>
-
-namespace eloo::Math {
-class float2;
-
-float2 normalize(const float2& v);
-float2 fastNormalize(const float2& v, unsigned int iterationCount = 1);
-bool isNormalized(const float2& v);
-float dot(const float2& v1, const float2& v2);
-float distance(const float2& v1, const float2& v2);
-float angle(const float2& v1, const float2& v2);
-float2 reflect(const float2& v, const float2& normal);
-float2 project(const float2& v, const float2& normal);
-float2 rotate(const float2& v, float radians);
-float2 lerp(const float2& start, const float2& end, float t);
-
+namespace eloo {
 class float2 {
 public:
     inline constexpr float2() : x(0.0f), y(0.0f) {}
@@ -30,22 +15,16 @@ public:
     inline static constexpr float2 up()                             { return { 0.0f, 1.0f }; }
     inline static constexpr float2 right()                          { return { 1.0f, 0.0f }; }
 
-    float magnitude() const;
-    float fastMagnitude(unsigned int iterationCount = 1) const;
     inline float magnitudeSqr() const                               { return x * x + y * y; }
 
-    inline bool isNormalized() const                                { return Math::isNormalized(*this); }
-    inline float2& normalize()                                      { return (*this = Math::normalize(*this)); }
-    inline float2& fastNormalize(unsigned int iterationCount = 1)   { return (*this = Math::fastNormalize(*this, iterationCount)); }
-    inline float2& reflect(const float2& normal)                    { return (*this = Math::reflect(*this, normal)); }
-    inline float2& project(const float2& normal)                    { return (*this = Math::project(*this, normal)); }
-    inline float2& rotate(float radians)                            { return (*this = Math::rotate(*this, radians)); }
-
-
-    //////////////////////////////////////////////
-    // Swizzles
-
-    SWIZZLE_FLOAT2
+    bool isNormalized() const;
+    float2& normalize();
+    float2& normalizeFast(unsigned int iterationCount = 1);
+    float magnitude() const;
+    float magnitudeFast(unsigned int iterationCount = 1) const;
+    float2& reflect(const float2& normal);
+    float2& project(const float2& normal);
+    float2& rotate(float radians);
 
 
     //////////////////////////////////////////////

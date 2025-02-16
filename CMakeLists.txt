@@ -38,17 +38,20 @@ set(SOURCES
     "src/Utilities.cpp"
     "src/Logging.cpp"
     "src/Game.cpp"
-    "src/Easing.cpp"
+    "src/Interpolation.cpp"
     "src/ImGuiEx.cpp"
     "src/Maths/Matrix3x3.cpp"
-    "src/Maths/float2.cpp"
-    "src/Maths/float3.cpp"
+    "src/float2.cpp"
+    "src/float3.cpp"
+    "src/float4.cpp"
     "src/Maths/Quaternion.cpp"
     "src/Maths/Transform2D.cpp"
     "src/Maths/Matrix4x4.cpp"
     "src/Maths/Matrix2x2.cpp"
     "src/Maths/Transform3D.cpp"
-    "src/Camera.cpp")
+    "src/Camera.cpp"
+    "src/Rendering/Window.cpp"
+    "src/Maths/CoreMath.cpp")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     #list(APPEND SOURCES)
@@ -106,7 +109,7 @@ target_include_directories(EloomenateEngine PRIVATE ${imgui_SOURCE_DIR})
 ###########################################
 # Defines
 
-set(PRIVATE_DEFINES "")
+set(PRIVATE_DEFINES "NOMINMAX")
 set(PUBLIC_DEFINES "")
 
 # DEBUG Config
@@ -123,6 +126,12 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
         RELEASE_BUILD
         ASSERTS_ENABLED
     )
+endif()
+
+include(TestBigEndian)
+TEST_BIG_ENDIAN(IsBigEndianResult)
+if(IsBigEndianResult)
+    list(APPEND PUBLIC_DEFINES IS_BIG_ENDIAN)
 endif()
 
 message("============= Private compile definitions: ${PRIVATE_DEFINES} =============")
