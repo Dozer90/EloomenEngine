@@ -6,7 +6,6 @@
 #include <Maths/Matrix2x2.h>
 #include <Maths/Matrix3x3.h>
 #include <Maths/Matrix4x4.h>
-#include <Maths/Helpers.h>
 #include <Maths/Interpolation.h>
 
 #include <EASTL/type_traits.h>
@@ -66,47 +65,47 @@ inline float rsqrtFast(float v, uint16_t iterations = 1) {
 /////////////////////////////////////////////////////////
 // Comparison
 
-bool isEqual(ldouble lhs, ldouble rhs)          { return abs(lhs - rhs) <= Consts::ldbl::Epsilon; }
-bool isEqual(double lhs, double rhs)            { return abs(lhs - rhs) <= Consts::dbl::Epsilon; }
-bool isEqual(float lhs, float rhs)              { return abs(lhs - rhs) <= Consts::flt::Epsilon; }
+bool isEqual(ldouble lhs, ldouble rhs)              { return abs(lhs - rhs) <= Consts::ldbl::Epsilon; }
+bool isEqual(double lhs, double rhs)                { return abs(lhs - rhs) <= Consts::dbl::Epsilon; }
+bool isEqual(float lhs, float rhs)                  { return abs(lhs - rhs) <= Consts::flt::Epsilon; }
 
-NUMERIC_TEMPLATE min(T value, T minValue)       { return value < minValue ? minValue : value; }
-NUMERIC_TEMPLATE max(T value, T maxValue)       { return value > maxValue ? maxValue : value; }
+NUMERIC_TEMPLATE min(T value, T minValue)           { return value < minValue ? minValue : value; }
+NUMERIC_TEMPLATE max(T value, T maxValue)           { return value > maxValue ? maxValue : value; }
 
 
 /////////////////////////////////////////////////////////
 // Signs
 
-NUMERIC_TEMPLATE abs(T value)                   { return std::abs(value); }
-NUMERIC_TEMPLATE_RETURN_TYPE(int) sign(T value) { return value < 0 ? -1 : value > 0 ? 1 : 0; }
+NUMERIC_TEMPLATE abs(T value)                       { return std::abs(value); }
+NUMERIC_TEMPLATE_RETURN_TYPE(int) sign(T value)     { return static_cast<int>((val > static_cast<T>(0)) - (val < static_cast<T>(0))); }
 
 
 /////////////////////////////////////////////////////////
 // Logarithm
 
-NUMERIC_TEMPLATE log(T value)                   { return std::abs(value); }
-inline double log(double value)                 { return static_cast<double>(log(static_cast<ldouble>(value))); }
+NUMERIC_TEMPLATE log(T value)                       { return std::abs(value); }
+inline double log(double value)                     { return static_cast<double>(log(static_cast<ldouble>(value))); }
 
-NUMERIC_TEMPLATE log10(T value)                 { return std::log10(value); }
-inline double log10(double value)               { return static_cast<double>(log10(static_cast<ldouble>(value))); }
+NUMERIC_TEMPLATE log10(T value)                     { return std::log10(value); }
+inline double log10(double value)                   { return static_cast<double>(log10(static_cast<ldouble>(value))); }
 
 
 /////////////////////////////////////////////////////////
 // Exponentials
 
-NUMERIC_TEMPLATE pow(T value, T power)          { return std::pow(value, power); }
-inline double pow(double value, double power)   { return static_cast<double>(pow(static_cast<ldouble>(value), static_cast<ldouble>(power))); }
+NUMERIC_TEMPLATE pow(T value, T power)              { return std::pow(value, power); }
+inline double pow(double value, double power)       { return static_cast<double>(pow(static_cast<ldouble>(value), static_cast<ldouble>(power))); }
 
-NUMERIC_TEMPLATE exp(T value)                   { return static_cast<T>(std::exp(value)); }
+NUMERIC_TEMPLATE exp(T value)                       { return static_cast<T>(std::exp(value)); }
 
-NUMERIC_TEMPLATE sqr(T value)                   { return value * value; }
-NUMERIC_TEMPLATE cube(T value)                  { return value * value * value; }
-NUMERIC_TEMPLATE quad(T value)                  { return value * value * value * value; }
-NUMERIC_TEMPLATE quint(T value)                 { return value * value * value * value * value; }
+NUMERIC_TEMPLATE sqr(T value)                       { return value * value; }
+NUMERIC_TEMPLATE cube(T value)                      { return value * value * value; }
+NUMERIC_TEMPLATE quad(T value)                      { return value * value * value * value; }
+NUMERIC_TEMPLATE quint(T value)                     { return value * value * value * value * value; }
 
-NUMERIC_TEMPLATE sqrt(T value)                  { return std::sqrt(value); }
+NUMERIC_TEMPLATE sqrt(T value)                      { return std::sqrt(value); }
 
-NUMERIC_TEMPLATE rsqrt(T value)                 { return static_cast<T>(1.0) / std::sqrt(value); }
+NUMERIC_TEMPLATE rsqrt(T value)                     { return static_cast<T>(1.0) / std::sqrt(value); }
 
 
 /////////////////////////////////////////////////////////
@@ -117,16 +116,20 @@ NUMERIC_TEMPLATE clamp(T value, T minValue, T maxValue) {
          : (value > maxValue) ? maxValue
          : value;
 }
-inline double clamp01(double value)             { return clamp(value, 0.0, 1.0); }
-inline float clamp01(float value)               { return clamp(value, 0.0f, 1.0f); }
+inline double saturate(double value)                { return clamp(value, 0.0, 1.0); }
+inline float saturate(float value)                  { return clamp(value, 0.0f, 1.0f); }
 
 
 /////////////////////////////////////////////////////////
 // Rounding
 
-NUMERIC_TEMPLATE floor(T value)                 { return std::floor(value); }
-NUMERIC_TEMPLATE round(T value)                 { return std::round(value); }
-NUMERIC_TEMPLATE ceil(T value)                  { return std::ceil(value); }
+NUMERIC_TEMPLATE floor(T value)                     { return std::floor(value); }
+NUMERIC_TEMPLATE round(T value)                     { return std::round(value); }
+NUMERIC_TEMPLATE ceil(T value)                      { return std::ceil(value); }
+
+inline ldouble frac(ldouble value)                  { return value - floor(value); }
+inline double frac(double value)                    { return value - floor(value); }
+inline float frac(float value)                      { return value - floor(value); }
 
 
 /////////////////////////////////////////////////////////
@@ -140,28 +143,28 @@ NUMERIC_TEMPLATE remapClamped(T v, T old1, T old2, T new1, T new2) {
     return clamp(remap(v, old1, old2, new1, new2), min(new1, new2), max(new1, new2));
 }
 
-NUMERIC_TEMPLATE toRadians(T degrees) { return static_cast<T>(static_cast<ldouble>(degrees) * Consts::ldbl::DegToRad); }
-NUMERIC_TEMPLATE toDegrees(T radians) { return static_cast<T>(static_cast<ldouble>(radians) * Consts::ldbl::RadToDeg); }
+NUMERIC_TEMPLATE toRadians(T degrees)               { return static_cast<T>(static_cast<ldouble>(degrees) * Consts::ldbl::DegToRad); }
+NUMERIC_TEMPLATE toDegrees(T radians)               { return static_cast<T>(static_cast<ldouble>(radians) * Consts::ldbl::RadToDeg); }
 
 
 /////////////////////////////////////////////////////////
 // Trigonometry
 
-NUMERIC_TEMPLATE sin(T radians)                 { return std::sin(radians); }
-inline double sin(double radians)               { return static_cast<double>(sin(static_cast<ldouble>(radians))); }
-NUMERIC_TEMPLATE cos(T radians)                 { return std::cos(radians); }
-inline double cos(double radians)               { return static_cast<double>(cos(static_cast<ldouble>(radians))); }
-NUMERIC_TEMPLATE tan(T radians)                 { return std::tan(radians); }
-inline double tan(double radians)               { return static_cast<double>(tan(static_cast<ldouble>(radians))); }
+NUMERIC_TEMPLATE sin(T radians)                     { return std::sin(radians); }
+inline double sin(double radians)                   { return static_cast<double>(sin(static_cast<ldouble>(radians))); }
+NUMERIC_TEMPLATE cos(T radians)                     { return std::cos(radians); }
+inline double cos(double radians)                   { return static_cast<double>(cos(static_cast<ldouble>(radians))); }
+NUMERIC_TEMPLATE tan(T radians)                     { return std::tan(radians); }
+inline double tan(double radians)                   { return static_cast<double>(tan(static_cast<ldouble>(radians))); }
 
-NUMERIC_TEMPLATE asin(T value)                  { return std::asin(value); }
-inline double asin(double value)                { return static_cast<double>(asin(static_cast<ldouble>(value))); }
-NUMERIC_TEMPLATE acos(T value)                  { return std::acos(value); }
-inline double acos(double value)                { return static_cast<double>(acos(static_cast<ldouble>(value))); }
-NUMERIC_TEMPLATE atan(T value)                  { return std::atan(value); }
-inline double atan(double value)                { return static_cast<double>(atan(static_cast<ldouble>(value))); }
+NUMERIC_TEMPLATE asin(T value)                      { return std::asin(value); }
+inline double asin(double value)                    { return static_cast<double>(asin(static_cast<ldouble>(value))); }
+NUMERIC_TEMPLATE acos(T value)                      { return std::acos(value); }
+inline double acos(double value)                    { return static_cast<double>(acos(static_cast<ldouble>(value))); }
+NUMERIC_TEMPLATE atan(T value)                      { return std::atan(value); }
+inline double atan(double value)                    { return static_cast<double>(atan(static_cast<ldouble>(value))); }
 
-NUMERIC_TEMPLATE atan2(T y, T x)                { return std::atan2(y, x); }
+NUMERIC_TEMPLATE atan2(T y, T x)                    { return std::atan2(y, x); }
 
 /////////////////////////////////////////////////////////
 // Modulo
@@ -273,5 +276,14 @@ float distanceToPlane(const float4& plane, const float3& point);
 namespace Interpolation {
 float4 interpolate(const float4& start, const float4& end, double t, Type type, Options options = eastl::monostate{});
 }
+
+
+
+
+float3 operator * (const float3& v, const Matrix3x3& m) {
+
+    m.row(0)
+    return { m.r1 * v.x + m.r2 * v.y + m.r3 * v.z }; }
+
 
 };

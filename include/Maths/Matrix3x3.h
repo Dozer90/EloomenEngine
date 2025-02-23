@@ -21,10 +21,21 @@ class Matrix4x4;
 
 class Matrix3x3 {
 public:
-    constexpr Matrix3x3() :
-        data({1.0f, 0.0f, 0.0f,
-              0.0f, 1.0f, 0.0f,
-              0.0f, 0.0f, 1.0f}) {}
+    struct Row {
+        float x, y, z;
+
+        float& operator [] (uint8_t colIndex);
+        const float& operator [] (uint8_t colIndex) const;
+    };
+
+public:
+    inline Matrix3x3(const Matrix3x3&) = default;
+    Matrix3x3(Matrix3x3&&) = default;
+
+    constexpr Matrix3x3()
+        : data({1.0f, 0.0f, 0.0f,
+                0.0f, 1.0f, 0.0f,
+                0.0f, 0.0f, 1.0f}) {}
 
     constexpr Matrix3x3(float v11, float v12, float v13,
                         float v21, float v22, float v23,
@@ -34,8 +45,9 @@ public:
                 v31, v32, v33}) {}
 
     Matrix3x3(const float3& r1, const float3& r2, const float3& r3);
-    Matrix3x3(const Matrix4x4& m, uint8_t row, uint8_t col);
+    Matrix3x3(const Matrix4x4& m, uint8_t rowToRemove, uint8_t colToRemove);
 
+public:
     static const Matrix3x3& zero();
     static const Matrix3x3& one();
     static const Matrix3x3& identity();
@@ -60,46 +72,84 @@ public:
     inline static Matrix3x3& rotate(float radians, Matrix3x3& mat)                  { return (mat *= createRotation(radians)); }
     inline static Matrix3x3& shear(const float2& shearing, Matrix3x3& mat)          { return (mat *= createShear(shearing)); }
 
-    inline float3& getRow(uint8_t r)                                                { return row[r]; }
-    inline const float3& getRow(uint8_t r) const                                    { return row[r]; }
-    inline void setRow(uint8_t r, const float3& xyz)                                { row[r] = xyz; }
-    inline void setRow(uint8_t r, const float2& xy, float z)                        { row[r] = { xy.x, xy.y, z }; }
-    inline void setRow(uint8_t r, float x, const float2& yz)                        { row[r] = { x, yz.x, yz.y }; }
-    inline void setRow(uint8_t r, float x, float y, float z)                        { row[r] = { x, y, z }; }
+    void setRow(uint8_t rowIndex, const float3& xyz);
+    void setRow(uint8_t rowIndex, const float2& xy, float z);
+    void setRow(uint8_t rowIndex, float x, const float2& yz);
+    void setRow(uint8_t rowIndex, float x, float y, float z);
 
-    inline const float3 getColumn(uint8_t c) const                                  { return { cell[0][c], cell[1][c], cell[2][c] }; }
-    inline void setColumn(uint8_t c, const float3& xyz)                             { cell[0][c] = xyz.x;  cell[1][c] = xyz.y;  cell[2][c] = xyz.z; }
-    inline void setColumn(uint8_t c, const float2& xy, float z)                     { cell[0][c] = xy.x;   cell[1][c] = xy.y;   cell[2][c] = z;     }
-    inline void setColumn(uint8_t c, float x, const float2& yz)                     { cell[0][c] = x;      cell[1][c] = yz.x;   cell[2][c] = yz.y;  }
-    inline void setColumn(uint8_t c, float x, float y, float z)                     { cell[0][c] = x;      cell[1][c] = y;      cell[2][c] = z;     }
+    inline const Row column(uint8_t colIndex)                                       { return Row{ cell[0][colIndex], cell[1][colIndex], cell[2][colIndex] }; }
+    void setColumn(uint8_t colIndex, const float3& xyz);
+    void setColumn(uint8_t colIndex, const float2& xy, float z);
+    void setColumn(uint8_t colIndex, float x, const float2& yz);
+    void setColumn(uint8_t colIndex, float x, float y, float z);
 
 public:
-    inline float3& operator [] (uint8_t rowIndex)                                   { return row[rowIndex]; }
-    inline const float3& operator [] (uint8_t rowIndex) const                       { return row[rowIndex]; }
+    inline Row& operator [] (uint8_t rowIndex)                                      { return row[rowIndex]; }
+    inline const Row& operator [] (uint8_t rowIndex) const                          { return row[rowIndex]; }
 
-    friend bool operator!=(const Matrix3x3& m1, const Matrix3x3& m2)                { return m1.cell != m2.cell; }
-    inline friend bool operator == (const Matrix3x3& m1, const Matrix3x3& m2)       { return m1.cell == m2.cell; }
+    friend bool operator!=(const Matrix3x3& m1, const Matrix3x3& m2)                { return !eastl::equal(m1.cell.begin(), m1.cell.end(), m2.cell.begin()); }
+    inline friend bool operator == (const Matrix3x3& m1, const Matrix3x3& m2)       { return eastl::equal(m1.cell.begin(), m1.cell.end(), m2.cell.begin()); }
+    
+    friend Matrix3x3 operator / (const Matrix3x3& m1, const Matrix3x3& m2) {
+        return {
+            m1.a11 / m2.a11, m1.a12 / m2.a12, m1.a13 / m2.a13,
+            m1.a21 / m2.a21, m1.a22 / m2.a22, m1.a23 / m2.a23,
+            m1.a31 / m2.a31, m1.a32 / m2.a32, m1.a33 / m2.a33 };
+    }
+    friend Matrix3x3 operator / (const Matrix3x3& m, float f) {
+        return {
+            m.a11 / f, m.a12 / f, m.a13 / f,
+            m.a21 / f, m.a22 / f, m.a23 / f,
+            m.a31 / f, m.a32 / f, m.a33 / f };
+    }
 
-    friend float3 operator * (const float3& v, const Matrix3x3& m)                  { return { m.r1 * v.x + m.r2 * v.y + m.r3 * v.z }; }
-    friend Matrix3x3 operator * (const Matrix3x3& m1, const Matrix3x3& m2)          { return { m1.r1 * m2.r1, m1.r2 * m2.r2, m1.r3 * m2.r3 }; }
-    friend Matrix3x3 operator * (const Matrix3x3& m, float f)                       { return { m.r1 * f, m.r2 * f, m.r3 * f }; }
-    inline Matrix3x3& operator *= (const Matrix3x3& m)                              { return (*this = *this * m); }
-    inline Matrix3x3& operator *= (float f)                                         { return (*this = *this * f); }
+    friend Matrix3x3 operator * (const Matrix3x3& m1, const Matrix3x3& m2) {
+        return {
+            m1.a11 * m2.a11, m1.a12 * m2.a12, m1.a13 * m2.a13,
+            m1.a21 * m2.a21, m1.a22 * m2.a22, m1.a23 * m2.a23,
+            m1.a31 * m2.a31, m1.a32 * m2.a32, m1.a33 * m2.a33 };
+    }
+    friend Matrix3x3 operator * (const Matrix3x3& m, float f) {
+        return {
+            m.a11 * f, m.a12 * f, m.a13 * f,
+            m.a21 * f, m.a22 * f, m.a23 * f,
+            m.a31 * f, m.a32 * f, m.a33 * f };
+    }
 
-    friend Matrix3x3 operator / (const Matrix3x3& m1, const Matrix3x3& m2)          { return { m1.r1 / m2.r1, m1.r2 / m2.r2, m1.r3 / m2.r3 }; }
-    friend Matrix3x3 operator / (const Matrix3x3& m, float f)                       { return m * (1.0f / f); }
-    inline Matrix3x3& operator /= (const Matrix3x3& m)                              { return (*this = *this / m); }
-    inline Matrix3x3& operator /= (float f)                                         { return (*this = *this / f); }
+    friend Matrix3x3 operator + (const Matrix3x3& m1, const Matrix3x3& m2) {
+        return {
+            m1.a11 + m2.a11, m1.a12 + m2.a12, m1.a13 + m2.a13,
+            m1.a21 + m2.a21, m1.a22 + m2.a22, m1.a23 + m2.a23,
+            m1.a31 + m2.a31, m1.a32 + m2.a32, m1.a33 + m2.a33 };
+    }
+    friend Matrix3x3 operator + (const Matrix3x3& m, float f) {
+        return {
+            m.a11 + f, m.a12 + f, m.a13 + f,
+            m.a21 + f, m.a22 + f, m.a23 + f,
+            m.a31 + f, m.a32 + f, m.a33 + f };
+    }
 
-    friend Matrix3x3 operator + (const Matrix3x3& m1, const Matrix3x3& m2)          { return { m1.r1 + m2.r1, m1.r2 + m2.r2, m1.r3 + m2.r3 }; }
-    friend Matrix3x3 operator + (const Matrix3x3& m, float f)                       { return { m.r1 + f, m.r2 + f, m.r3 + f}; }
-    inline Matrix3x3& operator += (const Matrix3x3& m)                              { return (*this = *this + m); }
-    inline Matrix3x3& operator += (float f)                                         { return (*this = *this + f); }
+    friend Matrix3x3 operator - (const Matrix3x3& m1, const Matrix3x3& m2) {
+        return {
+            m1.a11 - m2.a11, m1.a12 - m2.a12, m1.a13 - m2.a13,
+            m1.a21 - m2.a21, m1.a22 - m2.a22, m1.a23 - m2.a23,
+            m1.a31 - m2.a31, m1.a32 - m2.a32, m1.a33 - m2.a33 };
+    }
+    friend Matrix3x3 operator - (const Matrix3x3& m, float f) {
+        return {
+            m.a11 - f, m.a12 - f, m.a13 - f,
+            m.a21 - f, m.a22 - f, m.a23 - f,
+            m.a31 - f, m.a32 - f, m.a33 - f };
+    }
 
-    friend Matrix3x3 operator - (const Matrix3x3& m1, const Matrix3x3& m2)          { return { m1.r1 - m2.r1, m1.r2 - m2.r2, m1.r3 - m2.r3 }; }
-    friend Matrix3x3 operator - (const Matrix3x3& m, float f)                       { return { m.r1 - f, m.r2 - f, m.r3 - f }; }
-    inline Matrix3x3& operator -= (const Matrix3x3& m)                              { return (*this = *this - m); }
-    inline Matrix3x3& operator -= (float f)                                         { return (*this = *this - f); }
+    inline Matrix3x3& operator /= (const Matrix3x3& m) { return (*this = *this / m); }
+    inline Matrix3x3& operator *= (const Matrix3x3& m) { return (*this = *this * m); }
+    inline Matrix3x3& operator += (const Matrix3x3& m) { return (*this = *this + m); }
+    inline Matrix3x3& operator -= (const Matrix3x3& m) { return (*this = *this - m); }
+    inline Matrix3x3& operator /= (float f)            { return (*this = *this / f); }
+    inline Matrix3x3& operator *= (float f)            { return (*this = *this * f); }
+    inline Matrix3x3& operator += (float f)            { return (*this = *this + f); }
+    inline Matrix3x3& operator -= (float f)            { return (*this = *this - f); }
 
 private:
     union {
@@ -108,6 +158,7 @@ private:
             float a21, a22, a23;
             float a31, a32, a33;
         };
+        eastl::array<Row, 3> row;
         eastl::array<eastl::array<float, 3>, 3> cell;
         eastl::array<float, 9> data;
     };

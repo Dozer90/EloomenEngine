@@ -82,7 +82,7 @@ public:
     inline void setAlpha(float value)       { a = fromFloat(value); }
 
 private:
-    inline uint8_t fromFloat(float value) const { return static_cast<uint8_t>(Math::round(Math::clamp01(value) * 0xFF)); }
+    inline uint8_t fromFloat(float value) const { return static_cast<uint8_t>(Math::round(Math::saturate(value) * 0xFF)); }
     inline float asFloat(uint8_t value) const { return static_cast<float>(value) / 0xFF; }
 };
 }
