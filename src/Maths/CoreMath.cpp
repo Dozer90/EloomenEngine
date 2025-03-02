@@ -7,7 +7,7 @@ using namespace eloo;
 ///////////////////////////////////////////////
 
 bool Math::isNormalized(const float2& v) {
-    return isEqual(v.magnitudeSqr(), 1.0f);
+    return is_close(v.magnitudeSqr(), 1.0f);
 }
 
 float2 Math::normalize(const float2& v) {
@@ -20,7 +20,7 @@ float2 Math::normalizeFast(const float2& v, unsigned int iterationCount) {
     if (v.isNormalized()) return v;
     const float magSqr = v.magnitudeSqr();
     if (magSqr == 0.0f) return float2::zero();
-    if (isEqual(v.x, v.y)) return Consts::flt::RSqrt2;
+    if (is_close(v.x, v.y)) return Consts::flt::RSqrt2;
     return v * rsqrtFast(magSqr, iterationCount);
 }
 
@@ -44,8 +44,8 @@ float Math::distanceSqr(const float2& v1, const float2& v2) {
 
 float Math::angle(const float2& v1, const float2& v2) {
     const float magTotalSqr = v1.magnitudeSqr() * v2.magnitudeSqr();
-    if (isEqual(magTotalSqr, 0.0f)) return 0.0f;
-    if (isEqual(v1.x, v1.y) && isEqual(v2.x, v2.y)) return acos(Consts::flt::RSqrt2);
+    if (is_close(magTotalSqr, 0.0f)) return 0.0f;
+    if (is_close(v1.x, v1.y) && is_close(v2.x, v2.y)) return acos(Consts::flt::RSqrt2);
     const float d = dot(v1, v2);
     return acos(clamp(d * rsqrt(magTotalSqr), -1.0f, 1.0f));
 }
@@ -60,7 +60,7 @@ float2 Math::reflect(const float2& v, const float2& normal) {
 
 float2 Math::project(const float2& v, const float2& normal) {
     const float magSqr = normal.magnitudeSqr();
-    if (isEqual(magSqr, 0.0f)) {
+    if (is_close(magSqr, 0.0f)) {
         return float2::zero();
     }
     return normal * (dot(v, normal) / magSqr);
@@ -86,7 +86,7 @@ float2 Math::Interpolation::interpolate(const float2& start, const float2& end, 
 ///////////////////////////////////////////////
 
 bool Math::isNormalized(const float3& v) {
-    return isEqual(v.magnitudeSqr(), 1.0f);
+    return is_close(v.magnitudeSqr(), 1.0f);
 }
 
 float3 Math::normalize(const float3& v) {
@@ -131,7 +131,7 @@ float Math::distanceSqr(const float3& v1, const float3& v2) {
 
 float Math::angle(const float3& v1, const float3& v2) {
     const float magTotalSqr = v1.magnitudeSqr() * v2.magnitudeSqr();
-    if (isEqual(magTotalSqr, 0.0f)) {
+    if (is_close(magTotalSqr, 0.0f)) {
         return 0.0f;
     }
     const float d = dot(v1, v2);
@@ -148,7 +148,7 @@ float3 Math::reflect(const float3& v, const float3& normal) {
 
 float3 Math::project(const float3& v, const float3& normal) {
     const float magSqr = normal.magnitudeSqr();
-    if (isEqual(magSqr, 0.0f)) {
+    if (is_close(magSqr, 0.0f)) {
         return float3::zero();
     }
     return normal * (dot(v, normal) / magSqr);
@@ -177,7 +177,7 @@ float3 Math::Interpolation::interpolate(const float3& start, const float3& end, 
 ///////////////////////////////////////////////
 
 bool Math::isNormalized(const float4& v) {
-    return isEqual(v.magnitudeSqr(), 1.0f);
+    return is_close(v.magnitudeSqr(), 1.0f);
 }
 
 float4 Math::normalize(const float4& v) {
@@ -211,7 +211,7 @@ float Math::distanceSqr(const float4& v1, const float4& v2) {
 }
 
 float3 Math::projectTo3D(const float4& v) {
-    return isEqual(v.w, 0.0f) ? v.xyz() : v.xyz() / v.w;
+    return is_close(v.w, 0.0f) ? v.xyz() : v.xyz() / v.w;
 }
 
 float Math::distanceToPlane(const float4& plane, const float3& point) {

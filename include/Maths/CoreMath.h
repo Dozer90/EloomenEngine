@@ -12,167 +12,280 @@
 
 #include <cmath>
 
-#define NUMERIC_TEMPLATE template<typename T> inline eastl::enable_if<eastl::is_arithmetic<T>::value, T>::type
-#define NUMERIC_TEMPLATE_RETURN_TYPE(_T) template<typename T> inline eastl::enable_if<eastl::is_arithmetic<T>::value, _T>::type
-
 namespace eloo::Math {
 
-/////////////////////////////////////////////////////////
-// Fast square variants
+namespace {
+template <typename T> concept number_t = eastl::is_arithmetic_v<T>;
+template <typename T> concept float_t = eastl::is_floating_point_v<T>;
+template <typename T> concept int_t = eastl::is_integral_v<T>;
+template <number_t T1, number_t T2>
+using common_t = eastl::common_type_t<T1, T2>;
+template <float_t T>
+using ftoi_t = eastl::conditional_t<eastl::is_same_v<T, float64_t>, int64_t,
+               eastl::conditional_t<eastl::is_same_v<T, float32_t>, int32_t,
+               eastl::conditional_t<eastl::is_same_v<T, float16_t>, uint16_t, void>>>;
+template <int_t T>
+using ttof_t = eastl::conditional_t<eastl::is_same_v<T, int64_t>, float64_t,
+               eastl::conditional_t<eastl::is_same_v<T, int32_t>, float32_t,
+               eastl::conditional_t<eastl::is_same_v<T, uint16_t>, float16_t, void>>>;
 
-inline double invSqrtFast(double v) {
-    const int64_t i = 0x5FE6EB50C7B537A9 - (*(int64_t*)&v >> 1);
-    const double y = *(double*)&i;
-    return y * (1.5 - (v * 0.5 * y * y));
+#define make_func_for_float16(f) \
+template <> float16_t f(float16_t v) { \
+    return float16_t::float32_to_16(f(float16_t::float16_to_32(v))); \
+}
+#define make_constexpr_func_for_float16(f) \
+template <> constexpr float16_t f(float16_t v) { \
+    return float16_t::float32_to_16(f(float16_t::float16_to_32(v))); \
 }
 
-inline float invSqrtFast(float v) {
-    const int32_t i = 0x5F3759DF - (*(int32_t*)&v >> 1);
-    const float y = *(float*)&i;
-    return y * (1.5f - (v * 0.5f * y * y));
+#define make_func_for_float16_2args(f) \
+template <> float16_t f(float16_t x, float16_t y) { \
+    return float16_t::float32_to_16(f(float16_t::float16_to_32(x), float16_t::float16_to_32(y))); \
+}
+#define make_constexpr_func_for_float16_2args(f) \
+template <> constexpr float16_t f(float16_t x, float16_t y) { \
+    return float16_t::float32_to_16(f(float16_t::float16_to_32(x), float16_t::float16_to_32(y))); \
 }
 
-// Newton's Method (Iterative Refinement)
-inline double sqrtFast(double v, uint16_t iterations = 1) {
-    if (v == 0.0 || iterations == 0) { return 0.0; }
-    double guess = v * 0.5;
-    do {
-        guess = (guess + v / guess) * 0.5;
-    } while (--iterations > 0);
-    return guess;
-}
-
-inline float sqrtFast(float v, uint16_t iterations = 1) {
-    if (v == 0.0f || iterations == 0) { return 0.0f; }
-    float guess = v * 0.5f;
-    do {
-        guess = (guess + v / guess) * 0.5f;
-    } while (--iterations > 0);
-    return guess;
-}
-
-inline double rsqrtFast(double v, uint16_t iterations = 1) {
-    if (v == 0.0 || iterations == 0) { return 0.0; }
-    return 1.0 / sqrtFast(v, iterations);
-}
-
-inline float rsqrtFast(float v, uint16_t iterations = 1) {
-    if (v == 0.0 || iterations == 0) { return 0.0; }
-    return 1.0 / sqrtFast(v, iterations);
+template <float_t T>
+inline constexpr int32_t float_exponent_bias = eastl::is_same_v<T, float64_t> ? 0x03FF :
+                                               eastl::is_same_v<T, float32_t> ? 0x007F :
+                                               eastl::is_same_v<T, float16_t> ? 0x000F : 0x0000;
+template <float_t T>
+inline constexpr int32_t float_mantissa_mask = eastl::is_same_v<T, float64_t> ? 0x0034 :
+                                               eastl::is_same_v<T, float32_t> ? 0x0017 :
+                                               eastl::is_same_v<T, float16_t> ? 0x000A : 0x0000;
 }
 
 
 /////////////////////////////////////////////////////////
 // Comparison
 
-bool isEqual(ldouble lhs, ldouble rhs)              { return abs(lhs - rhs) <= Consts::ldbl::Epsilon; }
-bool isEqual(double lhs, double rhs)                { return abs(lhs - rhs) <= Consts::dbl::Epsilon; }
-bool isEqual(float lhs, float rhs)                  { return abs(lhs - rhs) <= Consts::flt::Epsilon; }
+template <float_t T1, number_t T2>
+constexpr bool is_close(T1 val1, T2 val2) {
+    const T1 v = abs(val1 - static_cast<T1>(val2));
+    if constexpr (sizeof(T1) >= 64) {
+        return v <= static_cast<T2>(Consts::f64::Epsilon);
+    } else if constexpr (sizeof(T1) == 32) {
+        return v <= Consts::f32::Epsilon;
+    } else {
+        return v <= Consts::f16::Epsilon;
+    }
+}
 
-NUMERIC_TEMPLATE min(T value, T minValue)           { return value < minValue ? minValue : value; }
-NUMERIC_TEMPLATE max(T value, T maxValue)           { return value > maxValue ? maxValue : value; }
+template <number_t T1, number_t T2, typename TOut = common_t<T1, T2>>
+constexpr TOut min(T1 v1, T2 v2) {
+    return static_cast<TOut>(v1 <  v2 ? v1 : v2);
+}
 
+template <number_t T1, number_t T2, typename TOut = common_t<T1, T2>>
+constexpr TOut max(T1 v1, T2 v2) {
+    return static_cast<TOut>(v1 > v2 ? v1 : v2);
+}
 
 /////////////////////////////////////////////////////////
 // Signs
 
-NUMERIC_TEMPLATE abs(T value)                       { return std::abs(value); }
-NUMERIC_TEMPLATE_RETURN_TYPE(int) sign(T value)     { return static_cast<int>((val > static_cast<T>(0)) - (val < static_cast<T>(0))); }
+template <number_t T>
+constexpr T abs(T v)                { return std::abs(value); }
+template <number_t T>
+constexpr int sign(T v)             { return static_cast<int>((val > 0) - (val < 0)); }
 
 
 /////////////////////////////////////////////////////////
 // Logarithm
 
-NUMERIC_TEMPLATE log(T value)                       { return std::abs(value); }
-inline double log(double value)                     { return static_cast<double>(log(static_cast<ldouble>(value))); }
+// Provides ~99.7% accuracy, significantly faster than log2()
+template <float_t T> constexpr T fast_log2(T v) {
+    using intX_t = ftoi_t<T>;
+    if constexpr (eastl::is_same_v<T, float64_t>) {
+        return std::bit_cast<intX_t>(v) * 1.4426950408889634e-16 - float_exponent_bias<T>;
+    } else if constexpr (eastl::is_same_v<T, float32_t>) {
+        return std::bit_cast<intX_t>(v) * 1.1920928955078125e-7f - float_exponent_bias<T>;
+    } else {
+        return std::bit_cast<intX_t>(v) * 5.960464477539063e-8_h - float_exponent_bias<T>;
+    }
+}
 
-NUMERIC_TEMPLATE log10(T value)                     { return std::log10(value); }
-inline double log10(double value)                   { return static_cast<double>(log10(static_cast<ldouble>(value))); }
+// Provides ~99.7% accuracy, significantly faster than ln()
+constexpr float64_t fast_ln(float64_t v)        { return fast_log2(v) * Consts::f64::ln2; }
+constexpr float32_t fast_ln(float32_t v)        { return fast_log2(v) * Consts::f32::ln2; }
+constexpr float16_t fast_ln(float16_t v)        { return fast_log2(v) * Consts::f16::ln2; }
+
+// Provides ~99.99% accuracy, slightly slower than fast_ln
+template <float_t T>
+constexpr T fast_ln_poly(T v) {
+    constexpr float64_t _1_3rd = 0.33333333333333333;
+    constexpr float64_t _1_5th = 0.2;
+    constexpr float64_t _1_7th = 0.14285714285714285;
+    const float64_t y = (static_cast<float64_t>(v) - 1.0) / (static_cast<float64_t>(v) + 1.0);
+    const float64_t y2 = y * y;
+    const float64_t r = 2.0 * y * (1.0 + y2 * (_1_3rd + y2 * (_1_5th + y2 * _1_7th)));
+    if constexpr (eastl::is_same<T, float64_t>::value) {
+        return r;
+    } else {
+        return static_cast<T>(r);
+    }
+}
+
+template <float_t T1, float_t T2, typename TOut = common_t<T1, T2>>
+constexpr TOut fast_log(T1 v, T2 base)          { return static_cast<TOut>(fast_log2(v) / fast_log2(base)); }
+
+// Provides complete accuracy, slow to calculate
+template <float_t T> constexpr T log(T v)       { return std::log(v); }
 
 
 /////////////////////////////////////////////////////////
 // Exponentials
 
-NUMERIC_TEMPLATE pow(T value, T power)              { return std::pow(value, power); }
-inline double pow(double value, double power)       { return static_cast<double>(pow(static_cast<ldouble>(value), static_cast<ldouble>(power))); }
+template <float_t T>
+constexpr T fast_exp2_int(int v)                { return static_cast<T>(1ull << v); }
 
-NUMERIC_TEMPLATE exp(T value)                       { return static_cast<T>(std::exp(value)); }
+template <float_t T>
+constexpr T fast_exp2(T v) {
+    constexpr float64_t c1 = 0.6960656421;
+    constexpr float64_t c2 = 0.2244667935;
+    constexpr float64_t c3 = 0.0790243555;
+    const int i = static_cast<int>(v);
+    const T d = v - i;
+    return fast_exp2_int<T>(i) * static_cast<T>(1.0 + d * (c1 + d * (c2 + d * c3)));
+}
 
-NUMERIC_TEMPLATE sqr(T value)                       { return value * value; }
-NUMERIC_TEMPLATE cube(T value)                      { return value * value * value; }
-NUMERIC_TEMPLATE quad(T value)                      { return value * value * value * value; }
-NUMERIC_TEMPLATE quint(T value)                     { return value * value * value * value * value; }
+constexpr float64_t fast_exp(float64_t v)       { return fast_exp2(v * Consts::f64::log2e); }
+constexpr float32_t fast_exp(float32_t v)       { return fast_exp2(v * Consts::f32::log2e); }
+constexpr float16_t fast_exp(float16_t v)       { return fast_exp2(v * Consts::f16::log2e); }
+template <float_t T1, float_t T2, typename TOut = common_t<T1, T2>>
+constexpr TOut fast_exp(T1 v, T2 base)          { return fast_exp<TOut>(v * fast_ln(base)); }
 
-NUMERIC_TEMPLATE sqrt(T value)                      { return std::sqrt(value); }
+constexpr float64_t fast_exp10(float64_t v)     { return fast_exp(v * Consts::f64::log10e); }
+constexpr float32_t fast_exp10(float32_t v)     { return fast_exp(v * Consts::f32::log10e); }
+constexpr float16_t fast_exp10(float16_t v)     { return fast_exp(v * Consts::f16::log10e); }
 
-NUMERIC_TEMPLATE rsqrt(T value)                     { return static_cast<T>(1.0) / std::sqrt(value); }
+template <number_t T> constexpr T sqr(T v)      { return v * v; }
+template <number_t T> constexpr T cube(T v)     { return v * v * v; }
+template <number_t T> constexpr T quad(T v)     { return v * v * v * v; }
+template <number_t T> constexpr T quint(T v)    { return v * v * v * v * v; }
+
+
+/////////////////////////////////////////////////////////
+// Square roots
+
+constexpr float64_t fast_inv_sqrt(float64_t v) {
+    const int64_t i = 0x5FE6EB50C7B537A9 - (std::bit_cast<int64_t>(v) >> 1);
+    const float64_t y = std::bit_cast<float64_t>(i);
+    return y * (1.5 - (v * 0.5 * y * y));
+}
+
+constexpr float32_t fast_inv_sqrt(float32_t v) {
+    const int32_t i = 0x5F3759DF - (std::bit_cast<int32_t>(v) >> 1);
+    const float32_t y = std::bit_cast<float32_t>(i);
+    return y * (1.5f - (v * 0.5f * y * y));
+}
+
+constexpr float16_t fast_inv_sqrt(float16_t v) {
+    const uint16_t i = 0x5F30 - (std::bit_cast<uint16_t>(v) >> 1);
+    const float16_t y = std::bit_cast<float16_t>(i);
+    return y * (1.5_h - (v * 0.5_h * y * y));
+}
+
+template <float_t T> constexpr T fast_sqrt(T v, uint16_t iterations = 1) {
+    const float64_t v64 = static_cast<float64_t>(v);
+    if (is_close(v64, 0.0) || iterations == 0) {
+        return static_cast<T>(0.0);
+    }
+
+    float64_t guess = v64 * 0.5;
+    do {
+        guess = (guess + v64 / guess) * 0.5;
+    } while (--iterations > 0);
+    return guess;
+}
+
+template <float_t T> constexpr T fast_rsqrt(T v, uint16_t iterations = 1) {
+    const float64_t v64 = static_cast<float64_t>(v);
+    if (is_close(v64, 0.0) || iterations == 0) {
+        return static_cast<T>(0.0);
+    }
+    return static_cast<T>(1.0 / fast_sqrt(v, iterations));
+}
 
 
 /////////////////////////////////////////////////////////
 // Clamping
 
-NUMERIC_TEMPLATE clamp(T value, T minValue, T maxValue) {
-    return (value < minValue) ? minValue
-         : (value > maxValue) ? maxValue
-         : value;
+template <number_t T> constexpr T clamp(T v, T m, T M) {
+    return v < m ? m : v > M ? M : v;
 }
-inline double saturate(double value)                { return clamp(value, 0.0, 1.0); }
-inline float saturate(float value)                  { return clamp(value, 0.0f, 1.0f); }
+
+template <number_t T> constexpr T saturate(T v)     { return clamp(v, 0, 1); }
 
 
 /////////////////////////////////////////////////////////
 // Rounding
 
-NUMERIC_TEMPLATE floor(T value)                     { return std::floor(value); }
-NUMERIC_TEMPLATE round(T value)                     { return std::round(value); }
-NUMERIC_TEMPLATE ceil(T value)                      { return std::ceil(value); }
+template <float_t T> constexpr T floor(T v)         { return std::floor(v); }
+template <float_t T> constexpr T ceil(T v)          { return std::ceil(v); }
+template <float_t T> constexpr T frac(T v)          { return v - floor(v); }
 
-inline ldouble frac(ldouble value)                  { return value - floor(value); }
-inline double frac(double value)                    { return value - floor(value); }
-inline float frac(float value)                      { return value - floor(value); }
+make_constexpr_func_for_float16(floor)
+make_constexpr_func_for_float16(ceil)
 
 
 /////////////////////////////////////////////////////////
 // Conversions
 
-NUMERIC_TEMPLATE lerp(T from, T to, float t)    { return from + (to - from) * t; }
-NUMERIC_TEMPLATE remap(T v, T old1, T old2, T new1, T new2) {
-    return new1 + (v - old1) * (new2 - new1) / (old2 - old1);
-}
-NUMERIC_TEMPLATE remapClamped(T v, T old1, T old2, T new1, T new2) {
-    return clamp(remap(v, old1, old2, new1, new2), min(new1, new2), max(new1, new2));
-}
+template <float_t T1, float_t T2, typename TOut = common_t<T1, T2>>
+constexpr TOut lerp(T1 from, T2 to, T2 t)           { return static_cast<TOut>(from + (to - from) * t); }
 
-NUMERIC_TEMPLATE toRadians(T degrees)               { return static_cast<T>(static_cast<ldouble>(degrees) * Consts::ldbl::DegToRad); }
-NUMERIC_TEMPLATE toDegrees(T radians)               { return static_cast<T>(static_cast<ldouble>(radians) * Consts::ldbl::RadToDeg); }
+template <float_t T>
+constexpr T remap(T v, T om, T oM, T nm, T nM)      { return nm + (v - om) * (nM - nm) / (oM - om); }
 
 
 /////////////////////////////////////////////////////////
 // Trigonometry
 
-NUMERIC_TEMPLATE sin(T radians)                     { return std::sin(radians); }
-inline double sin(double radians)                   { return static_cast<double>(sin(static_cast<ldouble>(radians))); }
-NUMERIC_TEMPLATE cos(T radians)                     { return std::cos(radians); }
-inline double cos(double radians)                   { return static_cast<double>(cos(static_cast<ldouble>(radians))); }
-NUMERIC_TEMPLATE tan(T radians)                     { return std::tan(radians); }
-inline double tan(double radians)                   { return static_cast<double>(tan(static_cast<ldouble>(radians))); }
+template <number_t T> constexpr T deg_to_rad(T v)   { return static_cast<T>(static_cast<float64_t>(v) * Consts::ldbl::DegToRad); }
+template <number_t T> constexpr T rad_to_deg(T v)   { return static_cast<T>(static_cast<float64_t>(v) * Consts::ldbl::RadToDeg); }
 
-NUMERIC_TEMPLATE asin(T value)                      { return std::asin(value); }
-inline double asin(double value)                    { return static_cast<double>(asin(static_cast<ldouble>(value))); }
-NUMERIC_TEMPLATE acos(T value)                      { return std::acos(value); }
-inline double acos(double value)                    { return static_cast<double>(acos(static_cast<ldouble>(value))); }
-NUMERIC_TEMPLATE atan(T value)                      { return std::atan(value); }
-inline double atan(double value)                    { return static_cast<double>(atan(static_cast<ldouble>(value))); }
+template <float_t T> T sin(T rads)                  { return std::sin(rads); }
+template <float_t T> T cos(T rads)                  { return std::cos(rads); }
+template <float_t T> T tan(T rads)                  { return std::tan(rads); }
+make_func_for_float16(sin)
+make_func_for_float16(cos)
+make_func_for_float16(tan)
 
-NUMERIC_TEMPLATE atan2(T y, T x)                    { return std::atan2(y, x); }
+template <float_t T> T asin(T rads)                 { return std::asin(rads); }
+template <float_t T> T acos(T rads)                 { return std::acos(rads); }
+template <float_t T> T atan(T rads)                 { return std::atan(rads); }
+make_func_for_float16(asin)
+make_func_for_float16(acos)
+make_func_for_float16(atan)
+
+template <float_t T> T atan2(T y, T x)              { return std::atan2(y, x); }
+make_func_for_float16_2args(atan2)
+
 
 /////////////////////////////////////////////////////////
 // Modulo
 
-NUMERIC_TEMPLATE mod(T value, T divisor)            { return divisor != 0 ? value % divisor : 0; }
-inline ldouble mod(ldouble value, ldouble divisor)  { return divisor != 0.0L ? std::fmod(value, divisor) : 0.0L; }
-inline double mod(double value, double divisor)     { return divisor != 0.0 ? std::fmod(value, divisor) : 0.0; }
-inline float mod(float value, float divisor)        { return divisor != 0.0f ? std::fmod(value, divisor) : 0.0f; }
+template <number_t T1, number_t T2, typename TOut = common_t<T1, T2>>
+constexpr TOut mod(T1 v, T2 d) {
+    if constexpr (eastl::is_integral<TOut>::value) {
+        // Regular integral modulo
+        return d == 0 ? 0 : return static_cast<TOut>(v % d);
+    } else {
+        // Floating modulo
+        using intX_t = ftoi_t<TOut>;
+
+        const intX_t bits = std::bit_cast<intX_t>(v);
+        const intX_t expo = ((bits >> float_mantissa_mask<TOut>) & 0xFF) - float_exponent_bias<TOut>;
+        if (expo <= 0) {
+            return static_cast<TOut>(0);
+        }
+        TOut wholePart = std::bit_cast<TOut>(bits & ~((1LL << (float_mantissa_mask<TOut> - expo)) - 1));
+        return static_cast<TOut>(v) - wholePart * d;
+    }
+}
 
 
 /////////////////////////////////////////////////////////
