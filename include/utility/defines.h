@@ -31,6 +31,7 @@ namespace eloo {
     struct id_t { \
         constexpr id_t(size_t value) ELOO_NOEXCEPT : mID(value) {} \
         constexpr operator size_t() const ELOO_NOEXCEPT { return mID; } \
+        constexpr bool operator == (const size_t& other) const { return mID == other; } \
         auto operator <=>(const id_t& other) const ELOO_NOEXCEPT = default; \
     private: \
         size_t mID = 0; \

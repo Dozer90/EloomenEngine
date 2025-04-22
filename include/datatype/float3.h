@@ -71,7 +71,6 @@ namespace eloo::float3 {
     inline static constexpr values RIGHT    { 1.0f, 0.0f, 0.0f };
     inline static constexpr values UP       { 0.0f, 1.0f, 0.0f };
     inline static constexpr values FORWARD  { 0.0f, 0.0f, 1.0f };
-    inline static constexpr values NaN      { EASTL_FLT_NAN, EASTL_FLT_NAN, EASTL_FLT_NAN };
 
     id_t create(float x = 0.0f, float y = 0.0f, float z = 0.0f, bool useIDPool = true);
     id_t create(const values& vals, bool useIDPool = true);

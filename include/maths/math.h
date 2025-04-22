@@ -76,6 +76,16 @@ namespace eloo::math {
     /////////////////////////////////////////////////////////
     // Comparison
 
+    template <numeric_t T>
+    FORCE_INLINE constexpr bool is_inf(T val) {
+        return std::isinf(val);
+    }
+
+    template <numeric_t T>
+    FORCE_INLINE constexpr bool is_nan(T val) {
+        return std::isnan(val);
+    }
+
     template <float_t T1, numeric_t T2>
     FORCE_INLINE constexpr bool is_close_to(T1 val1, T2 val2) {
         if constexpr (sizeof(T1) == 8) {

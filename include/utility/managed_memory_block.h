@@ -32,12 +32,17 @@ namespace eloo {
             return id;
         }
 
-        bool try_remove(size_t id) {
-            const bool successful = is_valid(id) && mUnusedIDs.insert(id).second;
-            if (successful) {
-                mData[id] = T();
+        bool remove(size_t id) {
+            if (!is_valid(id)) {
+                ASSERT_FALSE("Cannot remove invalid id %i from managed_memory_block.", id);
+                return false;
             }
-            return successful;
+            if (!mUnusedIDs.insert(id).second) {
+                ASSERT_FALSE("ID %i is already in managed_memory_block's pool. This should not happen.", id);
+                return false;
+            }
+            mData[id] = T();
+            return true;
         }
 
         bool is_valid(size_t id) const {

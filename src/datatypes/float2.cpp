@@ -16,376 +16,246 @@ float2::id_t float2::create(float x, float y, bool useIDPool) {
     return id;
 }
 
-inline float2::id_t float2::create(const value& vals, bool useIDPool) {
+inline float2::id_t float2::create(const values& vals, bool useIDPool) {
     return create(vals.x(), vals.y(), useIDPool);
 }
 
 bool float2::try_release(id_t id) {
-    return
-        gMemoryBlockX.try_remove(id) &&
-        gMemoryBlockY.try_remove(id);
+    if (!is_valid(id)) {
+        return false;
+    }
+    gMemoryBlockX.remove(id);
+    gMemoryBlockY.remove(id);
+    return true;
 }
 
-inline float2::view float2::get_view(id_t id) {
-    return {
-        gMemoryBlockX.get(id),
-        gMemoryBlockY.get(id)
-    };
+inline bool float2::try_get_values(id_t id, float2::values& vals) {
+    if (is_valid(id)) {
+        vals = {
+            gMemoryBlockX.get(id),
+            gMemoryBlockY.get(id)
+        };
+        return true;
+    }
+    return false;
 }
 
-inline float& float2::x(id_t id) {
-    return gMemoryBlockX.get(id);
-}
+inline float& float2::x(id_t id) { return gMemoryBlockX.get(id); }
+inline float& float2::y(id_t id) { return gMemoryBlockY.get(id); }
 
-inline float& float2::y(id_t id) {
-    return gMemoryBlockY.get(id);
-}
-
-inline const float& float2::const_x(id_t id) {
-    return gMemoryBlockX.get(id);
-}
-
-inline const float& float2::const_y(id_t id) {
-    return gMemoryBlockY.get(id);
-}
+inline const float& float2::const_x(id_t id) { return gMemoryBlockX.get(id); }
+inline const float& float2::const_y(id_t id) { return gMemoryBlockY.get(id); }
 
 
-/////////////////////////////////////////////////////////////////
-// float2::value
+///////////////////////////////////////////////////////
+// Values container
 
-bool operator != (const float2::value& lhs, const float2::value& rhs) {
+bool operator != (const float2::values& lhs, const float2::values& rhs) {
     return
         lhs.x() != rhs.x() ||
         lhs.y() != rhs.y();
 }
-bool operator != (const float2::value& lhs, const float2::view& rhs) {
-    return
-        lhs.x() != rhs.x() ||
-        lhs.y() != rhs.y();
-}
-bool operator != (const float2::value& lhs, float rhs) {
+bool operator != (const float2::values& lhs, float rhs) {
     return
         lhs.x() != rhs ||
         lhs.y() != rhs;
 }
 
-bool operator == (const float2::value& lhs, const float2::value& rhs) {
+bool operator == (const float2::values& lhs, const float2::values& rhs) {
     return
         lhs.x() == rhs.x() &&
         lhs.y() == rhs.y();
 }
-bool operator == (const float2::value& lhs, const float2::view& rhs) {
-    return
-        lhs.x() == rhs.x() &&
-        lhs.y() == rhs.y();
-}
-bool operator == (const float2::value& lhs, float rhs) {
+bool operator == (const float2::values& lhs, float rhs) {
     return
         lhs.x() == rhs &&
         lhs.y() == rhs;
 }
 
-float2::value operator - (const float2::value& lhs) {
+float2::values operator - (const float2::values& lhs) {
     return {
         -lhs.x(),
         -lhs.y()
     };
 }
 
-float2::value operator / (const float2::value& lhs, const float2::value& rhs) {
+float2::values operator / (const float2::values& lhs, const float2::values& rhs) {
     return {
-        math::is_close_to_zero(rhs.x()) ? 0.0f : lhs.x() / rhs.x(),
-        math::is_close_to_zero(rhs.y()) ? 0.0f : lhs.y() / rhs.y()
+        lhs.x() / rhs.x(),
+        lhs.y() / rhs.y()
     };
 }
-float2::value operator / (const float2::value& lhs, const float2::view& rhs) {
-    return {
-        math::is_close_to_zero(rhs.x()) ? 0.0f : lhs.x() / rhs.x(),
-        math::is_close_to_zero(rhs.y()) ? 0.0f : lhs.y() / rhs.y()
-    };
-}
-float2::value operator / (const float2::value& lhs, float rhs) {
-    if (math::is_close_to_zero(rhs)) {
-        return { 0.0f, 0.0f };
-    }
+float2::values operator / (const float2::values& lhs, float rhs) {
     return {
         lhs.x() / rhs,
         lhs.y() / rhs
     };
 }
 
-float2::value operator * (const float2::value& lhs, const float2::value& rhs) {
+float2::values operator * (const float2::values& lhs, const float2::values& rhs) {
     return {
         lhs.x() * rhs.x(),
         lhs.y() * rhs.y()
     };
 }
-float2::value operator * (const float2::value& lhs, const float2::view& rhs) {
-    return {
-        lhs.x() * rhs.x(),
-        lhs.y() * rhs.y()
-    };
-}
-float2::value operator * (const float2::value& lhs, float rhs) {
+float2::values operator * (const float2::values& lhs, float rhs) {
     return {
         lhs.x() * rhs,
         lhs.y() * rhs
     };
 }
 
-float2::value operator + (const float2::value& lhs, const float2::value& rhs) {
+float2::values operator + (const float2::values& lhs, const float2::values& rhs) {
     return {
         lhs.x() + rhs.x(),
         lhs.y() + rhs.y()
     };
 }
-float2::value operator + (const float2::value& lhs, const float2::view& rhs) {
-    return {
-        lhs.x() + rhs.x(),
-        lhs.y() + rhs.y()
-    };
-}
-float2::value operator + (const float2::value& lhs, float rhs) {
+float2::values operator + (const float2::values& lhs, float rhs) {
     return {
         lhs.x() + rhs,
         lhs.y() + rhs
     };
 }
 
-float2::value operator - (const float2::value& lhs, const float2::value& rhs) {
+float2::values operator - (const float2::values& lhs, const float2::values& rhs) {
     return {
         lhs.x() - rhs.x(),
         lhs.y() - rhs.y()
     };
 }
-float2::value operator - (const float2::value& lhs, const float2::view& rhs) {
-    return {
-        lhs.x() - rhs.x(),
-        lhs.y() - rhs.y()
-    };
-}
-float2::value operator - (const float2::value& lhs, float rhs) {
+float2::values operator - (const float2::values& lhs, float rhs) {
     return {
         lhs.x() - rhs,
         lhs.y() - rhs
     };
 }
 
-float2::value& float2::value::operator = (const value& other) {
+float2::values& float2::values::operator = (const values& other) {
     mX = other.x();
     mY = other.y();
     return *this;
 }
-float2::value& float2::value::operator = (const view& other) {
-    mX = other.x();
-    mY = other.y();
-    return *this;
-}
-float2::value& float2::value::operator = (float value) {
-    mX = value;
-    mY = value;
+float2::values& float2::values::operator = (float val) {
+    mX = val;
+    mY = val;
     return *this;
 }
 
-float2::value& float2::value::operator - () {
+float2::values& float2::values::operator - () {
     mX = -mX;
     mY = -mY;
     return *this;
 }
 
-float2::value& float2::value::operator /= (const view& other) {
-    mX = math::is_close_to_zero(other.x()) ? 0.0f : mX / other.x();
-    mY = math::is_close_to_zero(other.y()) ? 0.0f : mY / other.y();
+float2::values& float2::values::operator /= (const values& other) {
+    mX /= other.x();
+    mY /= other.y();
     return *this;
 }
-float2::value& float2::value::operator /= (const value& other) {
-    mX = math::is_close_to_zero(other.x()) ? 0.0f : mX / other.x();
-    mY = math::is_close_to_zero(other.y()) ? 0.0f : mY / other.y();
-    return *this;
-}
-float2::value& float2::value::operator /= (float value) {
-    if (math::is_close_to_zero(value)) {
-        mX = 0.0f;
-        mY = 0.0f;
-    } else {
-        mX /= value;
-        mY /= value;
-    }
+float2::values& float2::values::operator /= (float val) {
+    mX /= val;
+    mY /= val;
     return *this;
 }
 
-float2::value& float2::value::operator *= (const view& other) {
+float2::values& float2::values::operator *= (const values& other) {
     mX *= other.x();
     mY *= other.y();
     return *this;
 }
-float2::value& float2::value::operator *= (const value& other) {
-    mX *= other.x();
-    mY *= other.y();
-    return *this;
-}
-float2::value& float2::value::operator *= (float value) {
-    mX *= value;
-    mY *= value;
+float2::values& float2::values::operator *= (float val) {
+    mX *= val;
+    mY *= val;
     return *this;
 }
 
-float2::value& float2::value::operator += (const view& other) {
+float2::values& float2::values::operator += (const values& other) {
     mX += other.x();
     mY += other.y();
     return *this;
 }
-float2::value& float2::value::operator += (const value& other) {
-    mX += other.x();
-    mY += other.y();
-    return *this;
-}
-float2::value& float2::value::operator += (float value) {
-    mX += value;
-    mY += value;
+float2::values& float2::values::operator += (float val) {
+    mX += val;
+    mY += val;
     return *this;
 }
 
-float2::value& float2::value::operator -= (const view& other) {
+float2::values& float2::values::operator -= (const values& other) {
     mX -= other.x();
     mY -= other.y();
     return *this;
 }
-float2::value& float2::value::operator -= (const value& other) {
-    mX -= other.x();
-    mY -= other.y();
-    return *this;
-}
-float2::value& float2::value::operator -= (float value) {
-    mX -= value;
-    mY -= value;
+float2::values& float2::values::operator -= (float val) {
+    mX -= val;
+    mY -= val;
     return *this;
 }
 
 
-/////////////////////////////////////////////////////////////////
-// float2::view
+///////////////////////////////////////////////////////
+// Assignment and manipulation operators
 
-bool operator != (const float2::view& lhs, const float2::view& rhs) {
-    return
-        lhs.x() != rhs.x() ||
-        lhs.y() != rhs.y();
-}
-bool operator != (const float2::view& lhs, const float2::value& rhs) {
-    return
-        lhs.x() != rhs.x() ||
-        lhs.y() != rhs.y();
-}
-bool operator != (const float2::view& lhs, float rhs) {
-    return
-        lhs.x() != rhs ||
-        lhs.y() != rhs;
-}
-
-bool operator == (const float2::view& lhs, const float2::view& rhs) {
-    return
-        lhs.x() == rhs.x() &&
-        lhs.y() == rhs.y();
-}
-bool operator == (const float2::view& lhs, const float2::value& rhs) {
-    return
-        lhs.x() == rhs.x() &&
-        lhs.y() == rhs.y();
-}
-bool operator == (const float2::view& lhs, float rhs) {
-    return
-        lhs.x() == rhs &&
-        lhs.y() == rhs;
-}
-
-float2::view& float2::view::operator = (const view& other) {
+float2::values& float2::values::operator = (const values& other) {
     mX = other.x();
     mY = other.y();
     return *this;
 }
-float2::view& float2::view::operator = (const value& other) {
-    mX = other.x();
-    mY = other.y();
-    return *this;
-}
-float2::view& float2::view::operator = (float value) {
-    mX = value;
-    mY = value;
+float2::values& float2::values::operator = (float val) {
+    mX = val;
+    mY = val;
     return *this;
 }
 
-float2::view& float2::view::operator - () {
+float2::values& float2::values::operator + () {
+    return *this;
+}
+float2::values& float2::values::operator - () {
     mX = -mX;
     mY = -mY;
     return *this;
 }
 
-float2::view& float2::view::operator /= (const view& other) {
-    mX = math::is_close_to_zero(other.x()) ? 0.0f : mX / other.x();
-    mY = math::is_close_to_zero(other.y()) ? 0.0f : mY / other.y();
+float2::values& float2::values::operator /= (const values& other) {
+    mX /= other.x();
+    mY /= other.y();
     return *this;
 }
-float2::view& float2::view::operator /= (const value& other) {
-    mX = math::is_close_to_zero(other.x()) ? 0.0f : mX / other.x();
-    mY = math::is_close_to_zero(other.y()) ? 0.0f : mY / other.y();
-    return *this;
-}
-float2::view& float2::view::operator /= (float value) {
-    if (math::is_close_to_zero(value)) {
-        mX = 0.0f;
-        mY = 0.0f;
-    }
-    else {
-        mX /= value;
-        mY /= value;
-    }
+float2::values& float2::values::operator /= (float val) {
+    mX /= val;
+    mY /= val;
     return *this;
 }
 
-float2::view& float2::view::operator *= (const view& other) {
+float2::values& float2::values::operator *= (const values& other) {
     mX *= other.x();
     mY *= other.y();
     return *this;
 }
-float2::view& float2::view::operator *= (const value& other) {
-    mX *= other.x();
-    mY *= other.y();
-    return *this;
-}
-float2::view& float2::view::operator *= (float value) {
-    mX *= value;
-    mY *= value;
+float2::values& float2::values::operator *= (float val) {
+    mX *= val;
+    mY *= val;
     return *this;
 }
 
-float2::view& float2::view::operator += (const view& other) {
+float2::values& float2::values::operator += (const values& other) {
     mX += other.x();
     mY += other.y();
     return *this;
 }
-float2::view& float2::view::operator += (const value& other) {
-    mX += other.x();
-    mY += other.y();
-    return *this;
-}
-float2::view& float2::view::operator += (float value) {
-    mX += value;
-    mY += value;
+float2::values& float2::values::operator += (float val) {
+    mX += val;
+    mY += val;
     return *this;
 }
 
-float2::view& float2::view::operator -= (const view& other) {
+float2::values& float2::values::operator -= (const values& other) {
     mX -= other.x();
     mY -= other.y();
     return *this;
 }
-float2::view& float2::view::operator -= (const value& other) {
-    mX -= other.x();
-    mY -= other.y();
-    return *this;
-}
-float2::view& float2::view::operator -= (float value) {
-    mX -= value;
-    mY -= value;
+float2::values& float2::values::operator -= (float val) {
+    mX -= val;
+    mY -= val;
     return *this;
 }
