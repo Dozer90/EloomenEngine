@@ -2,7 +2,7 @@
 
 #include <Maths/float3.h>
 
-namespace eloo::Math {
+namespace eloo::math {
 class Quaternion {
 public:
     inline constexpr Quaternion() : w(1.0f), x(0.0f), y(0.0f), z(0.0f) {}

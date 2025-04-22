@@ -1,6 +1,6 @@
 #include <Maths/Transform2D.h>
 
-using namespace eloo::Math;
+using namespace eloo::math;
 
 Matrix3x3 Transform2D::toMatrix() const {
     Matrix3x3 m = Matrix3x3::createScale(mScale);

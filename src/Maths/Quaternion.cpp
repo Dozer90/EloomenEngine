@@ -2,7 +2,7 @@
 
 #include <Maths/Math.h>
 
-using namespace eloo::Math;
+using namespace eloo::math;
 
 void Quaternion::set(float w, float x, float y, float z) {
     this->w = w;

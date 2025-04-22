@@ -2,8 +2,8 @@
 
 #include <EASTL/variant.h>
 
-namespace eloo::Math::Interpolation {
-    enum class Type {
+namespace eloo::math::interpolation {
+    enum class blend_func {
         // No params
         lerp,
         sine,
@@ -14,7 +14,7 @@ namespace eloo::Math::Interpolation {
         circ,
         elastic,
         bounce,
-        logarithmic,
+        log,
 
         // Optional params
         expo,
@@ -29,55 +29,55 @@ namespace eloo::Math::Interpolation {
         _count
     };
 
-    enum class Ease {
+    enum class ease_type {
         in,
         out,
-        inout
+        in_out
     };
 
-    struct EaseOption {
-        Ease ease = Ease::in;
+    struct ease_opt {
+        ease_type ease = ease_type::in;
     };
 
-    struct ExpoOptions {
-        Ease ease = Ease::in;
+    struct expo_opt {
+        ease_type ease = ease_type::in;
         float power = 10.0;
     };
 
-    struct BackOptions {
-        Ease ease = Ease::in;
+    struct back_opt {
+        ease_type ease = ease_type::in;
         float overshoot = 1.70158;
     };
 
-    struct BezierOptions {
+    struct bezier_opt {
         float ctrl1 = 0.1f;
         float ctrl2 = 0.1f;
     };
 
-    struct SpringOptions {
+    struct spring_opt {
         float frequency = 0.64;
         float oscillation = 5.6;
         float decay = 1.4;
     };
 
-    struct PolyOptions {
-        Ease ease = Ease::in;
+    struct poly_opt {
+        ease_type ease = ease_type::in;
         float n = 0.0;
     };
 
-    struct StepOptions {
+    struct step_opt {
         int steps = 5;
     };
 
-    using Options = eastl::variant<
+    using blend_opt = eastl::variant<
         eastl::monostate,
-        EaseOption,
-        ExpoOptions,
-        BackOptions,
-        BezierOptions,
-        SpringOptions,
-        PolyOptions,
-        StepOptions>;
+        ease_opt,
+        expo_opt,
+        back_opt,
+        bezier_opt,
+        spring_opt,
+        poly_opt,
+        step_opt>;
 
-    float interpolate(float from, float to, float t, Type type, Options options = eastl::monostate{});
+    float interpolate(float from, float to, float t, blend_func type, blend_opt options = eastl::monostate{});
 }

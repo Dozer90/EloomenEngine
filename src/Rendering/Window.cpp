@@ -3,7 +3,7 @@
 #include <Maths/float2.h>
 
 using namespace eloo;
-using namespace eloo::Math;
+using namespace eloo::math;
 
 Window::Window(HINSTANCE instance, const eastl::wstring title, int width, int height) :
     mInstance(instance), mTitle(title), mWidth(width), mHeight(height) {

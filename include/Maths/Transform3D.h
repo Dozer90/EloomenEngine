@@ -3,7 +3,7 @@
 #include <Maths/float3.h>
 #include <Maths/Quaternion.h>
 
-namespace eloo::Math {
+namespace eloo::math {
 class Transform3D {
 public:
 	float3 forward() const;
@@ -22,4 +22,4 @@ private:
     Quaternion mRotation;
     float3 mScale;
 };
-} // eloo::Math
+} // eloo::math

@@ -136,8 +136,8 @@ namespace eloo {
             constexpr float scalar = 1.0f / 255.0f;
             if (kelvin <= 6600) {
                 r = 1.0f;
-                g = (99.470f * Math::log(kelvin) - 161.12f) * scalar;
-                b = kelvin <= 1900 ? 0.0f : (138.52 * Math::log(kelvin - 100) - 305.04f) * scalar;
+                g = (99.470f * math::log(kelvin) - 161.12f) * scalar;
+                b = kelvin <= 1900 ? 0.0f : (138.52 * math::log(kelvin - 100) - 305.04f) * scalar;
             } else {
                 r = 329.698f * pow(kelvin / 100.0f - 60.0f, -0.1332f) * scalar;
                 g = 288.122f * pow(kelvin / 100.0f - 60.0f, -0.0755f) * scalar;

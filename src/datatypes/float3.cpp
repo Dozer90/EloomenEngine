@@ -112,20 +112,20 @@ float3::value operator - (const float3::value& lhs) {
 
 float3::value operator / (const float3::value& lhs, const float3::value& rhs) {
     return {
-        Math::is_close_to_zero(rhs.x()) ? 0.0f : lhs.x() / rhs.x(),
-        Math::is_close_to_zero(rhs.y()) ? 0.0f : lhs.y() / rhs.y(),
-        Math::is_close_to_zero(rhs.z()) ? 0.0f : lhs.z() / rhs.z()
+        math::is_close_to_zero(rhs.x()) ? 0.0f : lhs.x() / rhs.x(),
+        math::is_close_to_zero(rhs.y()) ? 0.0f : lhs.y() / rhs.y(),
+        math::is_close_to_zero(rhs.z()) ? 0.0f : lhs.z() / rhs.z()
     };
 }
 float3::value operator / (const float3::value& lhs, const float3::view& rhs) {
     return {
-        Math::is_close_to_zero(rhs.x()) ? 0.0f : lhs.x() / rhs.x(),
-        Math::is_close_to_zero(rhs.y()) ? 0.0f : lhs.y() / rhs.y(),
-        Math::is_close_to_zero(rhs.z()) ? 0.0f : lhs.z() / rhs.z()
+        math::is_close_to_zero(rhs.x()) ? 0.0f : lhs.x() / rhs.x(),
+        math::is_close_to_zero(rhs.y()) ? 0.0f : lhs.y() / rhs.y(),
+        math::is_close_to_zero(rhs.z()) ? 0.0f : lhs.z() / rhs.z()
     };
 }
 float3::value operator / (const float3::value& lhs, float rhs) {
-    if (Math::is_close_to_zero(rhs)) {
+    if (math::is_close_to_zero(rhs)) {
         return { 0.0f, 0.0f, 0.0f };
     }
     return {
@@ -209,19 +209,19 @@ float3::value& float3::value::operator - () {
 }
 
 float3::value& float3::value::operator /= (const view& other) {
-    mX = Math::is_close_to_zero(other.x()) ? 0.0f : mX / other.x();
-    mY = Math::is_close_to_zero(other.y()) ? 0.0f : mY / other.y();
-    mZ = Math::is_close_to_zero(other.z()) ? 0.0f : mZ / other.z();
+    mX = math::is_close_to_zero(other.x()) ? 0.0f : mX / other.x();
+    mY = math::is_close_to_zero(other.y()) ? 0.0f : mY / other.y();
+    mZ = math::is_close_to_zero(other.z()) ? 0.0f : mZ / other.z();
     return *this;
 }
 float3::value& float3::value::operator /= (const value& other) {
-    mX = Math::is_close_to_zero(other.x()) ? 0.0f : mX / other.x();
-    mY = Math::is_close_to_zero(other.y()) ? 0.0f : mY / other.y();
-    mZ = Math::is_close_to_zero(other.z()) ? 0.0f : mZ / other.z();
+    mX = math::is_close_to_zero(other.x()) ? 0.0f : mX / other.x();
+    mY = math::is_close_to_zero(other.y()) ? 0.0f : mY / other.y();
+    mZ = math::is_close_to_zero(other.z()) ? 0.0f : mZ / other.z();
     return *this;
 }
 float3::value& float3::value::operator /= (float value) {
-    if (Math::is_close_to_zero(value)) {
+    if (math::is_close_to_zero(value)) {
         mX = 0.0f;
         mY = 0.0f;
         mZ = 0.0f;
@@ -341,19 +341,19 @@ float3::view& float3::view::operator - () {
 }
 
 float3::view& float3::view::operator /= (const view& other) {
-    mX = Math::is_close_to_zero(other.x()) ? 0.0f : mX / other.x();
-    mY = Math::is_close_to_zero(other.y()) ? 0.0f : mY / other.y();
-    mZ = Math::is_close_to_zero(other.z()) ? 0.0f : mZ / other.z();
+    mX = math::is_close_to_zero(other.x()) ? 0.0f : mX / other.x();
+    mY = math::is_close_to_zero(other.y()) ? 0.0f : mY / other.y();
+    mZ = math::is_close_to_zero(other.z()) ? 0.0f : mZ / other.z();
     return *this;
 }
 float3::view& float3::view::operator /= (const value& other) {
-    mX = Math::is_close_to_zero(other.x()) ? 0.0f : mX / other.x();
-    mY = Math::is_close_to_zero(other.y()) ? 0.0f : mY / other.y();
-    mZ = Math::is_close_to_zero(other.z()) ? 0.0f : mZ / other.z();
+    mX = math::is_close_to_zero(other.x()) ? 0.0f : mX / other.x();
+    mY = math::is_close_to_zero(other.y()) ? 0.0f : mY / other.y();
+    mZ = math::is_close_to_zero(other.z()) ? 0.0f : mZ / other.z();
     return *this;
 }
 float3::view& float3::view::operator /= (float value) {
-    if (Math::is_close_to_zero(value)) {
+    if (math::is_close_to_zero(value)) {
         mX = 0.0f;
         mY = 0.0f;
         mZ = 0.0f;

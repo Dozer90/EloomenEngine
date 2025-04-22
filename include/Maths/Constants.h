@@ -2,7 +2,7 @@
 
 #include <datatype/half.h>
 
-namespace eloo::Math {
+namespace eloo::math {
     namespace f64 {
         constexpr float64_t E                      = 2.71828182845904523536028747135266249775724709369995;
         constexpr float64_t LOG2E                  = 1.44269504088896340735992468100189213742664595415299;
@@ -98,4 +98,4 @@ namespace eloo::Math {
         constexpr float16_t CLOSE_REL_TOLERANCE    = float16_t(1e-3);
         constexpr float16_t CLOSE_ABS_TOLERANCE    = float16_t(1e-5);
     }
-} // namespace eloo::Math::Consts
+} // namespace eloo::math::Consts

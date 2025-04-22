@@ -3,7 +3,7 @@
 #include <Maths/float2.h>
 #include <Maths/Matrix3x3.h>
 
-namespace eloo::Math {
+namespace eloo::math {
 class Transform2D {
 public:
     Matrix3x3 toMatrix() const;
@@ -16,4 +16,4 @@ private:
     float mRotation;
     float2 mScale;
 };
-} // eloo::Math
+} // eloo::math

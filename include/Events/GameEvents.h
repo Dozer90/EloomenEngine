@@ -28,8 +28,8 @@ struct CollisionEvent : public IEvent
 {
     GameObjectID firstID;           // First object involved
     GameObjectID secondID;          // Second object involved
-    Math::float2 location;          // Where the collision detected
-    Math::float2 overlap;           // How much overlap there was
+    math::float2 location;          // Where the collision detected
+    math::float2 overlap;           // How much overlap there was
 };
 
 ///>=====================================================================

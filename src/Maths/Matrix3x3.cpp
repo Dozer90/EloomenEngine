@@ -2,7 +2,7 @@
 
 #include <Generic/Utilities.h>
 
-using namespace eloo::Math;
+using namespace eloo::math;
 
 namespace {
 static constexpr Matrix3x3 gZero({ 0.0f }, { 0.0f }, { 0.0f });

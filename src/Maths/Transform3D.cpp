@@ -1,6 +1,6 @@
 #include <Maths/Transform3D.h>
 
-using namespace eloo::Math;
+using namespace eloo::math;
 
 float3 Transform3D::forward() const {
 	return float3::forward() * mRotation;

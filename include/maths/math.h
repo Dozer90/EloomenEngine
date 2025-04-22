@@ -16,7 +16,7 @@
 #include <cmath>
 #include <bit>
 
-namespace eloo::Math {
+namespace eloo::math {
 
     namespace {
         template <typename T> concept numeric_t = ::eastl::is_arithmetic_v<T>;
@@ -53,21 +53,22 @@ namespace eloo::Math {
             ::eastl::is_same_v<T, float16_t> ? 0x000A : 0x0000;
 
 #define MAKE_FUNC_FOR_FLOAT16(f) \
-    template <> FORCE_INLINE float16_t f(float16_t v) { \
-        return float16_t::float32_to_16(f(float16_t::float16_to_32(v))); \
-    }
+        template <> FORCE_INLINE float16_t f(float16_t v) { \
+            return float16_t(f(float16_t::float16_to_32(v))); \
+        }
 #define MAKE_CONSTEXPR_FUNC_FOR_FLOAT16(f) \
-    template <> FORCE_INLINE constexpr float16_t f(float16_t v) { \
-        return float16_t::float32_to_16(f(float16_t::float16_to_32(v))); \
-    }
+        template <> FORCE_INLINE constexpr float16_t f(float16_t v) { \
+            return float16_t(f(float16_t::float16_to_32(v))); \
+        }
 
 #define MAKE_FUNC_FOR_FLOAT16_2ARGS(f) \
-    template <> FORCE_INLINE float16_t f(float16_t x, float16_t y) { \
-        return float16_t::float32_to_16(f(float16_t::float16_to_32(x), float16_t::float16_to_32(y))); \
-    }
+        template <> FORCE_INLINE float16_t f(float16_t x, float16_t y) { \
+            return float16_t(f(float16_t::float16_to_32(x), float16_t::float16_to_32(y))); \
+        }
 #define MAKE_CONSTEXPR_FUNC_FOR_FLOAT16_2ARGS(f) \
-    template <> FORCE_INLINE constexpr float16_t f(float16_t x, float16_t y) { \
-        return float16_t::float32_to_16(f(float16_t::float16_to_32(x), float16_t::float16_to_32(y))); \
+        template <> FORCE_INLINE constexpr float16_t f(float16_t x, float16_t y) { \
+            return float16_t(f(float16_t::float16_to_32(x), float16_t::float16_to_32(y))); \
+        }
     }
 
 
@@ -1088,15 +1089,15 @@ namespace eloo::Math {
     /////////////////////////////////////////////////////////////////////
     // Interpolation between two points (2D)
 
-    namespace Interpolation {
-        FORCE_INLINE constexpr float2::values interpolate(float xStart, float yStart, float xEnd, float yEnd, float t, Type type, Options options = ::eastl::monostate{}) {
+    namespace interpolation {
+        FORCE_INLINE constexpr float2::values interpolate(float xStart, float yStart, float xEnd, float yEnd, float t, blend_func type, blend_opt options = ::eastl::monostate{}) {
             return {
                 interpolate(xStart, xEnd, t, type, options),
                 interpolate(yStart, yEnd, t, type, options)
             };
         }
 
-        FORCE_INLINE constexpr float2::values interpolate(const float2::values& start, const float2::values& end, float t, Type type, Options options = ::eastl::monostate{}) {
+        FORCE_INLINE constexpr float2::values interpolate(const float2::values& start, const float2::values& end, float t, blend_func type, blend_opt options = ::eastl::monostate{}) {
             return interpolate(start.x(), start.y(), end.x(), end.y(), t, type, options);
         }
     }
@@ -1105,8 +1106,8 @@ namespace eloo::Math {
     /////////////////////////////////////////////////////////////////////
     // Interpolation between two points (3D)
 
-    namespace Interpolation {
-        FORCE_INLINE constexpr float3::values interpolate(float xStart, float yStart, float zStart, float xEnd, float yEnd, float zEnd, float t, Type type, Options options = ::eastl::monostate{}) {
+    namespace interpolation {
+        FORCE_INLINE constexpr float3::values interpolate(float xStart, float yStart, float zStart, float xEnd, float yEnd, float zEnd, float t, blend_func type, blend_opt options = ::eastl::monostate{}) {
             return {
                 interpolate(xStart, xEnd, t, type, options),
                 interpolate(yStart, yEnd, t, type, options),
@@ -1114,7 +1115,7 @@ namespace eloo::Math {
             };
         }
 
-        FORCE_INLINE constexpr float3::values interpolate(const float3::values& start, const float3::values& end, float t, Type type, Options options = ::eastl::monostate{}) {
+        FORCE_INLINE constexpr float3::values interpolate(const float3::values& start, const float3::values& end, float t, blend_func type, blend_opt options = ::eastl::monostate{}) {
             return interpolate(start.x(), start.y(), start.z(), end.x(), end.y(), end.z(), t, type, options);
         }
     }
@@ -1123,8 +1124,8 @@ namespace eloo::Math {
     /////////////////////////////////////////////////////////////////////
     // Interpolation between two points (4D)
 
-    namespace Interpolation {
-        FORCE_INLINE constexpr float4::values interpolate(float xStart, float yStart, float zStart, float wStart, float xEnd, float yEnd, float zEnd, float wEnd, float t, Type type, Options options = ::eastl::monostate{}) {
+    namespace interpolation {
+        FORCE_INLINE constexpr float4::values interpolate(float xStart, float yStart, float zStart, float wStart, float xEnd, float yEnd, float zEnd, float wEnd, float t, blend_func type, blend_opt options = ::eastl::monostate{}) {
             return {
                 interpolate(xStart, xEnd, t, type, options),
                 interpolate(yStart, yEnd, t, type, options),
@@ -1133,7 +1134,7 @@ namespace eloo::Math {
             };
         }
 
-        FORCE_INLINE constexpr float4::values interpolate(const float4::values& start, const float4::values& end, float t, Type type, Options options = ::eastl::monostate{}) {
+        FORCE_INLINE constexpr float4::values interpolate(const float4::values& start, const float4::values& end, float t, blend_func type, blend_opt options = ::eastl::monostate{}) {
             return interpolate(start.x(), start.y(), start.z(), start.w(), end.x(), end.y(), end.z(), end.w(), t, type, options);
         }
     }

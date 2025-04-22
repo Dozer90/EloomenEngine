@@ -12,7 +12,7 @@
 // Operations are left to right
 // mat = trans * rot * scale
 
-namespace eloo::Math {
+namespace eloo::math {
 class Matrix4x4 {
 public:
     constexpr Matrix4x4()

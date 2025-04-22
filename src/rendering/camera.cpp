@@ -2,22 +2,22 @@
 
 using namespace eloo;
 
-Math::Matrix4x4 Camera::getViewMatrix() const {
-	return Math::Matrix4x4::createView(mTransform.position(), mTransform.forward(), Math::float3::up());
+math::Matrix4x4 Camera::getViewMatrix() const {
+	return math::Matrix4x4::createView(mTransform.position(), mTransform.forward(), math::float3::up());
 }
 
-Math::Matrix4x4 Camera::getOrthoProjMatrix() const {
-	const Math::float3 boundsMin = { -mViewSize.x * 0.5f, -mViewSize.y * 0.5f, mClippingPlanes.x };
-	const Math::float3 boundsMax = { mViewSize.x * 0.5f, mViewSize.y * 0.5f, mClippingPlanes.y };
-	const Math::Matrix4x4 viewMatrix = Math::Matrix4x4::createView(mTransform.position(), mTransform.forward(), Math::float3::up());
-	const Math::Matrix4x4 projMatrix = Math::Matrix4x4::createOrthographicProjection(boundsMin, boundsMax);
+math::Matrix4x4 Camera::getOrthoProjMatrix() const {
+	const math::float3 boundsMin = { -mViewSize.x * 0.5f, -mViewSize.y * 0.5f, mClippingPlanes.x };
+	const math::float3 boundsMax = { mViewSize.x * 0.5f, mViewSize.y * 0.5f, mClippingPlanes.y };
+	const math::Matrix4x4 viewMatrix = math::Matrix4x4::createView(mTransform.position(), mTransform.forward(), math::float3::up());
+	const math::Matrix4x4 projMatrix = math::Matrix4x4::createOrthographicProjection(boundsMin, boundsMax);
 	return projMatrix * viewMatrix;
 }
 
-Math::Matrix4x4 Camera::getPerspectiveProjMatrix() const {
-	const Math::float3 boundsMin = { -mViewSize.x * 0.5f, -mViewSize.y * 0.5f, mClippingPlanes.x };
-	const Math::float3 boundsMax = { mViewSize.x * 0.5f, mViewSize.y * 0.5f, mClippingPlanes.y };
-	const Math::Matrix4x4 viewMatrix = Math::Matrix4x4::createView(mTransform.position(), mTransform.forward(), Math::float3::up());
-	const Math::Matrix4x4 projMatrix = Math::Matrix4x4::createPerspectiveProjection(mFOV, mViewSize.x / mViewSize.y, mClippingPlanes.x, mClippingPlanes.y);
+math::Matrix4x4 Camera::getPerspectiveProjMatrix() const {
+	const math::float3 boundsMin = { -mViewSize.x * 0.5f, -mViewSize.y * 0.5f, mClippingPlanes.x };
+	const math::float3 boundsMax = { mViewSize.x * 0.5f, mViewSize.y * 0.5f, mClippingPlanes.y };
+	const math::Matrix4x4 viewMatrix = math::Matrix4x4::createView(mTransform.position(), mTransform.forward(), math::float3::up());
+	const math::Matrix4x4 projMatrix = math::Matrix4x4::createPerspectiveProjection(mFOV, mViewSize.x / mViewSize.y, mClippingPlanes.x, mClippingPlanes.y);
 	return projMatrix * viewMatrix;
 }

@@ -226,7 +226,7 @@ bool SliderPlusMinusFloat(float* v, float v_min, float v_max, float smallChange,
 	bool changeWasMade = false;
 	const auto adjustValue = [&changeWasMade, v, v_min, v_max](float amount) {
 		changeWasMade = true;
-		*v = Math::clamp(*v + amount, v_min, v_max);
+		*v = math::clamp(*v + amount, v_min, v_max);
 	};
 
 	ImGui::PushItemWidth(buttonSize.x);

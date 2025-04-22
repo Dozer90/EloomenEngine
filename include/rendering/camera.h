@@ -8,14 +8,14 @@ namespace eloo {
 
 class Camera {
 public:
-	Math::Matrix4x4 getViewMatrix() const;
-	Math::Matrix4x4 getOrthoProjMatrix() const;
-	Math::Matrix4x4 getPerspectiveProjMatrix() const;
+	math::Matrix4x4 getViewMatrix() const;
+	math::Matrix4x4 getOrthoProjMatrix() const;
+	math::Matrix4x4 getPerspectiveProjMatrix() const;
 
 private:
-	Math::Transform3D mTransform;
+	math::Transform3D mTransform;
 	float mFOV = 70.0f;
-	Math::float2 mViewSize;
-	Math::float2 mClippingPlanes;
+	math::float2 mViewSize;
+	math::float2 mClippingPlanes;
 };
 }

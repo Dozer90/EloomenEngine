@@ -66,4 +66,4 @@ public:
 public:
     float x, y;
 };
-}; // namespace eloo::Math
+}; // namespace eloo::math
