@@ -1,7 +1,6 @@
 #pragma once
 
-#include <Maths/Math.h>
-#include <Maths/float2.h>
+#include <datatype/float2.h>
 
 #include <EASTL/array.h>
 
@@ -10,70 +9,105 @@
 // Operations are left to right
 // mat = trans * rot * scale
 
-namespace eloo::Math {
-class Matrix3x3;
-class Matrix2x2 {
-public:
-    constexpr Matrix2x2() : r1({ 1.0f, 0.0f }), r2({ 0.0f, 1.0f }) {}
-    constexpr Matrix2x2(const float2& r1, const float2& r2) : r1(r1), r2(r2) {}
-    constexpr Matrix2x2(float v11, float v12, float v21, float v22) : data({ v11, v12, v21, v22 }) {}
-    Matrix2x2(const Matrix3x3& m, uint8_t row, uint8_t col);
+namespace eloo::matrix2x2 {
+    using id_t = size_t;
 
-    static const Matrix2x2& zero();
-    static const Matrix2x2& one();
-    static const Matrix2x2& identity();
+    struct valuess {
+    private:
+        float m11, m12;
+        float m21, m22;
 
-    inline float determinant() const                                            { return a11 * a22 - a12 * a21; }
+    public:
+        constexpr valuess(float v11, float v12, float v21, float v22) : m11(v11), m12(v12), m21(v21), m22(v22) {}
 
-    inline float2& getRow(uint8_t r)                                            { return row[r]; }
-    inline const float2& getRow(uint8_t r) const                                { return row[r]; }
-    inline void setRow(uint8_t r, const float2& xy)                             { row[r] = xy; }
-    inline void setRow(uint8_t r, float x, float y)                             { row[r] = { x, y }; }
+        float2::values row(int index);
+        inline float2::values row1() { return float2::values(m11, m12); }
+        inline float2::values row2() { return float2::values(m21, m22); }
 
-    inline const float2 getColumn(uint8_t c) const                              { return { cell[0][c], cell[1][c] }; }
-    inline void setColumn(uint8_t c, const float2& xy)                          { cell[0][c] = xy.x; cell[1][c] = xy.y; }
-    inline void setColumn(uint8_t c, float x, float y)                          { cell[0][c] = x;    cell[1][c] = y; }
+        const float2::values row(int index) const;
+        inline const float2::values row1() const { return float2::values(m11, m12); }
+        inline const float2::values row2() const { return float2::values(m21, m22); }
 
-public:
-    inline float2& operator [] (uint8_t r)                                      { return row[r]; }
-    inline const float2& operator [] (uint8_t r) const                          { return row[r]; }
+        float2::values col(int index);
+        inline float2::values col1() { return float2::values(m11, m21); }
+        inline float2::values col2() { return float2::values(m12, m22); }
 
-    friend bool operator!=(const Matrix2x2& m1, const Matrix2x2& m2)            { return m1.cell != m2.cell; }
-    inline friend bool operator == (const Matrix2x2& m1, const Matrix2x2& m2)   { return m1.cell == m2.cell; }
+        const float2::values col(int index) const;
+        inline const float2::values col1() const { return float2::values(m11, m21); }
+        inline const float2::values col2() const { return float2::values(m12, m22); }
 
-    friend float2 operator * (const float2& v, const Matrix2x2& m)              { return { m.r1 * v.x + m.r2 * v.y }; }
-    friend Matrix2x2 operator * (const Matrix2x2& m1, const Matrix2x2& m2)      { return { m1.r1 * m2.r1, m1.r2 * m2.r2 }; }
-    friend Matrix2x2 operator * (const Matrix2x2& m, float f)                   { return { m.r1 * f, m.r2 * f }; }
-    inline Matrix2x2& operator *= (const Matrix2x2& m)                          { return (*this = *this * m); }
-    inline Matrix2x2& operator *= (float f)                                     { return (*this = *this * f); }
+        inline float& a11() { return m11; }
+        inline float& a12() { return m12; }
+        inline float& a21() { return m21; }
+        inline float& a22() { return m22; }
 
-    friend Matrix2x2 operator / (const Matrix2x2& m1, const Matrix2x2& m2)      { return { m1.r1 / m2.r1, m1.r2 / m2.r2 }; }
-    friend Matrix2x2 operator / (const Matrix2x2& m, float f)                   { return m * (1.0f / f); }
-    inline Matrix2x2& operator /= (const Matrix2x2& m)                          { return (*this = *this / m); }
-    inline Matrix2x2& operator /= (float f)                                     { return (*this = *this / f); }
+        inline const float& a11() const { return m11; }
+        inline const float& a12() const { return m12; }
+        inline const float& a21() const { return m21; }
+        inline const float& a22() const { return m22; }
 
-    friend Matrix2x2 operator + (const Matrix2x2& m1, const Matrix2x2& m2)      { return { m1.r1 + m2.r1, m1.r2 + m2.r2 }; }
-    friend Matrix2x2 operator + (const Matrix2x2& m, float f)                   { return { m.r1 + f, m.r2 + f }; }
-    inline Matrix2x2& operator += (const Matrix2x2& m)                          { return (*this = *this + m); }
-    inline Matrix2x2& operator += (float f)                                     { return (*this = *this + f); }
+    public:
+        float& operator [] (int index);
+        const float& operator [] (int index) const;
 
-    friend Matrix2x2 operator - (const Matrix2x2& m1, const Matrix2x2& m2)      { return { m1.r1 - m2.r1, m1.r2 - m2.r2 }; }
-    friend Matrix2x2 operator - (const Matrix2x2& m, float f)                   { return { m.r1 - f, m.r2 - f }; }
-    inline Matrix2x2& operator -= (const Matrix2x2& m)                          { return (*this = *this - m); }
-    inline Matrix2x2& operator -= (float f)                                     { return (*this = *this - f); }
+    public:
+        constexpr friend bool operator != (const valuess& lhs, const valuess& rhs);
+        constexpr friend bool operator != (const valuess& lhs, float rhs);
 
-private:
-    union {
-        struct {
-            float a11, a12;
-            float a21, a22;
-        };
-        struct {
-            float2 r1, r2;
-        };
-        eastl::array<float2, 2> row;
-        eastl::array<eastl::array<float, 2>, 2> cell;
-        eastl::array<float, 4> data;
+        friend bool operator == (const valuess& lhs, const valuess& rhs);
+        friend bool operator == (const valuess& lhs, float rhs);
+
+        friend valuess operator - (const valuess& lhs);
+
+        friend valuess operator / (const valuess& lhs, const valuess& rhs);
+        friend valuess operator / (const valuess& lhs, float rhs);
+
+        friend valuess operator * (const valuess& lhs, const valuess& rhs);
+        friend valuess operator * (const valuess& lhs, float rhs);
+
+        friend valuess operator + (const valuess& lhs, const valuess& rhs);
+        friend valuess operator + (const valuess& lhs, float rhs);
+
+        friend valuess operator - (const valuess& lhs, const valuess& rhs);
+        friend valuess operator - (const valuess& lhs, float rhs);
+
+    public:
+        valuess& operator = (const valuess& other);
+
+        valuess& operator - ();
+
+        valuess& operator /= (const valuess& other);
+        valuess& operator /= (float valuess);
+
+        valuess& operator *= (const valuess& other);
+        valuess& operator *= (float valuess);
+
+        valuess& operator += (const valuess& other);
+        valuess& operator += (float valuess);
+
+        valuess& operator -= (const valuess& other);
+        valuess& operator -= (float valuess);
     };
-};
-} // namespace eloo::Math
+
+    inline static constexpr valuess IDENTITY { 1.0f, 0.0f, 0.0f, 1.0f };
+    inline static constexpr valuess ZERO     { 0.0f, 0.0f, 0.0f, 0.0f };
+    inline static constexpr valuess ONE      { 1.0f, 1.0f, 1.0f, 1.0f };
+    inline static constexpr valuess NaN      { FLT_NAN, FLT_NAN, FLT_NAN, FLT_NAN };
+
+    id_t create(float v11 = 1.0f, float v12 = 0.0f, float v21 = 0.0f, float v22 = 1.0f, bool useIDPool = true);
+    id_t create(const float2::values& row1, const float2::values& row2, bool useIDPool = true);
+    id_t create(const valuess& vals, bool useIDPool = true);
+    bool try_release(id_t id);
+
+    valuess get_valuess(id_t id);
+
+    float& cell(id_t id, int elementOffset);
+    float& cell(id_t id, int rowIndex, int columnIndex);
+    valuess row(id_t id, int rowIndex);
+    valuess column(id_t id, int columnIndex);
+
+    const float& const_values(id_t id, int elementOffset);
+    const float& const_values(id_t id, int rowIndex, int columnIndex);
+    const valuess const_row(id_t id, int rowIndex);
+    const valuess const_column(id_t id, int columnIndex);
+}

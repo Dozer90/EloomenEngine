@@ -76,7 +76,7 @@ Matrix3x3 Matrix3x3::adjugate() const {
 
 Matrix3x3 Matrix3x3::inverse(const Matrix3x3& mat) {
     const float det = mat.determinant();
-    if (is_close(det, 0.0f)) {
+    if (is_close_to(det, 0.0f)) {
         return gZero;
     }
     return mat.adjugate() * (1.0f / det);

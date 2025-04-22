@@ -28,6 +28,23 @@ include_directories(${INCLUDE_DIRECTORIES})
 # Source Files
 
 set(SOURCES
+    "src/datatypes/float2.cpp"
+    "src/datatypes/float3.cpp"
+    "src/datatypes/float4.cpp"
+
+    "src/maths/quaternion.cpp"
+    "src/maths/matrix2x2.cpp"
+    "src/maths/matrix3x3.cpp"
+    "src/maths/matrix4x4.cpp"
+    "src/maths/interpolation.cpp"
+    "src/maths/transform2D.cpp"
+    "src/maths/transform3D.cpp"
+
+    "src/rendering/camera.cpp"
+    "src/rendering/window.cpp"
+
+    "src/utility/imgui_ext.cpp"
+
     "src/main.cpp"
     "src/Engine.cpp"
     "src/TankBot.cpp"
@@ -38,20 +55,7 @@ set(SOURCES
     "src/Utilities.cpp"
     "src/Logging.cpp"
     "src/Game.cpp"
-    "src/Interpolation.cpp"
-    "src/ImGuiEx.cpp"
-    "src/Maths/Matrix3x3.cpp"
-    "src/float2.cpp"
-    "src/float3.cpp"
-    "src/float4.cpp"
-    "src/Maths/Quaternion.cpp"
-    "src/Maths/Transform2D.cpp"
-    "src/Maths/Matrix4x4.cpp"
-    "src/Maths/Matrix2x2.cpp"
-    "src/Maths/Transform3D.cpp"
-    "src/Camera.cpp"
-    "src/Rendering/Window.cpp"
-    "src/Maths/CoreMath.cpp")
+    )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     #list(APPEND SOURCES)
