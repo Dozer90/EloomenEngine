@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Maths/CoreMath.h>
+#include <maths/math.h>
 
 namespace eloo {
     using colour_t = uint32_t;

@@ -2,24 +2,29 @@
 
 #include <utility/defines.h>
 
-#include <EASTL/numeric_limits.h>
-#include <EASTL/type_traits.h>
+#include <datatype/float3.h>
+#include <datatype/float4.h>
 
-namespace eloo::float2 {
+namespace eloo::quaternion {
     ELOO_DECLARE_ID_T;
 
-    // OOP style container for float2
+    // OOP style container for quaternion
     struct values {
     private:
-        float mX, mY;
+        float mX, mY, mZ, mW;
 
     public:
-        constexpr values(float x, float y) : mX(x), mY(y) {}
+        constexpr values(float x, float y, float z, float w) : mX(x), mY(y), mZ(z), mW(w) {}
+        constexpr values(const float4::values& vals) : mX(vals.x()), mY(vals.y()), mZ(vals.z()), mW(vals.w()) {}
 
         inline float& x() { return mX; }
         inline float& y() { return mY; }
+        inline float& z() { return mZ; }
+        inline float& w() { return mW; }
         inline const float& x() const { return mX; }
         inline const float& y() const { return mY; }
+        inline const float& z() const { return mZ; }
+        inline const float& w() const { return mW; }
 
     public:
         friend bool operator != (const values& lhs, const values& rhs);
@@ -36,6 +41,7 @@ namespace eloo::float2 {
 
         friend values operator * (const values& lhs, const values& rhs);
         friend values operator * (const values& lhs, float rhs);
+        friend float3::values operator * (const values& lhs, const float3::values& rhs);
 
         friend values operator + (const values& lhs, const values& rhs);
         friend values operator + (const values& lhs, float rhs);
@@ -63,14 +69,13 @@ namespace eloo::float2 {
         values& operator -= (float values);
     };
 
-    template <typename T> concept storage_t = eastl::is_same_v<T, values>;
+    inline static constexpr values IDENTITY { 0.0f, 0.0f, 0.0f, 1.0f };
+    inline static constexpr values ZERO     { 0.0f, 0.0f, 0.0f, 0.0f };
 
-    inline static constexpr values ZERO     { 0.0f, 0.0f };
-    inline static constexpr values ONE      { 1.0f, 1.0f };
-    inline static constexpr values RIGHT    { 1.0f, 0.0f };
-    inline static constexpr values UP       { 0.0f, 1.0f };
-
-    id_t create(float x = 0.0f, float y = 0.0f, bool useIDPool = true);
+    id_t create(float x = 0.0f, float y = 0.0f, float z = 0.0f, float w = 1.0f, bool useIDPool = true);
+    id_t create(const float4::values& vals, bool useIDPool = true);
+    id_t create(float eulerX = 0.0f, float eulerY = 0.0f, float eulerZ = 0.0f, bool useIDPool = true);
+    id_t create(const float3::values& vals, bool useIDPool = true);
     id_t create(const values& vals, bool useIDPool = true);
     bool try_release(id_t id);
 
@@ -80,7 +85,11 @@ namespace eloo::float2 {
 
     float& x(id_t id);
     float& y(id_t id);
+    float& z(id_t id);
+    float& w(id_t id);
 
     const float& const_x(id_t id);
     const float& const_y(id_t id);
+    const float& const_z(id_t id);
+    const float& const_w(id_t id);
 };

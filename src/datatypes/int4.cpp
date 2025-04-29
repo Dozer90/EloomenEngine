@@ -1,4 +1,7 @@
+#include <datatype/int4.h>
+
 #include <maths/math.h>
+
 #include <utility/managed_memory_block.h>
 
 using namespace eloo;
@@ -6,11 +9,11 @@ using namespace eloo;
 namespace {
     constexpr int MEMORY_BLOCK_INITIAL_SIZE = 50;
     constexpr float MEMORY_BLOCK_EXPANSION = 0.7f;
-    using memblock_t = managed_memory_block<float, MEMORY_BLOCK_INITIAL_SIZE, MEMORY_BLOCK_EXPANSION>;
+    using memblock_t = managed_memory_block<int, MEMORY_BLOCK_INITIAL_SIZE, MEMORY_BLOCK_EXPANSION>;
     static memblock_t gMemoryBlockX, gMemoryBlockY, gMemoryBlockZ, gMemoryBlockW;
 }
 
-float4::id_t float4::create(float x, float y, float z, float w, bool useIDPool) {
+int4::id_t int4::create(int x, int y, int z, int w, bool useIDPool) {
     id_t id = gMemoryBlockX.push(x, useIDPool);
     ELOO_ASSERT_FATAL(id == gMemoryBlockY.push(y, useIDPool), "ID mismatch between X and Y memory blocks.");
     ELOO_ASSERT_FATAL(id == gMemoryBlockZ.push(z, useIDPool), "ID mismatch between X and Z memory blocks.");
@@ -18,11 +21,11 @@ float4::id_t float4::create(float x, float y, float z, float w, bool useIDPool) 
     return id;
 }
 
-float4::id_t float4::create(const values& vals, bool useIDPool) {
+int4::id_t int4::create(const values& vals, bool useIDPool) {
     return create(vals.x(), vals.y(), vals.z(), vals.w(), useIDPool);
 }
 
-bool float4::try_release(id_t id) {
+bool int4::try_release(id_t id) {
     if (!is_valid(id)) {
         return false;
     }
@@ -33,7 +36,7 @@ bool float4::try_release(id_t id) {
     return true;
 }
 
-bool float4::try_get_values(id_t id, float4::values& vals) {
+bool int4::try_get_values(id_t id, int4::values& vals) {
     if (is_valid(id)) {
         vals = {
             gMemoryBlockX.get(id),
@@ -46,28 +49,28 @@ bool float4::try_get_values(id_t id, float4::values& vals) {
     return false;
 }
 
-float& float4::x(id_t id) { return gMemoryBlockX.get(id); }
-float& float4::y(id_t id) { return gMemoryBlockY.get(id); }
-float& float4::z(id_t id) { return gMemoryBlockZ.get(id); }
-float& float4::w(id_t id) { return gMemoryBlockW.get(id); }
+int& int4::x(id_t id) { return gMemoryBlockX.get(id); }
+int& int4::y(id_t id) { return gMemoryBlockY.get(id); }
+int& int4::z(id_t id) { return gMemoryBlockZ.get(id); }
+int& int4::w(id_t id) { return gMemoryBlockW.get(id); }
 
-const float& float4::const_x(id_t id) { return gMemoryBlockX.get(id); }
-const float& float4::const_y(id_t id) { return gMemoryBlockY.get(id); }
-const float& float4::const_z(id_t id) { return gMemoryBlockZ.get(id); }
-const float& float4::const_w(id_t id) { return gMemoryBlockW.get(id); }
+const int& int4::const_x(id_t id) { return gMemoryBlockX.get(id); }
+const int& int4::const_y(id_t id) { return gMemoryBlockY.get(id); }
+const int& int4::const_z(id_t id) { return gMemoryBlockZ.get(id); }
+const int& int4::const_w(id_t id) { return gMemoryBlockW.get(id); }
 
 
 ///////////////////////////////////////////////////////
 // Values container
 
-bool float4::operator != (const float4::values& lhs, const float4::values& rhs) {
+bool int4::operator != (const int4::values& lhs, const int4::values& rhs) {
     return
         lhs.x() != rhs.x() ||
         lhs.y() != rhs.y() ||
         lhs.z() != rhs.z() ||
         lhs.w() != rhs.w();
 }
-bool float4::operator != (const float4::values& lhs, float rhs) {
+bool int4::operator != (const int4::values& lhs, int rhs) {
     return
         lhs.x() != rhs ||
         lhs.y() != rhs ||
@@ -75,14 +78,14 @@ bool float4::operator != (const float4::values& lhs, float rhs) {
         lhs.w() != rhs;
 }
 
-bool float4::operator == (const float4::values& lhs, const float4::values& rhs) {
+bool int4::operator == (const int4::values& lhs, const int4::values& rhs) {
     return
         lhs.x() == rhs.x() &&
         lhs.y() == rhs.y() &&
         lhs.z() == rhs.z() &&
         lhs.w() == rhs.w();
 }
-bool float4::operator == (const float4::values& lhs, float rhs) {
+bool int4::operator == (const int4::values& lhs, int rhs) {
     return
         lhs.x() == rhs &&
         lhs.y() == rhs &&
@@ -90,10 +93,10 @@ bool float4::operator == (const float4::values& lhs, float rhs) {
         lhs.w() == rhs;
 }
 
-float4::values float4::operator + (const float4::values& lhs) {
+int4::values int4::operator + (const int4::values& lhs) {
     return lhs;
 }
-float4::values float4::operator - (const float4::values& lhs) {
+int4::values int4::operator - (const int4::values& lhs) {
     return {
         -lhs.x(),
         -lhs.y(),
@@ -102,7 +105,7 @@ float4::values float4::operator - (const float4::values& lhs) {
     };
 }
 
-float4::values float4::operator / (const float4::values& lhs, const float4::values& rhs) {
+int4::values int4::operator / (const int4::values& lhs, const int4::values& rhs) {
     return {
         lhs.x() / rhs.x(),
         lhs.y() / rhs.y(),
@@ -110,7 +113,7 @@ float4::values float4::operator / (const float4::values& lhs, const float4::valu
         lhs.w() / rhs.w()
     };
 }
-float4::values float4::operator / (const float4::values& lhs, float rhs) {
+int4::values int4::operator / (const int4::values& lhs, int rhs) {
 
     return {
         lhs.x() / rhs,
@@ -120,7 +123,7 @@ float4::values float4::operator / (const float4::values& lhs, float rhs) {
     };
 }
 
-float4::values float4::operator * (const float4::values& lhs, const float4::values& rhs) {
+int4::values int4::operator * (const int4::values& lhs, const int4::values& rhs) {
     return {
         lhs.x() * rhs.x(),
         lhs.y() * rhs.y(),
@@ -128,7 +131,7 @@ float4::values float4::operator * (const float4::values& lhs, const float4::valu
         lhs.w() * rhs.w()
     };
 }
-float4::values float4::operator * (const float4::values& lhs, float rhs) {
+int4::values int4::operator * (const int4::values& lhs, int rhs) {
     return {
         lhs.x() * rhs,
         lhs.y() * rhs,
@@ -137,7 +140,7 @@ float4::values float4::operator * (const float4::values& lhs, float rhs) {
     };
 }
 
-float4::values float4::operator + (const float4::values& lhs, const float4::values& rhs) {
+int4::values int4::operator + (const int4::values& lhs, const int4::values& rhs) {
     return {
         lhs.x() + rhs.x(),
         lhs.y() + rhs.y(),
@@ -145,7 +148,7 @@ float4::values float4::operator + (const float4::values& lhs, const float4::valu
         lhs.w() + rhs.w()
     };
 }
-float4::values float4::operator + (const float4::values& lhs, float rhs) {
+int4::values int4::operator + (const int4::values& lhs, int rhs) {
     return {
         lhs.x() + rhs,
         lhs.y() + rhs,
@@ -154,7 +157,7 @@ float4::values float4::operator + (const float4::values& lhs, float rhs) {
     };
 }
 
-float4::values float4::operator - (const float4::values& lhs, const float4::values& rhs) {
+int4::values int4::operator - (const int4::values& lhs, const int4::values& rhs) {
     return {
         lhs.x() - rhs.x(),
         lhs.y() - rhs.y(),
@@ -162,7 +165,7 @@ float4::values float4::operator - (const float4::values& lhs, const float4::valu
         lhs.w() - rhs.w()
     };
 }
-float4::values float4::operator - (const float4::values& lhs, float rhs) {
+int4::values int4::operator - (const int4::values& lhs, int rhs) {
     return {
         lhs.x() - rhs,
         lhs.y() - rhs,
@@ -173,54 +176,54 @@ float4::values float4::operator - (const float4::values& lhs, float rhs) {
 
 
 ///////////////////////////////////////////////////////
-// Assignment and manipulation float4::operators
+// Assignment and manipulation int4::operators
 
-float4::values& float4::values::operator = (const values& other) {
+int4::values& int4::values::operator = (const values& other) {
     *this = other;
     return *this;
 }
-float4::values& float4::values::operator = (float val) {
+int4::values& int4::values::operator = (int val) {
     *this = val;
     return *this;
 }
 
-float4::values& float4::values::operator - () {
+int4::values& int4::values::operator - () {
     *this = -*this;
     return *this;
 }
 
-float4::values& float4::values::operator /= (const values& other) {
+int4::values& int4::values::operator /= (const values& other) {
     *this = *this / other;
     return *this;
 }
-float4::values& float4::values::operator /= (float val) {
+int4::values& int4::values::operator /= (int val) {
     *this = *this / val;
     return *this;
 }
 
-float4::values& float4::values::operator *= (const values& other) {
+int4::values& int4::values::operator *= (const values& other) {
     *this = *this * other;
     return *this;
 }
-float4::values& float4::values::operator *= (float val) {
+int4::values& int4::values::operator *= (int val) {
     *this = *this * val;
     return *this;
 }
 
-float4::values& float4::values::operator += (const values& other) {
+int4::values& int4::values::operator += (const values& other) {
     *this = *this + other;
     return *this;
 }
-float4::values& float4::values::operator += (float val) {
+int4::values& int4::values::operator += (int val) {
     *this = *this + val;
     return *this;
 }
 
-float4::values& float4::values::operator -= (const values& other) {
+int4::values& int4::values::operator -= (const values& other) {
     *this = *this - other;
     return *this;
 }
-float4::values& float4::values::operator -= (float val) {
+int4::values& int4::values::operator -= (int val) {
     *this = *this - val;
     return *this;
 }

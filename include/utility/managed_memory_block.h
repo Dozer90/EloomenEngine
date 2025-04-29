@@ -34,11 +34,11 @@ namespace eloo {
 
         bool remove(size_t id) {
             if (!is_valid(id)) {
-                ASSERT_FALSE("Cannot remove invalid id %i from managed_memory_block.", id);
+                ELOO_ASSERT_FALSE("Cannot remove invalid id %i from managed_memory_block.", id);
                 return false;
             }
             if (!mUnusedIDs.insert(id).second) {
-                ASSERT_FALSE("ID %i is already in managed_memory_block's pool. This should not happen.", id);
+                ELOO_ASSERT_FALSE("ID %i is already in managed_memory_block's pool. This should not happen.", id);
                 return false;
             }
             mData[id] = T();
@@ -131,7 +131,7 @@ namespace eloo {
         }
 
         size_t push(std::initializer_list<T> values, bool useIDPool = true) {
-            ASSERT_FATAL(values.size() == ElementCount, "Invalid number of values provided to push");
+            ELOO_ASSERT_FATAL(values.size() == ElementCount, "Invalid number of values provided to push");
 
             size_t id = mSize;
             if (useIDPool && !mUnusedIDs.empty()) {

@@ -32,6 +32,7 @@ namespace eloo::float4 {
         friend bool operator == (const values& lhs, const values& rhs);
         friend bool operator == (const values& lhs, float rhs);
 
+        friend values operator + (const values& lhs);
         friend values operator - (const values& lhs);
 
         friend values operator / (const values& lhs, const values& rhs);

@@ -4,15 +4,15 @@
 using namespace eloo;
 
 namespace {
-    constexpr int gMemoryBlockInitialSize = 50;
-    constexpr float gMemoryBlockExpansionScalar = 0.7f;
-    using memblock_t = managed_memory_block<float, gMemoryBlockInitialSize, gMemoryBlockExpansionScalar>;
+    constexpr int MEMORY_BLOCK_INITIAL_SIZE = 50;
+    constexpr float MEMORY_BLOCK_EXPANSION = 0.7f;
+    using memblock_t = managed_memory_block<float, MEMORY_BLOCK_INITIAL_SIZE, MEMORY_BLOCK_EXPANSION>;
     static memblock_t gMemoryBlockX, gMemoryBlockY;
 }
 
 float2::id_t float2::create(float x, float y, bool useIDPool) {
     id_t id = gMemoryBlockX.push(x, useIDPool);
-    ASSERT_FATAL(id == gMemoryBlockY.push(y, useIDPool), "ID mismatch between X and Y memory blocks");
+    ELOO_ASSERT_FATAL(id == gMemoryBlockY.push(y, useIDPool), "ID mismatch between X and Y memory blocks");
     return id;
 }
 
@@ -50,212 +50,140 @@ inline const float& float2::const_y(id_t id) { return gMemoryBlockY.get(id); }
 ///////////////////////////////////////////////////////
 // Values container
 
-bool operator != (const float2::values& lhs, const float2::values& rhs) {
+bool float2::operator != (const float2::values& lhs, const float2::values& rhs) {
     return
         lhs.x() != rhs.x() ||
         lhs.y() != rhs.y();
 }
-bool operator != (const float2::values& lhs, float rhs) {
+bool float2::operator != (const float2::values& lhs, float rhs) {
     return
         lhs.x() != rhs ||
         lhs.y() != rhs;
 }
 
-bool operator == (const float2::values& lhs, const float2::values& rhs) {
+bool float2::operator == (const float2::values& lhs, const float2::values& rhs) {
     return
         lhs.x() == rhs.x() &&
         lhs.y() == rhs.y();
 }
-bool operator == (const float2::values& lhs, float rhs) {
+bool float2::operator == (const float2::values& lhs, float rhs) {
     return
         lhs.x() == rhs &&
         lhs.y() == rhs;
 }
 
-float2::values operator - (const float2::values& lhs) {
+float2::values float2::operator + (const float2::values& lhs) {
+    return lhs;
+}
+float2::values float2::operator - (const float2::values& lhs) {
     return {
         -lhs.x(),
         -lhs.y()
     };
 }
 
-float2::values operator / (const float2::values& lhs, const float2::values& rhs) {
+float2::values float2::operator / (const float2::values& lhs, const float2::values& rhs) {
     return {
         lhs.x() / rhs.x(),
         lhs.y() / rhs.y()
     };
 }
-float2::values operator / (const float2::values& lhs, float rhs) {
+float2::values float2::operator / (const float2::values& lhs, float rhs) {
     return {
         lhs.x() / rhs,
         lhs.y() / rhs
     };
 }
 
-float2::values operator * (const float2::values& lhs, const float2::values& rhs) {
+float2::values float2::operator * (const float2::values& lhs, const float2::values& rhs) {
     return {
         lhs.x() * rhs.x(),
         lhs.y() * rhs.y()
     };
 }
-float2::values operator * (const float2::values& lhs, float rhs) {
+float2::values float2::operator * (const float2::values& lhs, float rhs) {
     return {
         lhs.x() * rhs,
         lhs.y() * rhs
     };
 }
 
-float2::values operator + (const float2::values& lhs, const float2::values& rhs) {
+float2::values float2::operator + (const float2::values& lhs, const float2::values& rhs) {
     return {
         lhs.x() + rhs.x(),
         lhs.y() + rhs.y()
     };
 }
-float2::values operator + (const float2::values& lhs, float rhs) {
+float2::values float2::operator + (const float2::values& lhs, float rhs) {
     return {
         lhs.x() + rhs,
         lhs.y() + rhs
     };
 }
 
-float2::values operator - (const float2::values& lhs, const float2::values& rhs) {
+float2::values float2::operator - (const float2::values& lhs, const float2::values& rhs) {
     return {
         lhs.x() - rhs.x(),
         lhs.y() - rhs.y()
     };
 }
-float2::values operator - (const float2::values& lhs, float rhs) {
+float2::values float2::operator - (const float2::values& lhs, float rhs) {
     return {
         lhs.x() - rhs,
         lhs.y() - rhs
     };
 }
 
-float2::values& float2::values::operator = (const values& other) {
-    mX = other.x();
-    mY = other.y();
-    return *this;
-}
-float2::values& float2::values::operator = (float val) {
-    mX = val;
-    mY = val;
-    return *this;
-}
-
-float2::values& float2::values::operator - () {
-    mX = -mX;
-    mY = -mY;
-    return *this;
-}
-
-float2::values& float2::values::operator /= (const values& other) {
-    mX /= other.x();
-    mY /= other.y();
-    return *this;
-}
-float2::values& float2::values::operator /= (float val) {
-    mX /= val;
-    mY /= val;
-    return *this;
-}
-
-float2::values& float2::values::operator *= (const values& other) {
-    mX *= other.x();
-    mY *= other.y();
-    return *this;
-}
-float2::values& float2::values::operator *= (float val) {
-    mX *= val;
-    mY *= val;
-    return *this;
-}
-
-float2::values& float2::values::operator += (const values& other) {
-    mX += other.x();
-    mY += other.y();
-    return *this;
-}
-float2::values& float2::values::operator += (float val) {
-    mX += val;
-    mY += val;
-    return *this;
-}
-
-float2::values& float2::values::operator -= (const values& other) {
-    mX -= other.x();
-    mY -= other.y();
-    return *this;
-}
-float2::values& float2::values::operator -= (float val) {
-    mX -= val;
-    mY -= val;
-    return *this;
-}
-
 
 ///////////////////////////////////////////////////////
-// Assignment and manipulation operators
+// Assignment and manipulation float2::operators
 
 float2::values& float2::values::operator = (const values& other) {
-    mX = other.x();
-    mY = other.y();
+    *this = other;
     return *this;
 }
 float2::values& float2::values::operator = (float val) {
-    mX = val;
-    mY = val;
+    *this = val;
     return *this;
 }
 
-float2::values& float2::values::operator + () {
-    return *this;
-}
 float2::values& float2::values::operator - () {
-    mX = -mX;
-    mY = -mY;
+    *this = -*this;
     return *this;
 }
 
 float2::values& float2::values::operator /= (const values& other) {
-    mX /= other.x();
-    mY /= other.y();
+    *this = *this / other;
     return *this;
 }
 float2::values& float2::values::operator /= (float val) {
-    mX /= val;
-    mY /= val;
+    *this = *this / val;
     return *this;
 }
 
 float2::values& float2::values::operator *= (const values& other) {
-    mX *= other.x();
-    mY *= other.y();
+    *this = *this * other;
     return *this;
 }
 float2::values& float2::values::operator *= (float val) {
-    mX *= val;
-    mY *= val;
+    *this = *this * val;
     return *this;
 }
 
 float2::values& float2::values::operator += (const values& other) {
-    mX += other.x();
-    mY += other.y();
+    *this = *this + other;
     return *this;
 }
 float2::values& float2::values::operator += (float val) {
-    mX += val;
-    mY += val;
+    *this = *this + val;
     return *this;
 }
 
 float2::values& float2::values::operator -= (const values& other) {
-    mX -= other.x();
-    mY -= other.y();
+    *this = *this - other;
     return *this;
 }
 float2::values& float2::values::operator -= (float val) {
-    mX -= val;
-    mY -= val;
+    *this = *this - val;
     return *this;
 }

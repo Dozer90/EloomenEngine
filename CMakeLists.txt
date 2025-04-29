@@ -31,14 +31,14 @@ set(SOURCES
     "src/datatypes/float2.cpp"
     "src/datatypes/float3.cpp"
     "src/datatypes/float4.cpp"
+    "src/datatypes/quaternion.cpp"
+    "src/datatypes/matrix2x2.cpp"
+    "src/datatypes/matrix3x3.cpp"
+    "src/datatypes/matrix4x4.cpp"
+    
+    
 
-    "src/maths/quaternion.cpp"
-    "src/maths/matrix2x2.cpp"
-    "src/maths/matrix3x3.cpp"
-    "src/maths/matrix4x4.cpp"
     "src/maths/interpolation.cpp"
-    "src/maths/transform2D.cpp"
-    "src/maths/transform3D.cpp"
 
     "src/rendering/camera.cpp"
     "src/rendering/window.cpp"
@@ -55,7 +55,7 @@ set(SOURCES
     "src/Utilities.cpp"
     "src/Logging.cpp"
     "src/Game.cpp"
-    )
+     "src/datatypes/int2.cpp" "src/datatypes/int3.cpp" "src/datatypes/int4.cpp")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     #list(APPEND SOURCES)

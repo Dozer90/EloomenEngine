@@ -6,23 +6,23 @@ namespace eloo {
     void runtime_assert(const char* file, int line, bool condition, bool once, bool fatal, const char* conditionStr, const char* message, ...);
 }
 
-#define ASSERT(cond, message, ...) eloo::runtime_assert(__FILE__, __LINE__, (cond), false, false, #cond, (message), ##__VA_ARGS__)
-#define ASSERT_ONCE(cond, message, ...) eloo::runtime_assert(__FILE__, __LINE__, (cond), true, false, #cond, (message), ##__VA_ARGS__)
-#define ASSERT_FATAL(cond, message, ...) eloo::runtime_assert(__FILE__, __LINE__, (cond), false, true, #cond, (message), ##__VA_ARGS__)
+#define ELOO_ASSERT(cond, message, ...) eloo::runtime_assert(__FILE__, __LINE__, (cond), false, false, #cond, (message), ##__VA_ARGS__)
+#define ELOO_ASSERT_ONCE(cond, message, ...) eloo::runtime_assert(__FILE__, __LINE__, (cond), true, false, #cond, (message), ##__VA_ARGS__)
+#define ELOO_ASSERT_FATAL(cond, message, ...) eloo::runtime_assert(__FILE__, __LINE__, (cond), false, true, #cond, (message), ##__VA_ARGS__)
 
-#define ASSERT_FALSE(message, ...) ASSERT(false, message, ##__VA_ARGS__)
-#define ASSERT_ONCE_FALSE(message, ...) ASSERT_ONCE(false, message, ##__VA_ARGS__)
-#define ASSERT_FATAL_FALSE(message, ...) ASSERT_FATAL(false, message, ##__VA_ARGS__)
+#define ELOO_ASSERT_FALSE(message, ...) ELOO_ASSERT(false, message, ##__VA_ARGS__)
+#define ELOO_ASSERT_ONCE_FALSE(message, ...) ELOO_ASSERT_ONCE(false, message, ##__VA_ARGS__)
+#define ELOO_ASSERT_FATAL_FALSE(message, ...) ELOO_ASSERT_FATAL(false, message, ##__VA_ARGS__)
 
 #else
-#define ASSERT(cond, message, ...)
-#define ASSERT_ONCE(cond, message, ...)
-#define ASSERT_FATAL(cond, message, ...)
+#define ELOO_ASSERT(cond, message, ...)
+#define ELOO_ASSERT_ONCE(cond, message, ...)
+#define ELOO_ASSERT_FATAL(cond, message, ...)
 
-#define ASSERT_FALSE(message, ...)
-#define ASSERT_ONCE_FALSE(message, ...)
-#define ASSERT_FATAL_FALSE(message, ...)
-#endif // ASSERTS_ENABLED
+#define ELOO_ASSERT_FALSE(message, ...)
+#define ELOO_ASSERT_ONCE_FALSE(message, ...)
+#define ELOO_ASSERT_FATAL_FALSE(message, ...)
+#endif // ELOO_ASSERTS_ENABLED
 
 #define EASTL_FLT_NAN eastl::numeric_limits<float>::quiet_NaN()
 #define FLT_NAN std::numeric_limits<float>::quiet_NaN()

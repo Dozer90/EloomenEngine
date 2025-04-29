@@ -1,69 +1,95 @@
 #pragma once
 
-namespace eloo {
-class float3;
+#include <utility/defines.h>
 
-class float4 {
-public:
-    inline constexpr float4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {}
-    inline constexpr float4(float xyzw) : x(xyzw), y(xyzw), z(xyzw), w(xyzw) {}
-    inline constexpr float4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
-    float4(const float3& xyz, float w = 0.0f);
+#include <EASTL/numeric_limits.h>
+#include <EASTL/type_traits.h>
 
-    inline float* elements()                                                { return &x; }
-    inline const float* elements() const                                    { return &x; }
+namespace eloo::int4 {
+    ELOO_DECLARE_ID_T;
 
-    inline static constexpr float4 zero()                                   { return { 0.0f }; }
-    inline static constexpr float4 one()                                    { return { 1.0f }; }
+    // OOP style container for int2
+    struct values {
+    private:
+        int mX, mY, mZ, mW;
 
-    inline float magnitudeSqr() const                                       { return x * x + y * y + z * z + w * w; }
+    public:
+        constexpr values(int x, int y, int z, int w) : mX(x), mY(y), mZ(z), mW(w) {}
 
-    bool isNormalized() const;
-    float magnitude() const;
-    float magnitudeFast(unsigned int iterationCount = 1) const;
-    float4& normalize();
-    float4& normalizeFast(unsigned int iterationCount = 1);
+        inline int& x() { return mX; }
+        inline int& y() { return mY; }
+        inline int& z() { return mZ; }
+        inline int& w() { return mW; }
+        inline const int& x() const { return mX; }
+        inline const int& y() const { return mY; }
+        inline const int& z() const { return mZ; }
+        inline const int& w() const { return mW; }
 
-    float3 xyz() const;
+    public:
+        friend bool operator != (const values& lhs, const values& rhs);
+        friend bool operator != (const values& lhs, int rhs);
 
+        friend bool operator == (const values& lhs, const values& rhs);
+        friend bool operator == (const values& lhs, int rhs);
 
-    //////////////////////////////////////////////
-    // Accessors
+        friend values operator + (const values& lhs);
+        friend values operator - (const values& lhs);
 
-    inline float& operator [] (uint8_t index)                               { return elements()[index]; }
-    inline const float& operator [] (uint8_t index) const                   { return elements()[index]; }
+        friend values operator / (const values& lhs, const values& rhs);
+        friend values operator / (const values& lhs, int rhs);
 
+        friend values operator * (const values& lhs, const values& rhs);
+        friend values operator * (const values& lhs, int rhs);
 
-    //////////////////////////////////////////////
-    // Operator overloads
+        friend values operator + (const values& lhs, const values& rhs);
+        friend values operator + (const values& lhs, int rhs);
 
-    inline friend bool operator != (const float4& lhs, const float4& rhs)   { return lhs.x != rhs.x && lhs.y != lhs.y && lhs.z != lhs.z && lhs.w != lhs.w; }
-    inline friend bool operator == (const float4& lhs, const float4& rhs)   { return !(lhs != rhs); }
+        friend values operator - (const values& lhs, const values& rhs);
+        friend values operator - (const values& lhs, int rhs);
 
-    inline friend float4 operator - (const float4& v)                       { return { -v.x, -v.y, -v.z, -v.w }; }
-    inline float4& operator - ()                                            { return (*this = -*this); }
+    public:
+        values& operator = (const values& other);
+        values& operator = (int values);
 
-    inline friend float4 operator - (const float4& lhs, const float4& rhs)  { return { lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, lhs.w - rhs.w }; }
-    inline friend float4 operator - (const float4& v, float f)              { return { v.x - f, v.y - f, v.z - f, v.w - f }; }
-    inline float4& operator -= (const float4& v)                            { return (*this = *this - v); }
-    inline float4& operator -= (float f)                                    { return (*this = *this - f); }
+        values& operator + ();
+        values& operator - ();
 
-    inline friend float4 operator + (const float4& lhs, const float4& rhs)  { return { lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, lhs.w + rhs.w }; }
-    inline friend float4 operator + (const float4& v, float f)              { return { v.x + f, v.y + f, v.z + f, v.w + f }; }
-    inline float4& operator += (const float4& v)                            { return (*this = *this + v); }
-    inline float4& operator += (float f)                                    { return (*this = *this + f); }
+        values& operator /= (const values& other);
+        values& operator /= (int values);
 
-    inline friend float4 operator * (const float4& lhs, const float4& rhs)  { return { lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z, lhs.w * rhs.w }; }
-    inline friend float4 operator * (const float4& v, float f)              { return { v.x * f, v.y * f, v.z * f, v.w * f }; }
-    inline float4& operator *= (const float4& v)                            { return (*this = *this * v); }
-    inline float4& operator *= (float f)                                    { return (*this = *this * f); }
+        values& operator *= (const values& other);
+        values& operator *= (int values);
 
-    inline friend float4 operator / (const float4& lhs, const float4& rhs)  { return { lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z, lhs.w / rhs.w }; }
-    inline friend float4 operator / (const float4& v, float f)              { return { v.x / f, v.y / f, v.z / f, v.w / f }; }
-    inline float4& operator /= (const float4& v)                            { return (*this = *this / v); }
-    inline float4& operator /= (float f)                                    { return (*this = *this / f); }
+        values& operator += (const values& other);
+        values& operator += (int values);
 
-public:
-    float x, y, z, w;
+        values& operator -= (const values& other);
+        values& operator -= (int values);
+    };
+
+    template <typename T> concept storage_t = eastl::is_same_v<T, values>;
+
+    inline static constexpr values ZERO     { 0, 0, 0, 0 };
+    inline static constexpr values ONE      { 1, 1, 1, 1 };
+    inline static constexpr values RIGHT    { 1, 0, 0, 0 };
+    inline static constexpr values UP       { 0, 1, 0, 0 };
+    inline static constexpr values FORWARD  { 0, 0, 1, 0 };
+
+    id_t create(int x = 0, int y = 0, int z = 0, int w = 0, bool useIDPool = true);
+    id_t create(const values& vals, bool useIDPool = true);
+    bool try_release(id_t id);
+
+    bool is_valid(id_t id);
+
+    bool try_get_values(id_t id, values& vals);
+
+    int& x(id_t id);
+    int& y(id_t id);
+    int& z(id_t id);
+    int& w(id_t id);
+
+    const int& const_x(id_t id);
+    const int& const_y(id_t id);
+    const int& const_z(id_t id);
+    const int& const_w(id_t id);
 };
-}; // namespace eloo::math
