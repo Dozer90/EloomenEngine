@@ -115,8 +115,7 @@ namespace eloo::spherecast {
 
         const auto storeBest = [&](const result& toTest) {
             if (toTest.distance >= 0.0f && toTest.distance < hit.distance) {
-                hit.distance = toTest.distance;
-                hit.position = toTest.distance;
+                hit = toTest;
             }
         };
 
@@ -236,7 +235,7 @@ namespace eloo::spherecast {
     // Capsule
 
     bool test_capsule(ELOO_RAYCAST_PARAMS_1, float castRadius, const float3::values& origin, float height, float radius, result& hit) {
-        return raycast::test_capsule(ELOO_RAYCAST_FORWARD_PARAMS_1, origin, height + castRadius, radius + castRadius, hit);
+        return raycast::test_capsule(ELOO_RAYCAST_FORWARD_PARAMS_1, origin, height, radius + castRadius, hit);
     }
     bool test_capsule(ELOO_RAYCAST_PARAMS_2, float castRadius, FLOAT3_DECLARE_PARAMS(origin), float height, float radius, result& hit) {
         return test_capsule(ELOO_RAYCAST_FORWARD_PARAMS_2, castRadius, { FLOAT3_FORWARD_PARAMS(origin) }, height, radius, hit);
