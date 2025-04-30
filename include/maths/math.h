@@ -89,6 +89,11 @@ namespace eloo::math {
         return v;
     }
 
+    template <is_floating_t T>
+    FORCE_INLINE constexpr T abs(T v) {
+        return std::abs(v);
+    }
+
     template <is_numeric_t T>
     FORCE_INLINE constexpr int sign(T v) {
         if constexpr (is_floating_t<T>) {

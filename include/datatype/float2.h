@@ -5,6 +5,21 @@
 #include <EASTL/numeric_limits.h>
 #include <EASTL/type_traits.h>
 
+
+// Helper for letting functions take float2 elements individually
+#define FLOAT2_DECLARE_PARAMS(var) \
+    float var##X, float var##Y
+
+// Helper that collates the input exploded values from function input, allowing
+// the values to be passed to other functions
+#define FLOAT2_FORWARD_PARAMS(var) \
+    var##X, var##Y
+
+// Helper to extract the individual elements from a float2
+#define FLOAT2_UNPACK(f2Var) \
+    f2Var.x(), f2Var.y()
+
+
 namespace eloo::float2 {
     ELOO_DECLARE_ID_T;
 

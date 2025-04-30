@@ -2,8 +2,25 @@
 
 #include <utility/defines.h>
 
+#include <datatype/float2.h>
+
 #include <EASTL/numeric_limits.h>
 #include <EASTL/type_traits.h>
+
+
+// Helper for letting functions take float3 elements individually
+#define FLOAT3_DECLARE_PARAMS(var) \
+    float var##X, float var##Y, float var##Z
+
+// Helper that collates the input exploded values from function input, allowing
+// the values to be passed to other functions
+#define FLOAT3_FORWARD_PARAMS(var) \
+    var##X, var##Y, var##Z
+
+// Helper to extract the individual elements from a float3
+#define FLOAT3_UNPACK(f3Var) \
+    f3Var.x(), f3Var.y(), f3Var.z()
+
 
 namespace eloo::float3 {
     ELOO_DECLARE_ID_T;
@@ -22,6 +39,8 @@ namespace eloo::float3 {
         inline const float& x() const { return mX; }
         inline const float& y() const { return mY; }
         inline const float& z() const { return mZ; }
+
+        inline const float2::values xy() const { return { mX, mY }; }
 
     public:
         friend bool operator != (const values& lhs, const values& rhs);
