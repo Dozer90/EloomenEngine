@@ -1,7 +1,7 @@
-#pragma once
+#if !defined (ELOO_ASSERT)
 
 // Asserts
-#if defined(ASSERTS_ENABLED)
+#if defined(ELOO_ASSERTS_ENABLED)
 namespace eloo {
     void runtime_assert(const char* file, int line, bool condition, bool once, bool fatal, const char* conditionStr, const char* message, ...);
 }
@@ -13,7 +13,6 @@ namespace eloo {
 #define ELOO_ASSERT_FALSE(message, ...) ELOO_ASSERT(false, message, ##__VA_ARGS__)
 #define ELOO_ASSERT_ONCE_FALSE(message, ...) ELOO_ASSERT_ONCE(false, message, ##__VA_ARGS__)
 #define ELOO_ASSERT_FATAL_FALSE(message, ...) ELOO_ASSERT_FATAL(false, message, ##__VA_ARGS__)
-
 #else
 #define ELOO_ASSERT(cond, message, ...)
 #define ELOO_ASSERT_ONCE(cond, message, ...)
@@ -32,36 +31,35 @@ namespace eloo {
         constexpr id_t(size_t value) ELOO_NOEXCEPT : mID(value) {} \
         constexpr operator size_t() const ELOO_NOEXCEPT { return mID; } \
         constexpr bool operator == (const size_t& other) const { return mID == other; } \
-        auto operator <=>(const id_t& other) const ELOO_NOEXCEPT = default; \
     private: \
         size_t mID = 0; \
     };
 
 // Force inline
 #if defined(_MSC_VER)
-#define FORCE_INLINE __forceinline
+#define ELOO_FORCE_INLINE __forceinline
 #elif defined(__GNUC__) || defined(__clang__)
-#define FORCE_INLINE inline __attribute__((always_inline))
+#define ELOO_FORCE_INLINE inline __attribute__((always_inline))
 #else
-#define FORCE_INLINE inline
+#define ELOO_FORCE_INLINE inline
 #endif
 
 // Likely/unlikely branch prediction hints
 #if defined(__GNUC__) || defined(__clang__)
-#define LIKELY(x)   __builtin_expect(!!(x), 1)
-#define UNLIKELY(x) __builtin_expect(!!(x), 0)
+#define ELOO_LIKELY(x)   __builtin_expect(!!(x), 1)
+#define ELOO_UNLIKELY(x) __builtin_expect(!!(x), 0)
 #else
-#define LIKELY(x)   (x)
-#define UNLIKELY(x) (x)
+#define ELOO_LIKELY(x)   (x)
+#define ELOO_UNLIKELY(x) (x)
 #endif
 
 // Export/import (for DLLs, future-proofing)
 #ifdef _WIN32
-#define EXPORT __declspec(dllexport)
-#define IMPORT __declspec(dllimport)
+#define ELOO_EXPORT __declspec(dllexport)
+#define ELOO_IMPORT __declspec(dllimport)
 #else
-#define EXPORT __attribute__((visibility("default")))
-#define IMPORT
+#define ELOO_EXPORT __attribute__((visibility("default")))
+#define ELOO_IMPORT
 #endif
 
 // Noexcept
@@ -71,129 +69,34 @@ namespace eloo {
 #define ELOO_NOEXCEPT
 #endif
 
-// No copy
-#define NO_COPY(ClassName) \
-    ClassName(const ClassName&) = delete; \
-    ClassName& operator=(const ClassName&) = delete; \
-    ClassName(ClassName&&) = delete; \
-    ClassName& operator=(ClassName&&) = delete;
+// Rule of Three
+#define ELOO_CTOR_RULE_OF_THREE(ClassName) \
+    ClassName() = default; \
+    ClassName(const ClassName&) = default; \
+    ClassName& operator=(const ClassName&) = default; \
+    ~ClassName() = default;
 
-// No move
-#define NO_MOVE(ClassName) \
+// Rule of Five
+#define ELOO_CTOR_RULE_OF_FIVE(ClassName) \
+    ClassName() = default; \
+    ClassName(const ClassName&) = default; \
+    ClassName& operator=(const ClassName&) = default; \
+    ClassName(ClassName&&) ELOO_NOEXCEPT = default; \
+    ClassName& operator=(ClassName&&) ELOO_NOEXCEPT = default; \
+    ~ClassName() = default;
+
+// No default constructor
+#define ELOO_CTOR_DELETE_DEFAULT(ClassName) \
+    ClassName() = delete;
+
+// No copy constructor
+#define ELOO_CTOR_DELETE_COPY(ClassName) \
     ClassName(const ClassName&) = delete; \
     ClassName& operator=(const ClassName&) = delete;
 
-// No copy and move
-#define NO_COPY_MOVE(ClassName) \
-    ClassName(const ClassName&) = delete; \
-    ClassName& operator=(const ClassName&) = delete; \
+// No move constructor
+#define ELOO_CTOR_DELETE_MOVE(ClassName) \
     ClassName(ClassName&&) = delete; \
     ClassName& operator=(ClassName&&) = delete;
 
-// No default constructor
-#define NO_DEFAULT(ClassName) \
-    ClassName() = delete; \
-    ClassName& operator=(const ClassName&) = delete; \
-    ClassName(ClassName&&) = delete; \
-    ClassName& operator=(ClassName&&) = delete;
-
-// No destructor
-#define NO_DESTRUCTOR(ClassName) \
-    ~ClassName() = delete; \
-    ClassName& operator=(const ClassName&) = delete; \
-    ClassName(ClassName&&) = delete; \
-    ClassName& operator=(ClassName&&) = delete;
-
-// No copy and move constructor
-#define NO_COPY_MOVE_CONSTRUCTOR(ClassName) \
-    ClassName(const ClassName&) = delete; \
-    ClassName& operator=(const ClassName&) = delete; \
-    ClassName(ClassName&&) = delete; \
-    ClassName& operator=(ClassName&&) = delete;
-
-// No copy and move assignment
-#define NO_COPY_MOVE_ASSIGNMENT(ClassName) \
-    ClassName(const ClassName&) = delete; \
-    ClassName& operator=(const ClassName&) = delete; \
-    ClassName(ClassName&&) = delete; \
-    ClassName& operator=(ClassName&&) = delete;
-
-// No copy and move constructor and assignment
-#define NO_COPY_MOVE_CONSTRUCTOR_ASSIGNMENT(ClassName) \
-    ClassName(const ClassName&) = delete; \
-    ClassName& operator=(const ClassName&) = delete; \
-    ClassName(ClassName&&) = delete; \
-    ClassName& operator=(ClassName&&) = delete;
-
-// No default constructor and destructor
-#define NO_DEFAULT_DESTRUCTOR(ClassName) \
-    ClassName() = delete; \
-    ~ClassName() = delete; \
-    ClassName& operator=(const ClassName&) = delete; \
-    ClassName(ClassName&&) = delete; \
-    ClassName& operator=(ClassName&&) = delete;
-
-// No default constructor and copy constructor
-#define NO_DEFAULT_COPY_CONSTRUCTOR(ClassName) \
-    ClassName() = delete; \
-    ClassName(const ClassName&) = delete; \
-    ClassName& operator=(const ClassName&) = delete; \
-    ClassName(ClassName&&) = delete; \
-    ClassName& operator=(ClassName&&) = delete;
-
-// No default constructor and move constructor
-#define NO_DEFAULT_MOVE_CONSTRUCTOR(ClassName) \
-    ClassName() = delete; \
-    ClassName(ClassName&&) = delete; \
-    ClassName& operator=(const ClassName&) = delete; \
-    ClassName(ClassName&&) = delete; \
-    ClassName& operator=(ClassName&&) = delete;
-
-// No default constructor and copy assignment
-#define NO_DEFAULT_COPY_ASSIGNMENT(ClassName) \
-    ClassName() = delete; \
-    ClassName(const ClassName&) = delete; \
-    ClassName& operator=(const ClassName&) = delete; \
-    ClassName(ClassName&&) = delete; \
-    ClassName& operator=(ClassName&&) = delete;
-
-// No default constructor and move assignment
-#define NO_DEFAULT_MOVE_ASSIGNMENT(ClassName) \
-    ClassName() = delete; \
-    ClassName(ClassName&&) = delete; \
-    ClassName& operator=(const ClassName&) = delete; \
-    ClassName(ClassName&&) = delete; \
-    ClassName& operator=(ClassName&&) = delete;
-
-// No default constructor and copy and move constructor
-#define NO_DEFAULT_COPY_MOVE_CONSTRUCTOR(ClassName) \
-    ClassName() = delete; \
-    ClassName(const ClassName&) = delete; \
-    ClassName& operator=(const ClassName&) = delete; \
-    ClassName(ClassName&&) = delete; \
-    ClassName& operator=(ClassName&&) = delete;
-
-// No default constructor and copy and move assignment
-#define NO_DEFAULT_COPY_MOVE_ASSIGNMENT(ClassName) \
-    ClassName() = delete; \
-    ClassName(const ClassName&) = delete; \
-    ClassName& operator=(const ClassName&) = delete; \
-    ClassName(ClassName&&) = delete; \
-    ClassName& operator=(ClassName&&) = delete;
-
-// No default constructor and copy and move constructor and assignment
-#define NO_DEFAULT_COPY_MOVE_CONSTRUCTOR_ASSIGNMENT(ClassName) \
-    ClassName() = delete; \
-    ClassName(const ClassName&) = delete; \
-    ClassName& operator=(const ClassName&) = delete; \
-    ClassName(ClassName&&) = delete; \
-    ClassName& operator=(ClassName&&) = delete;
-
-// No default constructor and copy and move constructor and assignment and destructor
-#define NO_DEFAULT_COPY_MOVE_CONSTRUCTOR_ASSIGNMENT_DESTRUCTOR(ClassName) \
-    ClassName() = delete; \
-    ClassName(const ClassName&) = delete; \
-    ClassName& operator=(const ClassName&) = delete; \
-    ClassName(ClassName&&) = delete; \
-    ClassName& operator=(ClassName&&) = delete; \
-    ~ClassName() = delete;
+#endif

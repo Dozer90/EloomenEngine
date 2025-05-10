@@ -1,21 +1,20 @@
 #pragma once
 
-#include <Maths/Transform3D.h>
-#include <Maths/Matrix4x4.h>
-#include <Maths/float2.h>
+#include "datatype/matrix4x4.h"
+#include "datatype/float2.h"
 
 namespace eloo {
 
-class Camera {
-public:
-	math::Matrix4x4 getViewMatrix() const;
-	math::Matrix4x4 getOrthoProjMatrix() const;
-	math::Matrix4x4 getPerspectiveProjMatrix() const;
+	class Camera {
+	public:
+		matrix4x4::values get_view_matrix() const;
+		matrix4x4::values get_orthographic_projection_matrix() const;
+		matrix4x4::values get_perspective_projection_matrix() const;
 
-private:
-	math::Transform3D mTransform;
-	float mFOV = 70.0f;
-	math::float2 mViewSize;
-	math::float2 mClippingPlanes;
-};
+	private:
+
+		float mFOV = 70.0f;
+		float2::values mViewSize;
+		float2::values mClippingPlanes;
+	};
 }

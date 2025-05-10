@@ -1,7 +1,7 @@
-#include <utility/spherecast.h>
-#include <utility/raycast.h>
+#include "utility/spherecast.h"
+#include "utility/raycast.h"
 
-#include <maths/math.h>
+#include "maths/math.h"
 
 
 #define ELOO_RAYCAST_PARAMS_1 const float3::values& rayOrigin, const float3::values& rayDir, float rayLength

@@ -1,6 +1,7 @@
-#include "Generic/ImGuiEx.h"
+#if defined(ELOO_IMGUI_IS_ENABLED)
 
-#if defined(IMGUI_IS_ENABLED)
+#include "utility/imgui_ext.h"
+
 #include <EASTL/vector.h>
 
 using namespace ImGuiEx;
@@ -54,10 +55,10 @@ void Shapes::Ellipse::Draw(Canvas& canvas) const {
 	ImDrawList* drawList = canvas.GetDrawList();
 	ImVec2 offset = canvas.GetPosition();
 	if (Color(mStyle.mFillColour).a > 0.0f) {
-		drawList->AddEllipseFilled(offset + mMin, offset + mMax, mStyle.mFillColour);
+		drawList->AddEllipseFilled(offset + mOrigin, mSize, mStyle.mFillColour);
 	}
 	if (mStyle.mBorderThickness > 0.0f && Color(mStyle.mBorderColour).a > 0.0f) {
-		drawList->AddRectFilled(offset + mMin, offset + mMax, mStyle.mBorderColour, mStyle.mBorderThickness);
+		drawList->AddEllipseFilled(offset + mOrigin, mSize, mStyle.mBorderColour, mStyle.mBorderThickness);
 	}
 }
 

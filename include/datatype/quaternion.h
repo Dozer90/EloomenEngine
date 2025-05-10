@@ -1,9 +1,9 @@
 #pragma once
 
-#include <utility/defines.h>
+#include "utility/defines.h"
 
-#include <datatype/float3.h>
-#include <datatype/float4.h>
+#include "datatype/float3.h"
+#include "datatype/float4.h"
 
 namespace eloo::quaternion {
     ELOO_DECLARE_ID_T;
@@ -15,7 +15,7 @@ namespace eloo::quaternion {
 
     public:
         constexpr values(float x, float y, float z, float w) : mX(x), mY(y), mZ(z), mW(w) {}
-        constexpr values(const float4::values& vals) : mX(vals.x()), mY(vals.y()), mZ(vals.z()), mW(vals.w()) {}
+        values(const float4::values& vals) : mX(vals.x()), mY(vals.y()), mZ(vals.z()), mW(vals.w()) {}
 
         inline float& x() { return mX; }
         inline float& y() { return mY; }

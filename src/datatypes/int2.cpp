@@ -1,8 +1,8 @@
-#include <datatype/int2.h>
+#include "datatype/int2.h"
 
-#include <maths/math.h>
+#include "maths/math.h"
 
-#include <utility/managed_memory_block.h>
+#include "utility/managed_memory_block.h"
 
 using namespace eloo;
 

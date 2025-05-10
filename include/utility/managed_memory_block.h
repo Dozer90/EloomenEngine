@@ -1,5 +1,7 @@
 #pragma once
 
+#include "utility/defines.h"
+
 #include <EASTL/vector.h>
 #include <EASTL/unordered_set.h>
 #include <EASTL/type_traits.h>
@@ -58,37 +60,27 @@ namespace eloo {
         }
 
         T& get(size_t index) {
-            if (index >= mSize) {
-                throw std::out_of_range("Index out of range");
-            }
+            ELOO_ASSERT(index < mSize, "Index out of range");
             return mData[index];
         }
 
         const T& get(size_t index) const {
-            if (index >= mSize) {
-                throw std::out_of_range("Index out of range");
-            }
+            ELOO_ASSERT(index < mSize, "Index out of range");
             return mData[index];
         }
 
         T& operator[](size_t index) {
-            if (index >= mSize) {
-                throw std::out_of_range("Index out of range");
-            }
+            ELOO_ASSERT(index < mSize, "Index out of range");
             return get(index);
         }
 
         const T& operator[](size_t index) const {
-            if (index >= mSize) {
-                throw std::out_of_range("Index out of range");
-            }
+            ELOO_ASSERT(index < mSize, "Index out of range");
             return get(index);
         }
 
         void set(size_t index, T val) {
-            if (index >= mSize) {
-                throw std::out_of_range("Index out of range");
-            }
+            ELOO_ASSERT(index < mSize, "Index out of range");
             mData[index] = val;
         }
 
@@ -103,12 +95,10 @@ namespace eloo {
             mData.resize(oldSize + sizeExpansion);
             if constexpr (eastl::is_trivially_constructible_v<T>) {
                 memset(mData.data() + oldSize, 0, sizeExpansion * sizeof(T));
-            }
-            else {
+            } else {
                 std::uninitialized_fill(mData.begin() + oldSize, mData.end(), T());
             }
         }
-
 
     private:
         uint32_t mSize = 0;
@@ -141,9 +131,7 @@ namespace eloo {
                 expand();
             }
 
-            for (int i = 0; i < ElementCount; ++i) {
-                mData[id * ElementCount + i] = values[i];
-            }
+            eastl::copy(values.begin(), values.end(), mData.data() + id * ElementCount);
 
             return id;
         }
@@ -173,37 +161,27 @@ namespace eloo {
         }
 
         T& get(size_t id, size_t elementOffset) {
-            if (!is_valid(id)) {
-                throw std::out_of_range("ID out of range");
-            }
+            ELOO_ASSERT(is_valid(id), "ID is not valid");
             return mData[id * ElementCount + elementOffset];
         }
 
         const T& get(size_t id, size_t elementOffset) const {
-            if (!is_valid(id)) {
-                throw std::out_of_range("ID out of range");
-            }
+            ELOO_ASSERT(is_valid(id), "ID is not valid");
             return mData[id * ElementCount + elementOffset];
         }
 
         T* operator[](size_t id) {
-            if (!is_valid(id)) {
-                throw std::out_of_range("ID out of range");
-            }
+            ELOO_ASSERT(is_valid(id), "ID is not valid");
             return &get(id, 0);
         }
 
         const T* operator[](size_t id) const {
-            if (is_valid(id)) {
-                throw std::out_of_range("ID out of range");
-            }
+            ELOO_ASSERT(is_valid(id), "ID is not valid");
             return &get(id, 0);
         }
 
         void set(size_t id, size_t elementOffset, T val) {
-            if (is_valid(id)) {
-                throw std::out_of_range("ID out of range");
-            }
+            ELOO_ASSERT(is_valid(id), "ID is not valid");
             mData[id * ElementCount + elementOffset] = val;
         }
 

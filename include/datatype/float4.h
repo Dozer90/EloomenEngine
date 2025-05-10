@@ -1,9 +1,9 @@
 #pragma once
 
-#include <utility/defines.h>
+#include "utility/defines.h"
 
-#include <datatype/float2.h>
-#include <datatype/float3.h>
+#include "datatype/float2.h"
+#include "datatype/float3.h"
 
 #include <EASTL/numeric_limits.h>
 #include <EASTL/type_traits.h>

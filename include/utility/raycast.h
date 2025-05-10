@@ -1,7 +1,7 @@
 #pragma once
 
-#include <datatype/float3.h>
-#include <datatype/float4.h>
+#include "datatype/float3.h"
+#include "datatype/float4.h"
 
 #include <EASTL/optional.h>
 

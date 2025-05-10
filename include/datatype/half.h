@@ -7,20 +7,6 @@
 #include <EASTL/type_traits.h>
 #include <EASTL/numeric_limits.h>
 
-#define HLF_DECIMAL_DIG  5                       // # of decimal digits of rounding precision
-#define HLF_DIG          3                       // # of decimal digits of precision
-#define HLF_EPSILON      9.765625e-04f           // smallest such that 1.0+HLF_EPSILON != 1.0
-#define HLF_HAS_SUBNORM  1                       // type does support subnormal numbers
-#define HLF_MANT_DIG     11                      // # of bits in mantissa
-#define HLF_MAX          65504.0f                // max value
-#define HLF_MAX_10_EXP   4                       // max decimal exponent
-#define HLF_MAX_EXP      16                      // max binary exponent
-#define HLF_MIN          6.1035156e-05f          // min positive value
-#define HLF_MIN_10_EXP   (-4)                    // min decimal exponent
-#define HLF_MIN_EXP      (-13)                   // min binary exponent
-#define _HLF_RADIX       2                       // exponent radix
-#define HLF_TRUE_MIN     5.9604645e-08f          // min positive value
-
 namespace eloo {
     struct half;
 }
@@ -29,28 +15,16 @@ typedef float float32_t;
 typedef eloo::half float16_t;
 
 namespace eloo {
-
     struct half {
     private:
         uint16_t mBits = 0;
 
     public:
-        struct from_bits_t { explicit from_bits_t() = default; };
-        static inline constexpr from_bits_t from_bits{};
-
-    public:
         half() = default;
         constexpr inline half(float32_t f) : mBits(float32_to_16(f)) {}
         constexpr inline half(float64_t d) : mBits(float32_to_16(static_cast<float>(d))) {}
-        constexpr inline explicit half(uint16_t rawBits, from_bits_t) : mBits(rawBits) {}
-
 
         constexpr inline operator float32_t() const { return float16_to_32(*this); }
-
-        inline half& operator = (float32_t f) {
-            mBits = float32_to_16(f);
-            return *this;
-        }
 
         constexpr static half float32_to_16(float32_t f) {
             // IEEE 754 single-precision (float) bit layout:
@@ -64,18 +38,20 @@ namespace eloo {
 
             uint32_t bits = std::bit_cast<uint32_t>(f);
             uint32_t sign = (bits >> 16) & 0x8000;
-            uint32_t exponent = ((bits >> 23) & 0xFF) - 0x70;
+            int32_t exponent = ((bits >> 23) & 0xFF) - 0x70;
             uint32_t mantissa = (bits & 0x007FFFFF) >> 13;
 
             if (exponent <= 0) {
-                // Subnormal numbers (denormals)
-                return sign | (mantissa >> (1 - exponent));
+                if (exponent < -10) {
+                    return from_bits(sign); // Too small to be represented as subnormal
+                }
+                mantissa = (mantissa | 0x0800) >> (1 - exponent);
+                return from_bits(sign | mantissa);
             }
             if (exponent >= 31) {
-                // Infinity/NaN
-                return sign | 0x7C00 | (mantissa ? 1 : 0);
+                return from_bits(sign | 0x7C00 | (mantissa ? 1 : 0)); // Inf/NaN
             }
-            return half(sign | (exponent << 10) | mantissa);
+            return from_bits(sign | (exponent << 10) | mantissa);
         }
 
         inline constexpr static float32_t float16_to_32(uint16_t f16bits) {
@@ -116,7 +92,9 @@ namespace eloo {
         }
 
         constexpr static half from_bits(uint16_t bits) noexcept {
-            return half(bits, from_bits);
+            half h;
+            h.mBits = bits;
+            return h;
         }
 
         constexpr float as_float32() const noexcept {
@@ -124,6 +102,13 @@ namespace eloo {
         }
 
     public:
+        friend constexpr inline half operator + (half lhs) noexcept {
+            return lhs;
+        }
+        friend constexpr inline half operator - (half lhs) noexcept {
+            return half::from_bits(lhs.mBits ^ 0x8000);
+        }
+
         friend constexpr inline bool operator == (half lhs, half rhs) noexcept {
             return lhs.mBits == rhs.mBits;
         }
@@ -197,71 +182,61 @@ namespace eloo {
         }
 
         friend constexpr inline half operator / (half lhs, half rhs) noexcept {
-            if (static_cast<float>(rhs) == 0.0f) {
-                return half::from_bits(0x7E00); // Return NaN
-            }
-            return half(static_cast<float>(lhs) / static_cast<float>(rhs));
+            return half::float32_to_16(static_cast<float>(lhs) / static_cast<float>(rhs));
         }
         template <typename T, typename = eastl::enable_if_t<eastl::is_arithmetic_v<T>>>
         friend constexpr inline half operator / (half lhs, T rhs) noexcept {
-            if (static_cast<float>(rhs) == 0.0f) {
-                return half::from_bits(0x7E00); // Return NaN
-            }
-            return half(static_cast<float>(lhs) / static_cast<float>(rhs));
+            return half::float32_to_16(static_cast<float>(lhs) / static_cast<float>(rhs));
         }
         template <typename T, typename = eastl::enable_if_t<eastl::is_arithmetic_v<T>>>
         friend constexpr inline half operator / (T lhs, half rhs) noexcept {
-            if (static_cast<float>(rhs) == 0.0f) {
-                return half::from_bits(0x7E00); // Return NaN
-            }
-            return half(static_cast<float>(lhs) / static_cast<float>(rhs));
+            return half::float32_to_16(static_cast<float>(lhs) / static_cast<float>(rhs));
         }
 
         friend constexpr inline half operator * (half lhs, half rhs) noexcept {
-            return half(static_cast<float>(lhs) * static_cast<float>(rhs));
+            return half::float32_to_16(static_cast<float>(lhs) * static_cast<float>(rhs));
         }
         template <typename T, typename = eastl::enable_if_t<eastl::is_arithmetic_v<T>>>
         friend constexpr inline half operator * (half lhs, T rhs) noexcept {
-            return half(static_cast<float>(lhs) * static_cast<float>(rhs));
+            return half::float32_to_16(static_cast<float>(lhs) * static_cast<float>(rhs));
         }
         template <typename T, typename = eastl::enable_if_t<eastl::is_arithmetic_v<T>>>
         friend constexpr inline half operator * (T lhs, half rhs) noexcept {
-            return half(static_cast<float>(lhs) * static_cast<float>(rhs));
+            return half::float32_to_16(static_cast<float>(lhs) * static_cast<float>(rhs));
         }
 
         friend constexpr inline half operator + (half lhs, half rhs) noexcept {
-            return half(static_cast<float>(lhs) + static_cast<float>(rhs));
+            return half::float32_to_16(static_cast<float>(lhs) + static_cast<float>(rhs));
         }
         template <typename T, typename = eastl::enable_if_t<eastl::is_arithmetic_v<T>>>
         friend constexpr inline half operator + (half lhs, T rhs) noexcept {
-            return half(static_cast<float>(lhs) + static_cast<float>(rhs));
+            return half::float32_to_16(static_cast<float>(lhs) + static_cast<float>(rhs));
         }
         template <typename T, typename = eastl::enable_if_t<eastl::is_arithmetic_v<T>>>
         friend constexpr inline half operator + (T lhs, half rhs) noexcept {
-            return half(static_cast<float>(lhs) + static_cast<float>(rhs));
+            return half::float32_to_16(static_cast<float>(lhs) + static_cast<float>(rhs));
         }
 
         friend constexpr inline half operator - (half lhs, half rhs) noexcept {
-            return half(static_cast<float>(lhs) - static_cast<float>(rhs));
+            return half::float32_to_16(static_cast<float>(lhs) - static_cast<float>(rhs));
         }
         template <typename T, typename = eastl::enable_if_t<eastl::is_arithmetic_v<T>>>
         friend constexpr inline half operator - (half lhs, T rhs) noexcept {
-            return half(static_cast<float>(lhs) - static_cast<float>(rhs));
+            return half::float32_to_16(static_cast<float>(lhs) - static_cast<float>(rhs));
         }
         template <typename T, typename = eastl::enable_if_t<eastl::is_arithmetic_v<T>>>
         friend constexpr inline half operator - (T lhs, half rhs) noexcept {
-            return half(static_cast<float>(lhs) - static_cast<float>(rhs));
+            return half::float32_to_16(static_cast<float>(lhs) - static_cast<float>(rhs));
         }
     };
 
     constexpr half operator"" _h(long double v) {
-        return half(static_cast<float32_t>(v));
+        return half::float32_to_16(static_cast<float32_t>(v));
     }
 }
 
 static_assert(sizeof(eloo::half) == sizeof(uint16_t));
 static_assert(std::is_trivially_copyable_v<eloo::half>);
-static_assert(std::is_trivially_constructible_v<eloo::half>);
 
 // Include half (float16_t) in the floating point checks
 namespace std {
@@ -272,21 +247,35 @@ namespace eastl {
 }
 
 // Add numeric_limits for float16_t
+#define HLF_DECIMAL_DIG  5                 // # of decimal digits of rounding precision
+#define HLF_DIG          3                 // # of decimal digits of precision
+#define HLF_EPSILON      9.765625e-04f     // smallest such that 1.0+HLF_EPSILON != 1.0
+#define HLF_HAS_SUBNORM  1                 // type does support subnormal numbers
+#define HLF_MANT_DIG     11                // # of bits in mantissa
+#define HLF_MAX          65504.0f          // max value
+#define HLF_MAX_10_EXP   4                 // max decimal exponent
+#define HLF_MAX_EXP      16                // max binary exponent
+#define HLF_MIN          6.1035156e-05f    // min positive value
+#define HLF_MIN_10_EXP   (-4)              // min decimal exponent
+#define HLF_MIN_EXP      (-13)             // min binary exponent
+#define _HLF_RADIX       2                 // exponent radix
+#define HLF_TRUE_MIN     5.9604645e-08f    // min positive value
+
 namespace std {
     template<> struct numeric_limits<float16_t> {
         static constexpr bool is_specialized = true;
 
-        static constexpr float16_t min() noexcept { return float16_t(HLF_MIN); }             // smallest normalized positive
-        static constexpr float16_t max() noexcept { return float16_t(HLF_MAX); }             // max value
-        static constexpr float16_t lowest() noexcept { return float16_t(-HLF_MAX); }
+        static constexpr float16_t min() noexcept { return float16_t::float32_to_16(HLF_MIN); }             // smallest normalized positive
+        static constexpr float16_t max() noexcept { return float16_t::float32_to_16(HLF_MAX); }             // max value
+        static constexpr float16_t lowest() noexcept { return float16_t::float32_to_16(-HLF_MAX); }
 
-        static constexpr float16_t epsilon() noexcept { return float16_t(HLF_EPSILON); }
-        static constexpr float16_t round_error() noexcept { return float16_t(0.5f); }
+        static constexpr float16_t epsilon() noexcept { return float16_t::float32_to_16(HLF_EPSILON); }
+        static constexpr float16_t round_error() noexcept { return float16_t::float32_to_16(0.5f); }
 
         static constexpr float16_t infinity() noexcept { return float16_t::from_bits(0x7C00); }          // Inf
         static constexpr float16_t quiet_NaN() noexcept { return float16_t::from_bits(0x7E00); }         // Quiet NaN
         static constexpr float16_t signaling_NaN() noexcept { return float16_t::from_bits(0x7D00); }     // Signaling NaN
-        static constexpr float16_t denorm_min() noexcept { return float16_t(HLF_TRUE_MIN); }
+        static constexpr float16_t denorm_min() noexcept { return float16_t::float32_to_16(HLF_TRUE_MIN); }
 
         static constexpr int digits = HLF_MANT_DIG;
         static constexpr int digits10 = HLF_DIG;
@@ -316,17 +305,17 @@ namespace eastl {
     template<> struct numeric_limits<float16_t> {
         static constexpr bool is_specialized = true;
 
-        static constexpr float16_t min() noexcept { return float16_t(HLF_MIN); }             // smallest normalized positive
-        static constexpr float16_t max() noexcept { return float16_t(HLF_MAX); }             // max value
-        static constexpr float16_t lowest() noexcept { return float16_t(-HLF_MAX); }
+        static constexpr float16_t min() noexcept { return float16_t::float32_to_16(HLF_MIN); }             // smallest normalized positive
+        static constexpr float16_t max() noexcept { return float16_t::float32_to_16(HLF_MAX); }             // max value
+        static constexpr float16_t lowest() noexcept { return float16_t::float32_to_16(-HLF_MAX); }
 
-        static constexpr float16_t epsilon() noexcept { return float16_t(HLF_EPSILON); }
-        static constexpr float16_t round_error() noexcept { return float16_t(0.5f); }
+        static constexpr float16_t epsilon() noexcept { return float16_t::float32_to_16(HLF_EPSILON); }
+        static constexpr float16_t round_error() noexcept { return float16_t::float32_to_16(0.5f); }
 
         static constexpr float16_t infinity() noexcept { return float16_t::from_bits(0x7C00); }          // Inf
         static constexpr float16_t quiet_NaN() noexcept { return float16_t::from_bits(0x7E00); }         // Quiet NaN
         static constexpr float16_t signaling_NaN() noexcept { return float16_t::from_bits(0x7D00); }     // Signaling NaN
-        static constexpr float16_t denorm_min() noexcept { return float16_t(HLF_TRUE_MIN); }
+        static constexpr float16_t denorm_min() noexcept { return float16_t::float32_to_16(HLF_TRUE_MIN); }
 
         static constexpr int digits = HLF_MANT_DIG;
         static constexpr int digits10 = HLF_DIG;

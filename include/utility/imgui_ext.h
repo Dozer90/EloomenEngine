@@ -1,56 +1,29 @@
 #pragma once
 
-#if !defined(IMGUI_IS_ENABLED)
+#if !defined(ELOO_IMGUI_IS_ENABLED)
 #define IMGUI_MUTABLE constexpr
 #else
 #define IMGUI_MUTABLE
 
+#define IMGUI_DEFINE_MATH_OPERATORS
+
 #define IM_VEC2_CLASS_EXTRA \
-inline friend bool operator!=(const ImVec2& lhs, const ImVec2& rhs) { return lhs.x != rhs.x || lhs.y != rhs.y; } \
-inline friend bool operator == (const ImVec2& lhs, const ImVec2& rhs) { return !(lhs.x != rhs); } \
-inline friend ImVec2 operator + (const ImVec2& lhs, const ImVec2& rhs) { return { lhs.x + rhs.x, lhs.y + rhs.y }; } \
-inline friend ImVec2 operator - (const ImVec2& lhs, const ImVec2& rhs) { return { lhs.x - rhs.x, lhs.y - rhs.y }; } \
-inline friend ImVec2 operator * (const ImVec2& lhs, const ImVec2& rhs) { return { lhs.x * rhs.x, lhs.y * rhs.y }; } \
-inline friend ImVec2 operator / (const ImVec2& lhs, const ImVec2& rhs) { return { lhs.x / rhs.x, lhs.y / rhs.y }; } \
-inline friend ImVec2 operator + (const ImVec2& v, float f) { return { v.x + f, v.y + f }; } \
-inline friend ImVec2 operator - (const ImVec2& v, float f) { return { v.x - f, v.y - f }; } \
-inline friend ImVec2 operator * (const ImVec2& v, float f) { return { v.x * f, v.y * f }; } \
-inline friend ImVec2 operator / (const ImVec2& v, float f) { return { v.x / f, v.y / f }; } \
-inline ImVec2& operator += (const ImVec2& v) { return (*this = *this + v); } \
-inline ImVec2& operator -= (const ImVec2& v) { return (*this = *this - v); } \
-inline ImVec2& operator *= (const ImVec2& v) { return (*this = *this * v); } \
-inline ImVec2& operator /= (const ImVec2& v) { return (*this = *this / v); } \
-inline ImVec2& operator += (float f) { return (*this = *this + f); } \
-inline ImVec2& operator -= (float f) { return (*this = *this - f); } \
-inline ImVec2& operator *= (float f) { return (*this = *this * f); } \
-inline ImVec2& operator /= (float f) { return (*this = *this / f); }
+    ImVec2(const eloo::float2::values& f) { x = f.x(); y = f.y(); } \
+    operator eloo::float2::values() const { return eloo::float2::values(x, y); }
 
 #define IM_VEC4_CLASS_EXTRA \
-inline friend bool operator!=(const ImVec4& lhs, const ImVec4& rhs) { return lhs.x != rhs.x || lhs.y != rhs.y || lhs.z != rhs.z || lhs.w != rhs.w; } \
-inline friend bool operator == (const ImVec4& lhs, const ImVec4& rhs) { return !(lhs.x != rhs); } \
-inline friend ImVec4 operator + (const ImVec4& lhs, const ImVec4& rhs) { return { lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, lhs.w + rhs.w }; } \
-inline friend ImVec4 operator - (const ImVec4& lhs, const ImVec4& rhs) { return { lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, lhs.w - rhs.w }; } \
-inline friend ImVec4 operator * (const ImVec4& lhs, const ImVec4& rhs) { return { lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z, lhs.w * rhs.w }; } \
-inline friend ImVec4 operator / (const ImVec4& lhs, const ImVec4& rhs) { return { lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z, lhs.w / rhs.w }; } \
-inline friend ImVec4 operator + (const ImVec4& v, float f) { return { v.x + f, v.y + f, v.z + f, v.w + f }; } \
-inline friend ImVec4 operator - (const ImVec4& v, float f) { return { v.x - f, v.y - f, v.z - f, v.w - f }; } \
-inline friend ImVec4 operator * (const ImVec4& v, float f) { return { v.x * f, v.y * f, v.z * f, v.w * f }; } \
-inline friend ImVec4 operator / (const ImVec4& v, float f) { return { v.x / f, v.y / f, v.z / f, v.w / f }; } \
-inline ImVec4& operator += (const ImVec4& v) { return (*this = *this + v); } \
-inline ImVec4& operator -= (const ImVec4& v) { return (*this = *this - v); } \
-inline ImVec4& operator *= (const ImVec4& v) { return (*this = *this * v); } \
-inline ImVec4& operator /= (const ImVec4& v) { return (*this = *this / v); } \
-inline ImVec4& operator += (float f) { return (*this = *this + f); } \
-inline ImVec4& operator -= (float f) { return (*this = *this - f); } \
-inline ImVec4& operator *= (float f) { return (*this = *this * f); } \
-inline ImVec4& operator /= (float f) { return (*this = *this / f); }
+    ImVec4(const eloo::float4::values& f) { x = f.x(); y = f.y(); z = f.z(); w = f.w(); } \
+    operator eloo::float4::values() const { return eloo::float4::values(x, y, z, w); }
 
-#include "imgui.h"
+#include "datatype/float2.h"
+#include "datatype/float4.h"
 
-#include "EASTL/array.h"
-#include "EASTL/stack.h"
-#include "EASTL/string.h"
-#include "EASTL/unordered_map.h"
+#include <imgui.h>
+
+#include <EASTL/array.h>
+#include <EASTL/stack.h>
+#include <EASTL/string.h>
+#include <EASTL/unordered_map.h>
 
 
 //-----------------------------------------------------------------------------
@@ -75,16 +48,16 @@ enum ImGuiExCol_ {
 };
 
 struct ImGuiExStyle {
-    ImGuiStyle mImGuiStyle;
+    ImGuiStyle  mImGuiStyle;
 
-    ImVec4		Colors[ImGuiExCol_COUNT];
+    ImVec4      Colors[ImGuiExCol_COUNT];
 };
 
 
 namespace ImGuiEx {
 
 // Main
-IMGUI_API ImGuiExStyle& GetStyle();                                 // access the Style structure (colors, sizes). Always use PushStyleColor(), PushStyleVar() to modify style mid-frame!
+IMGUI_API ImGuiExStyle& GetStyle();                                                     // access the Style structure (colors, sizes). Always use PushStyleColor(), PushStyleVar() to modify style mid-frame!
 
 IMGUI_API void          PushStyleColor(ImGuiExCol idx, ImU32 col);                      // modify a style color. always use this if you modify the style after NewFrame().
 IMGUI_API void          PushStyleColor(ImGuiExCol idx, const ImVec4& col);
@@ -101,10 +74,10 @@ constexpr float ONE_DIV_TWO_FIFTY_FIVE = 1.0f / 255.0f;
 
 struct Color {
     Color(ImU32 imguiColor)
-		: r(static_cast<float>((imguiColor >> IM_COL32_R_SHIFT) & 0xFF) * ONE_DIV_TWO_FIFTY_FIVE)
-		, g(static_cast<float>((imguiColor >> IM_COL32_G_SHIFT) & 0xFF) * ONE_DIV_TWO_FIFTY_FIVE)
-		, b(static_cast<float>((imguiColor >> IM_COL32_B_SHIFT) & 0xFF) * ONE_DIV_TWO_FIFTY_FIVE)
-		, a(static_cast<float>((imguiColor >> IM_COL32_A_SHIFT) & 0xFF) * ONE_DIV_TWO_FIFTY_FIVE) {}
+        : r(static_cast<float>((imguiColor >> IM_COL32_R_SHIFT) & 0xFF) * ONE_DIV_TWO_FIFTY_FIVE)
+        , g(static_cast<float>((imguiColor >> IM_COL32_G_SHIFT) & 0xFF) * ONE_DIV_TWO_FIFTY_FIVE)
+        , b(static_cast<float>((imguiColor >> IM_COL32_B_SHIFT) & 0xFF) * ONE_DIV_TWO_FIFTY_FIVE)
+        , a(static_cast<float>((imguiColor >> IM_COL32_A_SHIFT) & 0xFF) * ONE_DIV_TWO_FIFTY_FIVE) {}
     float r, g, b, a;
 };
 
@@ -187,6 +160,8 @@ enum class Type : unsigned int {
     Bezier
 };
 
+class Canvas;
+
 class Shape {
 public:
     virtual Type GetType() const = 0;
@@ -207,17 +182,17 @@ protected:
 // ==================================================
 class Canvas {
 public:
-	explicit Canvas(ImVec2 size) : mPos(ImGui::GetCursorScreenPos()), mSize(size) {}
+    explicit Canvas(ImVec2 size) : mPos(ImGui::GetCursorScreenPos()), mSize(size) {}
 
-	inline ImDrawList* GetDrawList() const { return ImGui::GetWindowDrawList(); }
-	inline const ImVec2& GetPosition() const { return mPos; }
+    inline ImDrawList* GetDrawList() const { return ImGui::GetWindowDrawList(); }
+    inline const ImVec2& GetPosition() const { return mPos; }
 
-	void Update(const float deltaTime);
-	void Draw() const;
+    void Update(const float deltaTime);
+    void Draw() const;
 
 private:
-	ImVec2 mPos, mSize;
-	eastl::vector<Shape> mShapes;
+    ImVec2 mPos, mSize;
+    eastl::vector<Shape> mShapes;
 };
 
 // ==================================================
@@ -284,8 +259,8 @@ public:
 
     inline void SetPoints(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3) { mPoints = { p1, p2, p3 }; }
     inline void SetPoint1(const ImVec2& p) { mPoints[0] = p; }
-	inline void SetPoint2(const ImVec2& p) { mPoints[1] = p; }
-	inline void SetPoint3(const ImVec2& p) { mPoints[2] = p; }
+    inline void SetPoint2(const ImVec2& p) { mPoints[1] = p; }
+    inline void SetPoint3(const ImVec2& p) { mPoints[2] = p; }
 
 public:
     inline virtual Type GetType() const override { return Type::Line; }

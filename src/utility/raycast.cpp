@@ -1,6 +1,6 @@
-#include <utility/raycast.h>
+#include "utility/raycast.h"
 
-#include <maths/math.h>
+#include "maths/math.h"
 
 
 #define ELOO_RAYCAST_PARAMS_1 const float3::values& rayOrigin, const float3::values& rayDir, float rayLength
@@ -27,8 +27,8 @@ namespace eloo::raycast {
     /////////////////////////////////////////////////////////////////////
     // Plane
 
-    bool test_plane(ELOO_RAYCAST_PARAMS_1, const float4::values& plane, hit_info& hit) {
-        hit = hit_info();
+    bool test_plane(ELOO_RAYCAST_PARAMS_1, const float4::values& plane, result& hit) {
+        hit = result();
 
         const float3::values normRayDir = math::vector::normalize(rayDir);
         const float3::values planeNormal = math::vector::normalize(plane.xyz());
@@ -48,13 +48,13 @@ namespace eloo::raycast {
         hit.position = rayOrigin + normRayDir * t;
         return true;
     }
-    bool test_plane(ELOO_RAYCAST_PARAMS_2, FLOAT4_DECLARE_PARAMS(plane), hit_info& hit) {
+    bool test_plane(ELOO_RAYCAST_PARAMS_2, FLOAT4_DECLARE_PARAMS(plane), result& hit) {
         return test_plane(ELOO_RAYCAST_FORWARD_PARAMS_2, { FLOAT4_FORWARD_PARAMS(plane) }, hit);
     }
-    bool test_plane(ELOO_RAYCAST_PARAMS_3, const float4::values& plane, hit_info& hit) {
+    bool test_plane(ELOO_RAYCAST_PARAMS_3, const float4::values& plane, result& hit) {
         return test_plane(ELOO_RAYCAST_FORWARD_PARAMS_3, plane, hit);
     }
-    bool test_plane(ELOO_RAYCAST_PARAMS_4, FLOAT4_DECLARE_PARAMS(plane), hit_info& hit) {
+    bool test_plane(ELOO_RAYCAST_PARAMS_4, FLOAT4_DECLARE_PARAMS(plane), result& hit) {
         return test_plane(ELOO_RAYCAST_FORWARD_PARAMS_4, { FLOAT4_FORWARD_PARAMS(plane) }, hit);
     }
 
@@ -62,7 +62,7 @@ namespace eloo::raycast {
     /////////////////////////////////////////////////////////////////////
     // Quad
 
-    bool test_quad(ELOO_RAYCAST_PARAMS_1, const float4::values& quad, float width, float height, hit_info& hit) {
+    bool test_quad(ELOO_RAYCAST_PARAMS_1, const float4::values& quad, float width, float height, result& hit) {
         if (!test_plane(rayOrigin, rayDir, quad, hit)) {
             return false;
         }
@@ -82,16 +82,16 @@ namespace eloo::raycast {
             return true;
         }
 
-        hit = hit_info();
+        hit = result();
         return false;
     }
-    bool test_quad(ELOO_RAYCAST_PARAMS_2, FLOAT4_DECLARE_PARAMS(quad), float width, float height, hit_info& hit) {
+    bool test_quad(ELOO_RAYCAST_PARAMS_2, FLOAT4_DECLARE_PARAMS(quad), float width, float height, result& hit) {
         return test_quad(ELOO_RAYCAST_FORWARD_PARAMS_2, { FLOAT4_FORWARD_PARAMS(quad) }, width, height, hit);
     }
-    bool test_quad(ELOO_RAYCAST_PARAMS_3, const float4::values& quad, float width, float height, hit_info& hit) {
+    bool test_quad(ELOO_RAYCAST_PARAMS_3, const float4::values& quad, float width, float height, result& hit) {
         return test_quad(ELOO_RAYCAST_FORWARD_PARAMS_3, quad, width, height, hit);
     }
-    bool test_quad(ELOO_RAYCAST_PARAMS_4, FLOAT4_DECLARE_PARAMS(quad), float width, float height, hit_info& hit) {
+    bool test_quad(ELOO_RAYCAST_PARAMS_4, FLOAT4_DECLARE_PARAMS(quad), float width, float height, result& hit) {
         return test_quad(ELOO_RAYCAST_FORWARD_PARAMS_4, { FLOAT4_FORWARD_PARAMS(quad) }, width, height, hit);
     }
 
@@ -99,8 +99,8 @@ namespace eloo::raycast {
     /////////////////////////////////////////////////////////////////////
     // Triangle
 
-    bool test_tri(ELOO_RAYCAST_PARAMS_1, const float3::values& vertex1, const float3::values& vertex2, const float3::values& vertex3, hit_info& hit) {
-        hit = hit_info();
+    bool test_tri(ELOO_RAYCAST_PARAMS_1, const float3::values& vertex1, const float3::values& vertex2, const float3::values& vertex3, result& hit) {
+        hit = result();
 
         const float3::values edge1 = vertex2 - vertex1;
         const float3::values edge2 = vertex3 - vertex1;
@@ -128,13 +128,13 @@ namespace eloo::raycast {
         hit.position = rayOrigin + rayDir * t;
         return true;
     }
-    bool test_tri(ELOO_RAYCAST_PARAMS_2, FLOAT3_DECLARE_PARAMS(vertex1), FLOAT3_DECLARE_PARAMS(vertex2), FLOAT3_DECLARE_PARAMS(vertex3), hit_info& hit) {
+    bool test_tri(ELOO_RAYCAST_PARAMS_2, FLOAT3_DECLARE_PARAMS(vertex1), FLOAT3_DECLARE_PARAMS(vertex2), FLOAT3_DECLARE_PARAMS(vertex3), result& hit) {
         return test_tri(ELOO_RAYCAST_FORWARD_PARAMS_2, { FLOAT3_FORWARD_PARAMS(vertex1) }, { FLOAT3_FORWARD_PARAMS(vertex2) }, { FLOAT3_FORWARD_PARAMS(vertex3) }, hit);
     }
-    bool test_tri(ELOO_RAYCAST_PARAMS_3, const float3::values& vertex1, const float3::values& vertex2, const float3::values& vertex3, hit_info& hit) {
+    bool test_tri(ELOO_RAYCAST_PARAMS_3, const float3::values& vertex1, const float3::values& vertex2, const float3::values& vertex3, result& hit) {
         return test_tri(ELOO_RAYCAST_FORWARD_PARAMS_3, vertex1, vertex2, vertex3, hit);
     }
-    bool test_tri(ELOO_RAYCAST_PARAMS_4, FLOAT3_DECLARE_PARAMS(vertex1), FLOAT3_DECLARE_PARAMS(vertex2), FLOAT3_DECLARE_PARAMS(vertex3), hit_info& hit) {
+    bool test_tri(ELOO_RAYCAST_PARAMS_4, FLOAT3_DECLARE_PARAMS(vertex1), FLOAT3_DECLARE_PARAMS(vertex2), FLOAT3_DECLARE_PARAMS(vertex3), result& hit) {
         return test_tri(ELOO_RAYCAST_FORWARD_PARAMS_4, { FLOAT3_FORWARD_PARAMS(vertex1) }, { FLOAT3_FORWARD_PARAMS(vertex2) }, { FLOAT3_FORWARD_PARAMS(vertex3) }, hit);
     }
 
@@ -142,8 +142,8 @@ namespace eloo::raycast {
     /////////////////////////////////////////////////////////////////////
     // AABB
 
-    bool test_aabb(ELOO_RAYCAST_PARAMS_1, const float3::values& min, const float3::values& max, hit_info& hit) {
-        hit = hit_info();
+    bool test_aabb(ELOO_RAYCAST_PARAMS_1, const float3::values& min, const float3::values& max, result& hit) {
+        hit = result();
 
         float tmin = (min.x() - rayOrigin.x()) / rayDir.x();
         float tmax = (max.x() - rayOrigin.x()) / rayDir.x();
@@ -184,13 +184,13 @@ namespace eloo::raycast {
         hit.position = rayOrigin + rayDir * t;
         return true;
     }
-    bool test_aabb(ELOO_RAYCAST_PARAMS_2, FLOAT3_DECLARE_PARAMS(min), FLOAT3_DECLARE_PARAMS(max), hit_info& hit) {
+    bool test_aabb(ELOO_RAYCAST_PARAMS_2, FLOAT3_DECLARE_PARAMS(min), FLOAT3_DECLARE_PARAMS(max), result& hit) {
         return test_aabb(ELOO_RAYCAST_FORWARD_PARAMS_2, { FLOAT3_FORWARD_PARAMS(min) }, { FLOAT3_FORWARD_PARAMS(max) }, hit);
     }
-    bool test_aabb(ELOO_RAYCAST_PARAMS_3, const float3::values& min, const float3::values& max, hit_info& hit) {
+    bool test_aabb(ELOO_RAYCAST_PARAMS_3, const float3::values& min, const float3::values& max, result& hit) {
         return test_aabb(ELOO_RAYCAST_FORWARD_PARAMS_3, min, max, hit);
     }
-    bool test_aabb(ELOO_RAYCAST_PARAMS_4, FLOAT3_DECLARE_PARAMS(min), FLOAT3_DECLARE_PARAMS(max), hit_info& hit) {
+    bool test_aabb(ELOO_RAYCAST_PARAMS_4, FLOAT3_DECLARE_PARAMS(min), FLOAT3_DECLARE_PARAMS(max), result& hit) {
         return test_aabb(ELOO_RAYCAST_FORWARD_PARAMS_4, { FLOAT3_FORWARD_PARAMS(min) }, { FLOAT3_FORWARD_PARAMS(max) }, hit);
     }
 
@@ -198,8 +198,8 @@ namespace eloo::raycast {
     /////////////////////////////////////////////////////////////////////
     // Sphere
 
-    bool test_sphere(ELOO_RAYCAST_PARAMS_1, const float3::values& origin, float radius, hit_info& hit) {
-        hit = hit_info();
+    bool test_sphere(ELOO_RAYCAST_PARAMS_1, const float3::values& origin, float radius, result& hit) {
+        hit = result();
 
         float3::values L = rayOrigin - origin;
         const float a = math::vector::dot(rayDir, rayDir);
@@ -222,13 +222,13 @@ namespace eloo::raycast {
         hit.position = rayOrigin + rayDir * t;
         return true;
     }
-    bool test_sphere(ELOO_RAYCAST_PARAMS_2, FLOAT3_DECLARE_PARAMS(origin), float radius, hit_info& hit) {
+    bool test_sphere(ELOO_RAYCAST_PARAMS_2, FLOAT3_DECLARE_PARAMS(origin), float radius, result& hit) {
         return test_sphere(ELOO_RAYCAST_FORWARD_PARAMS_2, { FLOAT3_FORWARD_PARAMS(origin) }, radius, hit);
     }
-    bool test_sphere(ELOO_RAYCAST_PARAMS_3, const float3::values& origin, float radius, hit_info& hit) {
+    bool test_sphere(ELOO_RAYCAST_PARAMS_3, const float3::values& origin, float radius, result& hit) {
         return test_sphere(ELOO_RAYCAST_FORWARD_PARAMS_3, origin, radius, hit);
     }
-    bool test_sphere(ELOO_RAYCAST_PARAMS_4, FLOAT3_DECLARE_PARAMS(origin), float radius, hit_info& hit) {
+    bool test_sphere(ELOO_RAYCAST_PARAMS_4, FLOAT3_DECLARE_PARAMS(origin), float radius, result& hit) {
         return test_sphere(ELOO_RAYCAST_FORWARD_PARAMS_4, { FLOAT3_FORWARD_PARAMS(origin) }, radius, hit);
     }
 
@@ -236,8 +236,8 @@ namespace eloo::raycast {
     /////////////////////////////////////////////////////////////////////
     // Ellipsoid
 
-    bool test_ellipsoid(ELOO_RAYCAST_PARAMS_1, const float3::values& origin, const float3::values& radii, hit_info& hit) {
-        hit = hit_info();
+    bool test_ellipsoid(ELOO_RAYCAST_PARAMS_1, const float3::values& origin, const float3::values& radii, result& hit) {
+        hit = result();
 
         const float3::values L = rayOrigin - origin;
 
@@ -264,13 +264,13 @@ namespace eloo::raycast {
         hit.position = rayOrigin + rayDir * t;
         return true;
     }
-    bool test_ellipsoid(ELOO_RAYCAST_PARAMS_2, FLOAT3_DECLARE_PARAMS(origin), FLOAT3_DECLARE_PARAMS(radii), hit_info& hit) {
+    bool test_ellipsoid(ELOO_RAYCAST_PARAMS_2, FLOAT3_DECLARE_PARAMS(origin), FLOAT3_DECLARE_PARAMS(radii), result& hit) {
         return test_ellipsoid(ELOO_RAYCAST_FORWARD_PARAMS_2, { FLOAT3_FORWARD_PARAMS(origin) }, { FLOAT3_FORWARD_PARAMS(radii) }, hit);
     }
-    bool test_ellipsoid(ELOO_RAYCAST_PARAMS_3, const float3::values& origin, const float3::values& radii, hit_info& hit) {
+    bool test_ellipsoid(ELOO_RAYCAST_PARAMS_3, const float3::values& origin, const float3::values& radii, result& hit) {
         return test_ellipsoid(ELOO_RAYCAST_FORWARD_PARAMS_3, origin, radii, hit);
     }
-    bool test_ellipsoid(ELOO_RAYCAST_PARAMS_4, FLOAT3_DECLARE_PARAMS(origin), FLOAT3_DECLARE_PARAMS(radii), hit_info& hit) {
+    bool test_ellipsoid(ELOO_RAYCAST_PARAMS_4, FLOAT3_DECLARE_PARAMS(origin), FLOAT3_DECLARE_PARAMS(radii), result& hit) {
         return test_ellipsoid(ELOO_RAYCAST_FORWARD_PARAMS_4, { FLOAT3_FORWARD_PARAMS(origin) }, { FLOAT3_FORWARD_PARAMS(radii) }, hit);
     }
 
@@ -278,8 +278,8 @@ namespace eloo::raycast {
     /////////////////////////////////////////////////////////////////////
     // Capsule
 
-    bool test_capsule(ELOO_RAYCAST_PARAMS_1, const float3::values& origin, float height, float radius, hit_info& hit) {
-        hit = hit_info();
+    bool test_capsule(ELOO_RAYCAST_PARAMS_1, const float3::values& origin, float height, float radius, result& hit) {
+        hit = result();
 
         const float3::values P0 = origin - float3::UP * height * 0.5f;
         const float3::values P1 = P0 + float3::UP * height;
@@ -310,7 +310,7 @@ namespace eloo::raycast {
 
         // 2) Sphere caps
         const auto testSphere = [&](const float3::values& sphereOrigin) {
-            hit_info sphereHit;
+            result sphereHit;
             const bool didHit = test_sphere(rayOrigin, rayDir, sphereOrigin, radius, sphereHit);
             if (didHit && (hit.distance < 0.0f || sphereHit.distance < hit.distance)) {
                 hit = sphereHit;
@@ -322,13 +322,13 @@ namespace eloo::raycast {
 
         return hit.distance >= 0.0f;
     }
-    bool test_capsule(ELOO_RAYCAST_PARAMS_2, FLOAT3_DECLARE_PARAMS(origin), float height, float radius, hit_info& hit) {
+    bool test_capsule(ELOO_RAYCAST_PARAMS_2, FLOAT3_DECLARE_PARAMS(origin), float height, float radius, result& hit) {
         return test_capsule(ELOO_RAYCAST_FORWARD_PARAMS_2, { FLOAT3_FORWARD_PARAMS(origin) }, height, radius, hit);
     }
-    bool test_capsule(ELOO_RAYCAST_PARAMS_3, const float3::values& origin, float height, float radius, hit_info& hit) {
+    bool test_capsule(ELOO_RAYCAST_PARAMS_3, const float3::values& origin, float height, float radius, result& hit) {
         return test_capsule(ELOO_RAYCAST_FORWARD_PARAMS_3, origin, height, radius, hit);
     }
-    bool test_capsule(ELOO_RAYCAST_PARAMS_4, FLOAT3_DECLARE_PARAMS(origin), float height, float radius, hit_info& hit) {
+    bool test_capsule(ELOO_RAYCAST_PARAMS_4, FLOAT3_DECLARE_PARAMS(origin), float height, float radius, result& hit) {
         return test_capsule(ELOO_RAYCAST_FORWARD_PARAMS_4, { FLOAT3_FORWARD_PARAMS(origin) }, height, radius, hit);
     }
 };

@@ -1,118 +1,65 @@
-#include <Rendering/Window.h>
+#include "rendering/window.h"
 
-#include <Maths/float2.h>
+#include "events/engine/events.h"
 
-using namespace eloo;
-using namespace eloo::math;
 
-Window::Window(HINSTANCE instance, const eastl::wstring title, int width, int height) :
-    mInstance(instance), mTitle(title), mWidth(width), mHeight(height) {
-
-    // Get DPI
-    HDC screen = GetDC(0);
-    mDPI = { GetDeviceCaps(screen, LOGPIXELSX), GetDeviceCaps(screen, LOGPIXELSY) } / 96.0f;
-    ReleaseDC(0, screen);
-
-    WNDCLASSEXW wc{};
-    wc.cbSize = sizeof(WNDCLASSEXW);
-    wc.style = CS_HREDRAW | CS_VREDRAW;
-    wc.lpfnWndProc = Window::WindowProc;
-    wc.hInstance = mInstance;
-    wc.lpszClassName = L"DX12Window";
-    RegisterClassExW(&wc);
-
-    mHandle = CreateWindowExW(
-        0,
-        wc.lpszClassName,
-        mTitle.c_str(),
-        WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT,
-        mWidth, mHeight,
-        nullptr, nullptr,
-        mInstance, nullptr
-    );
-
-    SetWindowLongPtrW(mHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
-
-    ShowWindow(mHandle, SW_SHOWNORMAL);
-    mState = State::normal;
+eloo::window_ptr eloo::create_window(const eastl::wstring& title,
+                                     int width, int height) {
+#if defined ELOO_BACKEND_DX12
+    return eastl::make_unique<window_dx12>(::GetModuleHandle(nullptr), title, width, height);
+#else
+    static_assert(false, "No window backend defined");
+#endif
 }
 
-void Window::show() {
-    if (!mActive && mState < State::normal) return;
-    mState = State::normal;
-    ShowWindow(mHandle, SW_SHOW);
+eloo::window_interface::window_interface(const eastl::wstring& title, int width, int height) {
+    mTitle = title;
+    mSize.x() = width;
+    mSize.y() = height;
 }
 
-void Window::hide() {
-    if (mActive && mState >= State::normal) return;
-    mState = State::hidden;
-    ShowWindow(mHandle, SW_HIDE);
+void eloo::window_interface::hide() {
+    mState = state::hidden;
+    mActive = false;
+    on_hide();
+    events::engine::on_window_closed.broadcast();
 }
 
-void Window::restore() {
-    if (mActive && mState != State::normal) return;
-    mState = State::normal;
-    ShowWindow(mHandle, SW_RESTORE);
+void eloo::window_interface::show() {
+    mState = state::normal;
+    mActive = true;
+    on_show();
+    events::engine::on_window_opened.broadcast();
 }
 
-void Window::minimize() {
-    if (mActive && mState != State::minimized) return;
-    mState = State::minimized;
-    ShowWindow(mHandle, SW_MINIMIZE);
+void eloo::window_interface::restore() {
+    mState = state::normal;
+    mActive = true;
+    on_restore();
+    events::engine::on_window_focus_changed.broadcast({ true });
 }
 
-void Window::maximize() {
-    if (mActive && mState != State::maximized) return;
-    mState = State::maximized;
-    ShowWindow(mHandle, SW_MAXIMIZE);
+void eloo::window_interface::minimize() {
+    mState = state::minimized;
+    mActive = false;
+    on_minimize();
+    events::engine::on_window_minimized.broadcast();
 }
 
-bool Window::processMessages() {
-    MSG msg{};
-    while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) {
-        TranslateMessage(&msg);
-        DispatchMessageW(&msg);
-
-        if (msg.message == WM_QUIT) {
-            return false;
-        }
-    }
-    return true;
+void eloo::window_interface::maximize() {
+    mState = state::maximized;
+    mActive = true;
+    on_maximize();
+    events::engine::on_window_maximized.broadcast();
 }
 
-bool Window::processCommand(UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    switch (uMsg) {
-
-    case WM_CLOSE:
-        DestroyWindow(mHandle);
-        return true;
-
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        return true;
-
-    case WM_SIZE:
-        mWidth = LOWORD(lParam);
-        mHeight = HIWORD(lParam);
-        return true;
-
-    case WM_ACTIVATE:
-        mActive = LOWORD(wParam) != WA_INACTIVE;
-        return false;
-
-    case WM_PAINT:
-        ValidateRect(mHandle, nullptr);
-        return false;
-    }
-
-    return false;
+void eloo::window_interface::resize(int width, int height) {
+    mSize = int2::values(width, height);
+    on_resize(width, height);
+    events::engine::on_window_resized.broadcast({ width, height });
 }
 
-LRESULT CALLBACK Window::WindowProc(HWND handle, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    Window* window = reinterpret_cast<Window*>(GetWindowLongPtrW(handle, GWLP_USERDATA));
-    if (window != nullptr && window->processCommand(uMsg, wParam, lParam)) {
-        return 0;
-    }
-    return DefWindowProc(handle, uMsg, wParam, lParam);
+void eloo::window_interface::move(int x, int y) {
+    on_move(x, y);
+    events::engine::on_window_moved.broadcast({ x, y });
 }
