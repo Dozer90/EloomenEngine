@@ -114,7 +114,6 @@ FetchContent_Declare(Box2D
     EXCLUDE_FROM_ALL)
 FetchContent_MakeAvailable(Box2D)
 list(APPEND ELOO_PUBLIC_SYSTEM_INCLUDE_DIRECTORIES ${box2d_SOURCE_DIR}/include)
-cmake_print_variables(box2d_SOURCE_DIR)
 
 # EASTL
 FetchContent_Declare(EASTL
@@ -124,7 +123,6 @@ FetchContent_Declare(EASTL
     EXCLUDE_FROM_ALL)
 FetchContent_MakeAvailable(EASTL)
 list(APPEND ELOO_PUBLIC_SYSTEM_INCLUDE_DIRECTORIES ${EASTL_SOURCE_DIR}/include)
-cmake_print_variables(EASTL_SOURCE_DIR)
 
 #Dear ImGui
 FetchContent_Declare(ImGui
@@ -134,7 +132,6 @@ FetchContent_Declare(ImGui
     EXCLUDE_FROM_ALL)
 FetchContent_MakeAvailable(ImGui)
 list(APPEND ELOO_PUBLIC_SYSTEM_INCLUDE_DIRECTORIES ${imgui_SOURCE_DIR})
-cmake_print_variables(imgui_SOURCE_DIR)
 
 
 ###########################################
@@ -202,3 +199,8 @@ target_compile_definitions(EloomEngine
     PUBLIC  ${ELOO_PUBLIC_DEFINES}
     PRIVATE ${ELOO_PRIVATE_DEFINES}
 )
+
+if(MSVC)
+    target_compile_options(EloomEngine
+        PRIVATE /external:W0)
+endif()
