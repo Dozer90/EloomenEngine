@@ -1,8 +1,8 @@
 #include "rendering/renderer.h"
 
 #if defined ELOO_BACKEND_DX12
-#include "renderer_dx12.h"
-#include "window_dx12.h"
+#include "dx12/renderer_dx12.h"
+#include "dx12/window_dx12.h"
 #else
 static_assert(false, "No renderer backend defined");
 #endif

@@ -1,7 +1,8 @@
-#include "dx12/include/rendering/renderer_dx12.h"
+#include "renderer_dx12.h"
+#include "window_dx12.h"
 
-#include "core/interfaces/renderer_interface.h"
-#include "core/interfaces/window_interface.h"
+#include "renderer_interface.h"
+#include "window_interface.h"
 
 #include "utility/defines.h"
 #include "utility/colour.h"
@@ -15,126 +16,18 @@
 using namespace Microsoft::WRL;
 using namespace eloo;
 
-renderer_dx12::renderer_dx12(window_interface* wnd) {
+renderer_dx12::renderer_dx12(const window_dx12* wnd) {
+    if (!initilize_factory())       { return; }
+    if (!initilize_device())        { return; }
 
-    //////////////////////////////////////////////////////////////////////////
-    // Step 1: Create the factory
+    // Disable ALT+Enter fullscreen toggle
+    mFactory->MakeWindowAssociation(wnd->handle(), DXGI_MWA_NO_ALT_ENTER);
 
-    ELOO_ASSERT_FATAL(
-      SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&mFactory))),
-      "Unable to create DXGI factory"
-    );
-
-
-    //////////////////////////////////////////////////////////////////////////
-    // Step 2: Search for a compatible GPU and create the Direct3D 12 device
-
-    for (uint32_t index = 0; ; ++index) {
-        if (mFactory->EnumAdapters1(index, &mAdapter) == DXGI_ERROR_NOT_FOUND) {
-            // Searched for all available GPUs
-            break;
-        }
-
-        DXGI_ADAPTER_DESC1 adapterDesc;
-        mAdapter->GetDesc1(&adapterDesc);
-        if (adapterDesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) {
-            // Avoid software adapters
-            continue;
-        }
-
-        if (SUCCEEDED(
-          D3D12CreateDevice(
-            mAdapter.Get(),
-            D3D_FEATURE_LEVEL_12_0,
-            IID_PPV_ARGS(&mDevice))
-          )
-        ) {
-            break;
-        }
-    }
-    ELOO_ASSERT_FATAL(mDevice != nullptr, "Unable to find a GPU that supports DX12");
-
-
-    //////////////////////////////////////////////////////////////////////////
-    // Step 3: Create a command queue
-
-    D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
-    commandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-    ELOO_ASSERT_FATAL(
-      SUCCEEDED(
-        mDevice->CreateCommandQueue(
-          &commandQueueDesc,
-          IID_PPV_ARGS(&mCommandQueue)
-        )
-      ),
-      "Unable to create command queue"
-    );
-
-
-    //////////////////////////////////////////////////////////////////////////
-    // Step 4: Create a swap chain
-
-    {
-        const int2::values& size = wnd->size();
-        create_swap_chain(mCommandQueue, 2, DXGI_FORMAT_B8G8R8A8_UNORM, size.x(), size.y());
-    }
-
-
-    //////////////////////////////////////////////////////////////////////////
-    // Step 5: Create a command allocator
-
-    for (UINT i = 0; i < FRAME_COUNT; ++i) {
-      ELOO_ASSERT_FATAL(
-        SUCCEEDED(
-          mDevice->CreateCommandAllocator(
-            D3D12_COMMAND_LIST_TYPE_DIRECT,
-            IID_PPV_ARGS(&mCommandAllocator[i])
-          )
-        ),
-        "Unable to create command allocator"
-      );
-    }
-
-
-    //////////////////////////////////////////////////////////////////////////
-    // Step 6: Create a command list
-
-    ELOO_ASSERT_FATAL(
-      SUCCEEDED(
-        mDevice->CreateCommandList(
-          0,
-          D3D12_COMMAND_LIST_TYPE_DIRECT,
-          mCommandAllocator[0].Get(),
-          nullptr,
-          IID_PPV_ARGS(&mCommandList)
-        )),
-      "Unable to create command list"
-    );
-
-
-    //////////////////////////////////////////////////////////////////////////
-    // Step 7: Create a fence
-
-    ELOO_ASSERT_FATAL(
-      SUCCEEDED(
-        mDevice->CreateFence(
-          0,
-          D3D12_FENCE_FLAG_NONE,
-          IID_PPV_ARGS(&mFence)
-        )),
-      "Unable to create fence"
-    );
-    mFenceEvent = CreateEvent(nullptr, false, false, nullptr);
-
-
-    //////////////////////////////////////////////////////////////////////////
-    // Step 8: Bind the window resize callback
+    if (!create_command_queue())    { return; }
+    if (!create_command_objects())  { return; }
+    if (!create_swap_chain(wnd))    { return; }
 
     events::engine::on_window_resized.subscribe(&on_window_resized, this);
-
-
-    //////////////////////////////////////////////////////////////////////////
-    // Step 9: Other stuff
 
     // Root signature (empty for now)
     {
@@ -142,8 +35,8 @@ renderer_dx12::renderer_dx12(window_interface* wnd) {
         desc.Init(0, nullptr, 0, nullptr,
                   D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
-        D3D12BlobPtr signature;
-        D3D12BlobPtr error;
+        ComPtr<ID3D10Blob> signature;
+        ComPtr<ID3D10Blob> error;
         ELOO_ASSERT_FATAL(
           SUCCEEDED(D3D12SerializeRootSignature(
             &desc,
@@ -236,89 +129,157 @@ renderer_dx12::renderer_dx12(window_interface* wnd) {
     mVertexBufferView.SizeInBytes = vertexBufferSize;
 }
 
-void renderer_dx12::shutdown() {
+renderer_dx12::~renderer_dx12() {
     mSwapChain.Reset();
     mCommandQueue.Reset();
     mDevice.Reset();
     mAdapter.Reset();
     mFactory.Reset();
-    mWindow->hide();
 }
 
-void renderer_dx12::create_swap_chain(ComPtr<ID3D12CommandQueue> cmdQueue,
-                                      UINT bufferCount,
-                                      DXGI_FORMAT format,
-                                      int2::values size) {
+bool renderer_dx12::initilize_factory() {
+    UINT dxgiFactoryFlags = 0;
+
+#if defined(_DEBUG)
+    // Enable the D3D12 debug layer
+    ComPtr<ID3D12Debug> debugController;
+    if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
+        debugController->EnableDebugLayer();
+        dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
+    } else {
+        ELOO_ASSERT_FALSE("D3D12 debug layer is not available. Ensure you have the Windows SDK installed with the debug layer enabled.");
+    }
+#endif
+
+    const bool success = SUCCEEDED(CreateDXGIFactory2(dxgiFactoryFlags, IID_PPV_ARGS(&mFactory)));
+    ELOO_ASSERT_FATAL(success, "Unable to create DXGI factory");
+    return success;
+}
+
+bool renderer_dx12::initilize_device() {
+    // Enumerate adapters (GPUs) and create a device for the first one that supports D3D12
+    ComPtr<IDXGIAdapter1> currentAdapter;
+    SIZE_T bestMemory = 0;
+    for (uint32_t index = 0; ; ++index) {
+        if (mFactory->EnumAdapters1(index, &currentAdapter) == DXGI_ERROR_NOT_FOUND) {
+            // Searched all available GPUs
+            break;
+        }
+
+        DXGI_ADAPTER_DEsC adapterDesc;
+        currentAdapter->GetDesc(&adapterDesc);
+        if (adapterDesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) {
+            // Avoid software adapters
+            continue;
+        }
+
+        // Check if this adapter has more memory than the current best and can create a D3D12 device
+        if (adapterDesc.DedicatedVideoMemory > bestMemory &&
+            SUCCEEDED(D3D12CreateDevice(currentAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&mDevice)))) {
+            bestMemory = adapterDesc.DedicatedVideoMemory;
+            mAdapter = currentAdapter;
+        }
+    }
+    ELOO_ASSERT_FATAL(mDevice != nullptr, "Unable to find a GPU that supports DX12");
+    return mDevice != nullptr;
+}
+
+bool renderer_dx12::create_command_queue() {
+    D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
+    commandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+    const bool success = SUCCEEDED(mDevice->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&mCommandQueue)));
+    ELOO_ASSERT_FATAL(success, "Unable to create command queue");
+    return success;
+}
+
+bool renderer_dx12::create_command_objects() {
+    // Create command allocators for each frame
+    for (UINT i = 0; i < BACK_BUFFER_COUNT; ++i) {
+        if (FAILED(mDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&mCommandAllocator[i])))) {
+            ELOO_ASSERT_FATAL_FALSE("Unable to create command allocator for frame %u", i);
+            return false;
+        }
+    }
+
+    // Create a command list
+    if (FAILED(mDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, mCommandAllocator[0].Get(), nullptr, IID_PPV_ARGS(&mCommandList)))) {
+        ELOO_ASSERT_FATAL_FALSE("Unable to create command list");
+        return false;
+    }
+    mCommandList->Close(); // Close the command list to prepare it for execution
+
+    // Create a fence for synchronization
+    if (FAILED(mDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&mFence)))) {
+        ELOO_ASSERT_FATAL_FALSE("Unable to create fence");
+        return false;
+    }
+    mFenceEvent = CreateEvent(nullptr, false, false, nullptr);
+
+    return true;
+}
+
+bool renderer_dx12::create_swap_chain(const window_dx12* wnd) {
     // Describe swap-chain
-    DXGI_SWAP_CHAIN_DESC1 scDesc{};
-    scDesc.Width = width;
-    scDesc.Height = height;
-    scDesc.Format = format;
-    scDesc.BufferCount = bufferCount;
+    DXGI_SWAP_CHAIN_DESC scDesc{};
+    scDesc.Width = wnd->size().x();
+    scDesc.Height = wnd->size().y();
+    scDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    scDesc.BufferCount = BACK_BUFFER_COUNT;
     scDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     scDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     scDesc.SampleDesc.Count = 1;
+    scDesc.Flags = (mVsyncEnabled) ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-    // Optional: allow tearing if supported
-    BOOL allowTearing = FALSE;
-    if (SUCCEEDED(mFactory->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allowTearing, sizeof(allowTearing))) && allowTearing) {
-        scDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+    // Optional: allow tearing (if supported)
+    mFactory->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &mTearingSupported, sizeof(mTearingSupported));
+    if (mTearingSupported && mTearingEnabled) {
+        scDesc.Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
     }
 
     // Create the swap-chain
-    Microsoft::WRL::ComPtr<IDXGISwapChain1> sc1;
-    ELOO_ASSERT_FATAL(
-      SUCCEEDED(
-        mFactory->CreateSwapChainForHwnd(
-          cmdQueue.Get(),
-          mWindow->handle(),
-          &scDesc, nullptr, nullptr,
-          &sc1
-        )
-      ),
-      "Failed to create swap-chain"
-    );
-
-    // Disable ALT+Enter fullscreen toggle
-    mFactory->MakeWindowAssociation(
-      mWindow->handle(),
-      DXGI_MWA_NO_ALT_ENTER
-    );
+    Microsoft::WRL::ComPtr<IDXGISwapChain1> swapChain1;
+    if (FAILED(mFactory->CreateSwapChainForHwnd(mCommandQueue.Get(), wnd->handle(), &scDesc, nullptr, nullptr, &swapChain1))) {
+        ELOO_ASSERT_FATAL_FALSE("Failed to create swap-chain");
+        return false;
+    }
 
     // Upgrade to IDXGISwapChain3
-    ELOO_ASSERT_FATAL(
-      SUCCEEDED(sc1.As(&mSwapChain)),
-      "Failed to query IDXGISwapChain3"
-    );
-
-    // Create an RTV descriptor heap
-    D3D12_DESCRIPTOR_HEAP_DESC heapDesc{};
-    heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-    heapDesc.NumDescriptors = bufferCount;
-    heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-    ELOO_ASSERT_FATAL(
-      SUCCEEDED(mDevice->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&mRenderTargetHeap))),
-      "Failed to create RTV heap"
-    );
-    mRenderTargetDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(
-      D3D12_DESCRIPTOR_HEAP_TYPE_RTV
-    );
-
-    // Create one RTV per back-buffer
-    auto rtvHandle = mRenderTargetHeap->GetCPUDescriptorHandleForHeapStart();
-    for (UINT i = 0; i < bufferCount; ++i) {
-        Microsoft::WRL::ComPtr<ID3D12Resource> backBuffer;
-        ELOO_ASSERT_FATAL(
-          SUCCEEDED(mSwapChain->GetBuffer(i, IID_PPV_ARGS(&backBuffer))),
-          "Failed to get swap-chain buffer"
-        );
-        mBackBuffers[i] = backBuffer;
-        mDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, rtvHandle);
-        rtvHandle.ptr += mRenderTargetDescriptorSize;
+    if (FAILED(swapChain1.As(&mSwapChain))) {
+        ELOO_ASSERT_FATAL_FALSE("Failed to query IDXGISwapChain3");
+        return false;
     }
+
+    return true;
 }
 
-void renderer_dx12::render() {
+bool renderer_dx12::create_render_target_heap() {
+    // Create a descriptor heap for render targets
+    D3D12_DESCRIPTOR_HEAP_DESC heapDesc{};
+    heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+    heapDesc.NumDescriptors = BACK_BUFFER_COUNT;
+    if (FAILED(mDevice->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&mRTVHeap)))) {
+        ELOO_ASSERT_FATAL_FALSE("Failed to create RTV descriptor heap");
+        return false;
+    }
+
+    // Create one RTV per back-buffer
+    auto rtvHandle = mRTVHeap->GetCPUDescriptorHandleForHeapStart();
+    const UINT rtvStride = mDevice->GetDescriptorHandleIncrementSize(heapDesc.Type);
+    for (UINT i = 0; i < BACK_BUFFER_COUNT; ++i) {
+        Microsoft::WRL::ComPtr<ID3D12Resource> backBuffer;
+        if (FAILED(mSwapChain->GetBuffer(i, IID_PPV_ARGS(&backBuffer)))) {
+            ELOO_ASSERT_FATAL_FALSE("Failed to get swap-chain buffer %u", i);
+            return false;
+        }
+        mBackBuffers[i] = backBuffer;
+        mDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, rtvHandle);
+        rtvHandle.ptr += rtvStride;
+    }
+
+    return true;
+}
+
+void renderer_dx12::render(const window_interface* wnd) {
     const UINT backBufferIndex = mSwapChain->GetCurrentBackBufferIndex();
 
     // Reset the command allocator and command list
@@ -334,7 +295,7 @@ void renderer_dx12::render() {
     mCommandList->ResourceBarrier(1, &barrier);
 
     // Clear the render target
-    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = mRenderTargetHeap->GetCPUDescriptorHandleForHeapStart();
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = mRTVHeap->GetCPUDescriptorHandleForHeapStart();
     rtvHandle.ptr += backBufferIndex * mRenderTargetDescriptorSize;
     const FLOAT clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
     mCommandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
@@ -349,8 +310,19 @@ void renderer_dx12::render() {
     mCommandList->SetPipelineState(mPipelineState.Get());
 
     // Set the render target
-    CD3DX12_VIEWPORT viewport(0.0f, 0.0f, static_cast<float>(mWindow->width()), static_cast<float>(mWindow->height()));
-    CD3DX12_RECT scissorRect(0, 0, static_cast<LONG>(mWindow->width()), static_cast<LONG>(mWindow->height()));
+    const int4::values windowRect = wnd->viewport_rect();
+    CD3DX12_VIEWPORT viewport(
+        static_cast<float>(windowRect.x()),
+        static_cast<float>(windowRect.y()),
+        static_cast<float>(windowRect.z() - windowRect.x()),
+        static_cast<float>(windowRect.w() - windowRect.y())
+    );
+    CD3DX12_RECT scissorRect(
+        viewport.TopLeftX,
+        viewport.TopLeftY,
+        viewport.TopLeftX + viewport.Width,
+        viewport.TopLeftY + viewport.Height
+    );
     mCommandList->RSSetViewports(1, &viewport);
     mCommandList->RSSetScissorRects(1, &scissorRect);
 
@@ -387,7 +359,7 @@ void renderer_dx12::render() {
     );
 
     // Wait for the GPU to finish
-    const int fenceIndex = (mFrameIndex + 1) % FRAME_COUNT;
+    const int fenceIndex = (mFrameIndex + 1) % BACK_BUFFER_COUNT;
     const UINT64 fence = ++mFenceValue[fenceIndex];
     mCommandQueue->Signal(mFence.Get(), fence);
     if (mFence->GetCompletedValue() < fence) {
@@ -400,7 +372,7 @@ void renderer_dx12::render() {
 
 void renderer_dx12::on_window_resized(int width, int height) {
     // 1) Wait for the GPU to finish with all frames
-    const UINT64 fence = ++mFenceValue[current_frame() % FRAME_COUNT];
+    const UINT64 fence = ++mFenceValue[current_frame() % BACK_BUFFER_COUNT];
     mCommandQueue->Signal(mFence.Get(), fence);
     if (mFence->GetCompletedValue() < fence) {
         mFence->SetEventOnCompletion(fence, mFenceEvent);
@@ -408,17 +380,17 @@ void renderer_dx12::on_window_resized(int width, int height) {
     }
 
     // 2) Release references to the back-buffers and RTV heap
-    for (UINT i = 0; i < FRAME_COUNT; ++i) {
+    for (UINT i = 0; i < BACK_BUFFER_COUNT; ++i) {
         mBackBuffers[i].Reset();
     }
-    mRenderTargetHeap.Reset();
+    mRTVHeap.Reset();
 
     // 3) Resize the swap-chain
-    DXGI_SWAP_CHAIN_DESC1 desc = mSwapChain->GetDesc1();
+    DXGI_SWAP_CHAIN_DESC desc = mSwapChain->GetDesc();
     ELOO_ASSERT_FATAL(
       SUCCEEDED(
         mSwapChain->ResizeBuffers(
-        FRAME_COUNT,
+        BACK_BUFFER_COUNT,
           width, height,
           desc.Format,
           desc.Flags
@@ -430,15 +402,15 @@ void renderer_dx12::on_window_resized(int width, int height) {
     // 4) Recreate RTV heap & views (same as in create_swap_chain)
     D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
     heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-    heapDesc.NumDescriptors = FRAME_COUNT;
+    heapDesc.NumDescriptors = BACK_BUFFER_COUNT;
     heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-    mDevice->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&mRenderTargetHeap));
+    mDevice->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&mRTVHeap));
     mRenderTargetDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(
         D3D12_DESCRIPTOR_HEAP_TYPE_RTV
     );
 
-    auto handle = mRenderTargetHeap->GetCPUDescriptorHandleForHeapStart();
-    for (UINT i = 0; i < FRAME_COUNT; ++i) {
+    auto handle = mRTVHeap->GetCPUDescriptorHandleForHeapStart();
+    for (UINT i = 0; i < BACK_BUFFER_COUNT; ++i) {
         Microsoft::WRL::ComPtr<ID3D12Resource> buf;
         mSwapChain->GetBuffer(i, IID_PPV_ARGS(&buf));
         mBackBuffers[i] = buf;

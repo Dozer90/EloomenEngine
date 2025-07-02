@@ -22,16 +22,45 @@ namespace eloo {
             }
         }
 
-        size_t push(T val, bool useIDPool = true) {
+        template <typename... Args>
+        size_t emplace(Args&&... args) {
             size_t id = mSize;
-            if (useIDPool && !mUnusedIDs.empty()) {
+            if (!mUnusedIDs.empty()) {
                 id = *mUnusedIDs.begin();
                 mUnusedIDs.erase(mUnusedIDs.begin());
             } else if (++mSize >= mData.size()) {
                 expand();
             }
-            mData[id] = val;
+            if constexpr (!eastl::is_trivially_destructible_v<T>) {
+                mData[id].~T();
+            }
+            new (&mData[id]) T(std::forward<Args>(args)...);
             return id;
+        }
+
+        size_t push(T val) {
+            return push(std::move(val));
+        }
+
+        size_t push(T&& val) {
+            size_t id = mSize;
+            if (!mUnusedIDs.empty()) {
+                id = *mUnusedIDs.begin();
+                mUnusedIDs.erase(mUnusedIDs.begin());
+            } else if (++mSize >= mData.size()) {
+                expand();
+            }
+            mData[id] = std::move(val);
+            return id;
+        }
+
+        size_t push(const T* src, size_t count) {
+            while (mSize + count > mData.size()) {
+                expand();
+            }
+            memccpy(mData.data() + mSize, src, 0, count * sizeof(T));
+            mSize += count;
+            return mSize - count; // Return the starting index of the copied elements
         }
 
         bool remove(size_t id) {
@@ -120,11 +149,11 @@ namespace eloo {
             }
         }
 
-        size_t push(std::initializer_list<T> values, bool useIDPool = true) {
+        size_t push(std::initializer_list<T> values) {
             ELOO_ASSERT_FATAL(values.size() == ElementCount, "Invalid number of values provided to push");
 
             size_t id = mSize;
-            if (useIDPool && !mUnusedIDs.empty()) {
+            if (!mUnusedIDs.empty()) {
                 id = *mUnusedIDs.begin();
                 mUnusedIDs.erase(mUnusedIDs.begin());
             } else if (mData.size() <= (++mSize) * ElementCount) {

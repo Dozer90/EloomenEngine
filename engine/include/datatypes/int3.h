@@ -73,9 +73,9 @@ namespace eloo::int3 {
     inline static constexpr values UP       { 0, 1, 0 };
     inline static constexpr values FORWARD  { 0, 0, 1 };
 
-    id_t create(int x = 0, int y = 0, int z = 0, bool useIDPool = true);
-    id_t create(const values& vals, bool useIDPool = true);
-    bool try_release(id_t id);
+    id_t create(int x = 0, int y = 0, int z = 0);
+    id_t create(const values& vals);
+    bool release(id_t id);
 
     bool is_valid(id_t id);
 

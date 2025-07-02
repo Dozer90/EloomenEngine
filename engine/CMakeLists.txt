@@ -7,35 +7,19 @@ message("============= Active config: ${CMAKE_BUILD_TYPE} =============")
 
 
 ###########################################
-# Platform selection
+# Automations
 
-if(WIN32)
-    message("============= Windows platform detected =============")
-    set(ELOO_DEFAULT_BACKEND "DX12")
-elseif(UNIX)
-    message("============= Unix platform detected =============")
-    set(ELOO_DEFAULT_BACKEND "Vulkan")
-elseif(APPLE)
-    message("============= Apple platform detected =============")
-    set(ELOO_DEFAULT_BACKEND "Metal")
-else()
-    message("============= Unable to determine default platform =============")
-    set(ELOO_DEFAULT_BACKEND "")
-endif()
-
-set(ELOO_RENDERER_BACKEND
-    ${ELOO_DEFAULT_BACKEND}
-    CACHE STRING "Select the renderer backend to use. Options: DX12, Vulkan, OpenGL, Metal"
+file(GLOB_RECURSE ELOO_AUTOMATIONS
+    CONFIGURE_DEPENDS
+    "${CMAKE_SOURCE_DIR}/cmake/automations/*/automate.cmake"
 )
 
-set_property(CACHE ELOO_RENDERER_BACKEND PROPERTY STRINGS DX12 Vulkan OpenGL Metal None)
-
-if(ELOO_RENDERER_BACKEND STREQUAL "DX12")
-    set(ELOO_BACKEND_PRE_INCLUDE "backends/dx12/dx12_pre.cmake")
-    set(ELOO_BACKEND_POST_INCLUDE "backends/dx12/dx12_post.cmake")
-else()
-    message(FATAL_ERROR "============= Unsupported backend chosen =============")
-endif()
+foreach(ELOO_AUTOMATION IN LISTS ELOO_AUTOMATIONS)
+    get_filename_component(ELOO_CURRENT_AUTOMATION_DIR  ${ELOO_AUTOMATION} DIRECTORY)
+    get_filename_component(ELOO_CURRENT_AUTOMATION_NAME ${ELOO_CURRENT_AUTOMATION_DIR} NAME)
+    message("Running '${ELOO_CURRENT_AUTOMATION_NAME}' automation...")
+    include(${ELOO_AUTOMATION})
+endforeach()
 
 
 ###########################################
@@ -77,6 +61,10 @@ set(ELOO_RENDERING_SOURCE_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/rendering/camera.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/rendering/renderer.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/rendering/window.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/rendering/material.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/rendering/mesh.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/rendering/texture.cpp"
+#   "${CMAKE_CURRENT_SOURCE_DIR}/src/rendering/shader.cpp"
 )
 
 set (ELOO_MATH_SOURCE_FILES
@@ -87,6 +75,11 @@ set (ELOO_UTILITY_SOURCE_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/utility/imgui_ext.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/utility/raycast.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/utility/spherecast.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/utility/streaming.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/utility/serialization.cpp"
+
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/utility/filesystem/filesystem.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/utility/filesystem/filestream.cpp"
 )
 
 set(ELOO_SOURCE_FILES
@@ -94,7 +87,7 @@ set(ELOO_SOURCE_FILES
     ${ELOO_RENDERING_SOURCE_FILES}
     ${ELOO_MATH_SOURCE_FILES}
     ${ELOO_UTILITY_SOURCE_FILES}
-)
+ "src/logging.cpp")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     #list(APPEND SOURCE_FILES)
@@ -122,7 +115,6 @@ FetchContent_Declare(EASTL
     GIT_SHALLOW ON
     EXCLUDE_FROM_ALL)
 FetchContent_MakeAvailable(EASTL)
-list(APPEND ELOO_PUBLIC_SYSTEM_INCLUDE_DIRECTORIES ${EASTL_SOURCE_DIR}/include)
 
 #Dear ImGui
 FetchContent_Declare(ImGui
@@ -166,18 +158,10 @@ endif()
 ############################################
 # Finalization
 
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${ELOO_BACKEND_PRE_INCLUDE}")
-    include("${CMAKE_CURRENT_SOURCE_DIR}/${ELOO_BACKEND_PRE_INCLUDE}")
-endif()
-
 add_library(EloomEngine STATIC ${ELOO_SOURCE_FILES})
 set_target_properties(EloomEngine PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
 )
-
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${ELOO_BACKEND_POST_INCLUDE}")
-    include("${CMAKE_CURRENT_SOURCE_DIR}/${ELOO_BACKEND_POST_INCLUDE}")
-endif()
 
 target_include_directories(EloomEngine
     PUBLIC  ${ELOO_PUBLIC_INCLUDE_DIRECTORIES}
@@ -204,3 +188,31 @@ if(MSVC)
     target_compile_options(EloomEngine
         PRIVATE /external:W0)
 endif()
+
+
+
+###########################################
+# Platform selection
+
+if(WIN32)
+    message("============= Windows platform detected =============")
+    set(ELOO_DEFAULT_BACKEND "DX12")
+elseif(UNIX)
+    message("============= Unix platform detected =============")
+    set(ELOO_DEFAULT_BACKEND "Vulkan")
+elseif(APPLE)
+    message("============= Apple platform detected =============")
+    set(ELOO_DEFAULT_BACKEND "Metal")
+else()
+    message("============= Unable to determine default platform =============")
+    set(ELOO_DEFAULT_BACKEND "")
+endif()
+
+set(ELOO_RENDERER_BACKEND
+    ${ELOO_DEFAULT_BACKEND}
+    CACHE STRING "Select the renderer backend to use. Options: DX12, Vulkan, OpenGL, Metal"
+)
+
+set_property(CACHE ELOO_RENDERER_BACKEND PROPERTY STRINGS DX12 Vulkan OpenGL Metal None)
+
+add_subdirectory(backends/win32)

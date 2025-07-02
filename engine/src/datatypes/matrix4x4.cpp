@@ -14,14 +14,14 @@ namespace {
     static memblock_t gMemoryBlock;
 }
 
-matrix4x4::id_t matrix4x4::create(MATRIX4X4_DECLARE_PARAMS(v), bool useIDPool) {
-    return gMemoryBlock.push({ MATRIX4X4_FORWARD_PARAMS(v) }, useIDPool);
+matrix4x4::id_t matrix4x4::create(MATRIX4X4_DECLARE_PARAMS(v)) {
+    return gMemoryBlock.push({ MATRIX4X4_FORWARD_PARAMS(v) });
 }
-matrix4x4::id_t matrix4x4::create(const values& vals, bool useIDPool) {
-    return gMemoryBlock.push({ MATRIX4X4_UNPACK(vals) }, useIDPool);
+matrix4x4::id_t matrix4x4::create(const values& vals) {
+    return gMemoryBlock.push({ MATRIX4X4_UNPACK(vals) });
 }
 
-bool matrix4x4::try_release(id_t id) {
+bool matrix4x4::release(id_t id) {
     return gMemoryBlock.try_remove(id);
 }
 

@@ -13,17 +13,17 @@ namespace {
     static memblock_t gMemoryBlockX, gMemoryBlockY;
 }
 
-int2::id_t int2::create(int x, int y, bool useIDPool) {
-    id_t id = gMemoryBlockX.push(x, useIDPool);
-    ELOO_ASSERT_FATAL(id == gMemoryBlockY.push(y, useIDPool), "ID mismatch between X and Y memory blocks");
+int2::id_t int2::create(int x, int y) {
+    id_t id = gMemoryBlockX.push(x);
+    ELOO_ASSERT_FATAL(id == gMemoryBlockY.push(y), "ID mismatch between X and Y memory blocks");
     return id;
 }
 
-inline int2::id_t int2::create(const values& vals, bool useIDPool) {
-    return create(vals.x(), vals.y(), useIDPool);
+inline int2::id_t int2::create(const values& vals) {
+    return create(vals.x(), vals.y());
 }
 
-bool int2::try_release(id_t id) {
+bool int2::release(id_t id) {
     if (!is_valid(id)) {
         return false;
     }

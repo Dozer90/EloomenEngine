@@ -19,7 +19,15 @@ ELOO_DEFINE_EVENT_WITH_DATA(key_released)           \
 ELOO_DEFINE_EVENT_WITH_DATA(mouse_button_pressed)   \
 ELOO_DEFINE_EVENT_WITH_DATA(mouse_button_released)  \
 ELOO_DEFINE_EVENT_WITH_DATA(mouse_moved)            \
-ELOO_DEFINE_EVENT_WITH_DATA(mouse_scrolled)
+ELOO_DEFINE_EVENT_WITH_DATA(mouse_scrolled)         \
+/* Filesystem events */                             \
+ELOO_DEFINE_EVENT_WITH_DATA(directory_created)      \
+ELOO_DEFINE_EVENT_WITH_DATA(directory_modified)     \
+ELOO_DEFINE_EVENT_WITH_DATA(directory_removed)      \
+ELOO_DEFINE_EVENT_WITH_DATA(file_created)           \
+ELOO_DEFINE_EVENT_WITH_DATA(file_modified)          \
+ELOO_DEFINE_EVENT_WITH_DATA(file_removed)           \
+
 
 namespace eloo::events::engine
 {

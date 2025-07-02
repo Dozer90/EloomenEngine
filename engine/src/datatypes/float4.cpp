@@ -10,19 +10,19 @@ namespace {
     static memblock_t gMemoryBlockX, gMemoryBlockY, gMemoryBlockZ, gMemoryBlockW;
 }
 
-float4::id_t float4::create(float x, float y, float z, float w, bool useIDPool) {
-    id_t id = gMemoryBlockX.push(x, useIDPool);
-    ELOO_ASSERT_FATAL(id == gMemoryBlockY.push(y, useIDPool), "ID mismatch between X and Y memory blocks.");
-    ELOO_ASSERT_FATAL(id == gMemoryBlockZ.push(z, useIDPool), "ID mismatch between X and Z memory blocks.");
-    ELOO_ASSERT_FATAL(id == gMemoryBlockW.push(w, useIDPool), "ID mismatch between X and W memory blocks.");
+float4::id_t float4::create(float x, float y, float z, float w) {
+    id_t id = gMemoryBlockX.push(x);
+    ELOO_ASSERT_FATAL(id == gMemoryBlockY.push(y), "ID mismatch between X and Y memory blocks.");
+    ELOO_ASSERT_FATAL(id == gMemoryBlockZ.push(z), "ID mismatch between X and Z memory blocks.");
+    ELOO_ASSERT_FATAL(id == gMemoryBlockW.push(w), "ID mismatch between X and W memory blocks.");
     return id;
 }
 
-float4::id_t float4::create(const values& vals, bool useIDPool) {
-    return create(vals.x(), vals.y(), vals.z(), vals.w(), useIDPool);
+float4::id_t float4::create(const values& vals) {
+    return create(vals.x(), vals.y(), vals.z(), vals.w());
 }
 
-bool float4::try_release(id_t id) {
+bool float4::release(id_t id) {
     if (!is_valid(id)) {
         return false;
     }

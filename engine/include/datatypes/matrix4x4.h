@@ -148,9 +148,9 @@ namespace eloo::matrix4x4 {
     inline static constexpr values ZERO     { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
     inline static constexpr values ONE      { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
 
-    id_t create(MATRIX4X4_DECLARE_PARAMS_IDENTITY(v), bool useIDPool = true);
-    id_t create(const values& vals, bool useIDPool = true);
-    bool try_release(id_t id);
+    id_t create(MATRIX4X4_DECLARE_PARAMS_IDENTITY(v));
+    id_t create(const values& vals);
+    bool release(id_t id);
 
     bool is_valid(id_t id);
 

@@ -10,27 +10,27 @@ namespace {
     static memblock_t gMemoryBlockX, gMemoryBlockY, gMemoryBlockZ, gMemoryBlockW;
 }
 
-quaternion::id_t quaternion::create(float x, float y, float z, float w, bool useIDPool) {
-    id_t id = gMemoryBlockX.push(x, useIDPool);
-    ELOO_ASSERT_FATAL(id == gMemoryBlockY.push(y, useIDPool), "ID mismatch between X and Y memory blocks.");
-    ELOO_ASSERT_FATAL(id == gMemoryBlockZ.push(z, useIDPool), "ID mismatch between X and Z memory blocks.");
-    ELOO_ASSERT_FATAL(id == gMemoryBlockW.push(w, useIDPool), "ID mismatch between X and W memory blocks.");
+quaternion::id_t quaternion::create(float x, float y, float z, float w) {
+    id_t id = gMemoryBlockX.push(x);
+    ELOO_ASSERT_FATAL(id == gMemoryBlockY.push(y), "ID mismatch between X and Y memory blocks.");
+    ELOO_ASSERT_FATAL(id == gMemoryBlockZ.push(z), "ID mismatch between X and Z memory blocks.");
+    ELOO_ASSERT_FATAL(id == gMemoryBlockW.push(w), "ID mismatch between X and W memory blocks.");
     return id;
 }
-quaternion::id_t quaternion::create(const float4::values& vals, bool useIDPool) {
-    return create(vals.x(), vals.y(), vals.z(), vals.w(), useIDPool);
+quaternion::id_t quaternion::create(const float4::values& vals) {
+    return create(vals.x(), vals.y(), vals.z(), vals.w());
 }
-quaternion::id_t quaternion::create(float eulerX, float eulerY, float eulerZ, bool useIDPool) {
-    return create(math::quaternion::create_from_euler(eulerX, eulerY, eulerZ), useIDPool);
+quaternion::id_t quaternion::create(float eulerX, float eulerY, float eulerZ) {
+    return create(math::quaternion::create_from_euler(eulerX, eulerY, eulerZ));
 }
-quaternion::id_t quaternion::create(const float3::values& euler, bool useIDPool) {
-    return create(euler.x(), euler.y(), euler.z(), useIDPool);
+quaternion::id_t quaternion::create(const float3::values& euler) {
+    return create(euler.x(), euler.y(), euler.z());
 }
-quaternion::id_t quaternion::create(const quaternion::values& vals, bool useIDPool) {
-    return create(vals.x(), vals.y(), vals.z(), vals.w(), useIDPool);
+quaternion::id_t quaternion::create(const quaternion::values& vals) {
+    return create(vals.x(), vals.y(), vals.z(), vals.w());
 }
 
-bool quaternion::try_release(id_t id) {
+bool quaternion::release(id_t id) {
     if (!is_valid(id)) {
         return false;
     }

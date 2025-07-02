@@ -72,12 +72,12 @@ namespace eloo::quaternion {
     inline static constexpr values IDENTITY { 0.0f, 0.0f, 0.0f, 1.0f };
     inline static constexpr values ZERO     { 0.0f, 0.0f, 0.0f, 0.0f };
 
-    id_t create(float x = 0.0f, float y = 0.0f, float z = 0.0f, float w = 1.0f, bool useIDPool = true);
-    id_t create(const float4::values& vals, bool useIDPool = true);
-    id_t create(float eulerX = 0.0f, float eulerY = 0.0f, float eulerZ = 0.0f, bool useIDPool = true);
-    id_t create(const float3::values& vals, bool useIDPool = true);
-    id_t create(const values& vals, bool useIDPool = true);
-    bool try_release(id_t id);
+    id_t create(float x = 0.0f, float y = 0.0f, float z = 0.0f, float w = 1.0f);
+    id_t create(const float4::values& vals);
+    id_t create(float eulerX = 0.0f, float eulerY = 0.0f, float eulerZ = 0.0f);
+    id_t create(const float3::values& vals);
+    id_t create(const values& vals);
+    bool release(id_t id);
 
     bool is_valid(id_t id);
 

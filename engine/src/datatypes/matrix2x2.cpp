@@ -13,14 +13,14 @@ namespace {
     static memblock_t gMemoryBlock;
 }
 
-matrix2x2::id_t matrix2x2::create(MATRIX2X2_DECLARE_PARAMS(v), bool useIDPool) {
-    return gMemoryBlock.push({ MATRIX2X2_FORWARD_PARAMS(v) }, useIDPool);
+matrix2x2::id_t matrix2x2::create(MATRIX2X2_DECLARE_PARAMS(v)) {
+    return gMemoryBlock.push({ MATRIX2X2_FORWARD_PARAMS(v) });
 }
-matrix2x2::id_t matrix2x2::create(const values& vals, bool useIDPool) {
-    return gMemoryBlock.push({ MATRIX2X2_UNPACK(vals) }, useIDPool);
+matrix2x2::id_t matrix2x2::create(const values& vals) {
+    return gMemoryBlock.push({ MATRIX2X2_UNPACK(vals) });
 }
 
-bool matrix2x2::try_release(id_t id) {
+bool matrix2x2::release(id_t id) {
     return gMemoryBlock.try_remove(id);
 }
 

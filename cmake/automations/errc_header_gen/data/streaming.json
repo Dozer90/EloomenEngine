@@ -1,0 +1,13 @@
+{
+    "category": "Data Streaming",
+    "codes": [
+        {
+            "id": "null_data",
+            "msg": "No data was provided"
+        },
+        {
+            "id": "buffer_overflow",
+            "msg": "Attempting to access data beyond the buffer limit"
+        }
+    ]
+}

@@ -1,18 +1,18 @@
-#if !defined (ELOO_ASSERT)
+#pragma once
 
 // Asserts
 #if defined(ELOO_ASSERTS_ENABLED)
 namespace eloo {
-    void runtime_assert(const char* file, int line, bool condition, bool once, bool fatal, const char* conditionStr, const char* message, ...);
+    void runtime_assert(const char* file, int line, bool condition, bool forced, bool once, bool fatal, const char* conditionStr, const char* message, ...);
 }
 
-#define ELOO_ASSERT(cond, message, ...) eloo::runtime_assert(__FILE__, __LINE__, (cond), false, false, #cond, (message), ##__VA_ARGS__)
-#define ELOO_ASSERT_ONCE(cond, message, ...) eloo::runtime_assert(__FILE__, __LINE__, (cond), true, false, #cond, (message), ##__VA_ARGS__)
-#define ELOO_ASSERT_FATAL(cond, message, ...) eloo::runtime_assert(__FILE__, __LINE__, (cond), false, true, #cond, (message), ##__VA_ARGS__)
+#define ELOO_ASSERT(cond, message, ...) eloo::runtime_assert(__FILE__, __LINE__, (cond), false, false, false, #cond, (message), ##__VA_ARGS__)
+#define ELOO_ASSERT_ONCE(cond, message, ...) eloo::runtime_assert(__FILE__, __LINE__, (cond), false, true, false, #cond, (message), ##__VA_ARGS__)
+#define ELOO_ASSERT_FATAL(cond, message, ...) eloo::runtime_assert(__FILE__, __LINE__, (cond), false, false, true, #cond, (message), ##__VA_ARGS__)
 
-#define ELOO_ASSERT_FALSE(message, ...) ELOO_ASSERT(false, message, ##__VA_ARGS__)
-#define ELOO_ASSERT_ONCE_FALSE(message, ...) ELOO_ASSERT_ONCE(false, message, ##__VA_ARGS__)
-#define ELOO_ASSERT_FATAL_FALSE(message, ...) ELOO_ASSERT_FATAL(false, message, ##__VA_ARGS__)
+#define ELOO_ASSERT_FALSE(message, ...) eloo::runtime_assert(__FILE__, __LINE__, false, true, false, false, "(FORCED FALSE)", (message), ##__VA_ARGS__)
+#define ELOO_ASSERT_ONCE_FALSE(message, ...) eloo::runtime_assert(__FILE__, __LINE__, false, true, true, false, "(FORCED FALSE)", (message), ##__VA_ARGS__)
+#define ELOO_ASSERT_FATAL_FALSE(message, ...) eloo::runtime_assert(__FILE__, __LINE__, false, true, false, true, "(FORCED FALSE)", (message), ##__VA_ARGS__)
 #else
 #define ELOO_ASSERT(cond, message, ...) (cond)
 #define ELOO_ASSERT_ONCE(cond, message, ...) (cond)
@@ -31,6 +31,7 @@ namespace eloo {
         constexpr id_t(size_t value) ELOO_NOEXCEPT : mID(value) {} \
         constexpr operator size_t() const ELOO_NOEXCEPT { return mID; } \
         constexpr bool operator == (const size_t& other) const { return mID == other; } \
+        static constexpr size_t INVALID = static_cast<size_t>(-1); \
     private: \
         size_t mID = 0; \
     };
@@ -60,6 +61,13 @@ namespace eloo {
 #else
 #define ELOO_EXPORT __attribute__((visibility("default")))
 #define ELOO_IMPORT
+#endif
+
+// Nodiscard
+#if defined(__has_cpp_attribute) && __has_cpp_attribute(nodiscard)
+#define ELOO_NODISCARD [[nodiscard]]
+#else
+#define ELOO_NODISCARD
 #endif
 
 // Noexcept
@@ -98,5 +106,3 @@ namespace eloo {
 #define ELOO_CTOR_DELETE_MOVE(ClassName) \
     ClassName(ClassName&&) = delete; \
     ClassName& operator=(ClassName&&) = delete;
-
-#endif

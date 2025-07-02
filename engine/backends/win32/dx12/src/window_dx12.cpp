@@ -1,9 +1,7 @@
-#include "dx12/include/window_dx12.h"
+#include "window_dx12.h"
 
 #include "rendering/window.h"
 #include "utility/defines.h"
-
-#include <EASTL/string.h>
 
 #include <Windows.h>
 

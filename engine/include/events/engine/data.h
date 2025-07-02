@@ -65,4 +65,37 @@ namespace eloo::events::engine {
         float offsetX;     // Scroll offset in the X direction
         float offsetY;     // Scroll offset in the Y direction
     };
+
+
+    // ==================================================================
+    // ==================================================================
+    //
+    // Filesystem events
+    //
+    // ==================================================================
+    // ==================================================================
+
+    struct directory_created_data {
+        const char* absolutePath;  // Absolute path of the created directory
+    };
+
+    struct directory_modified_data {
+        const char* absolutePath;  // Absolute path of the modified directory
+    };
+
+    struct directory_removed_data {
+        const char* absolutePath;  // Absolute path of the removed directory
+    };
+
+    struct file_created_data {
+        const char* absolutePath;  // Absolute path of the created file
+    };
+
+    struct file_modified_data {
+        const char* absolutePath;  // Absolute path of the modified file
+    };
+
+    struct file_removed_data {
+        const char* absolutePath;  // Absolute path of the removed file
+    };
 }

@@ -1,7 +1,9 @@
 #pragma once
 
+#include "utility/defines.h"
 #include "datatypes/float2.h"
 #include "datatypes/int2.h"
+#include "datatypes/int4.h"
 
 #include <EASTL/unique_ptr.h>
 
@@ -24,6 +26,14 @@ namespace eloo {
         const wchar_t* title() const        { return mTitle; }
         const int2::values& size() const    { return mSize; }
         const float2::values& dpi() const   { return mDPI; }
+        const int4::values viewport_rect() const {
+            return int4::values(
+                mPosition.x(),
+                mPosition.y(),
+                mPosition.x() + mSize.x(),
+                mPosition.y() + mSize.y()
+            );
+        }
 
         void hide();
         void show();
@@ -52,6 +62,7 @@ namespace eloo {
         const wchar_t* mTitle = L"";
         state mState = state::invalid;
         bool mActive = false;
+        int2::values mPosition = int2::ZERO;
         int2::values mSize = int2::ZERO;
         float2::values mDPI = float2::ONE;
     };

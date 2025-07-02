@@ -85,9 +85,9 @@ namespace eloo::float2 {
     inline static constexpr values RIGHT    { 1.0f, 0.0f };
     inline static constexpr values UP       { 0.0f, 1.0f };
 
-    id_t create(float x = 0.0f, float y = 0.0f, bool useIDPool = true);
-    id_t create(const values& vals, bool useIDPool = true);
-    bool try_release(id_t id);
+    id_t create(float x = 0.0f, float y = 0.0f);
+    id_t create(const values& vals);
+    bool release(id_t id);
 
     bool is_valid(id_t id);
 
