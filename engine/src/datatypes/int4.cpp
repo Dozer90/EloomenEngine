@@ -193,6 +193,10 @@ int4::values& int4::values::operator = (int val) {
     return *this;
 }
 
+int4::values& int4::values::operator + () {
+    return *this;
+}
+
 int4::values& int4::values::operator - () {
     this->mX = -this->mX;
     this->mY = -this->mY;

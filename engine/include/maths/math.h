@@ -620,15 +620,11 @@ namespace eloo::math {
         /////////////////////////////////////////////////////////////////////
         // Normalization
 
-        // CODE REVIEW: CRITICAL - Division by zero risk!
-        // If the vector has zero magnitude, this will divide by zero and produce NaN values.
-        // Consider adding a check: if (mag < EPSILON) return zero or identity vector.
-        // Suggested fix:
-        //   const float mag = magnitude(x, y);
-        //   if (mag < f32::EPSILON) return float2::ZERO;  // or return { 0, 0 } or { 1, 0 }
-        //   return { x / mag, y / mag };
         ELOO_FORCE_INLINE float2_v normalize(float x, float y) {
             const float mag = magnitude(x, y);
+            if (mag < f32::EPSILON) {
+                return float2::ZERO;
+            }
             return { x / mag, y / mag };
         }
 
@@ -636,9 +632,11 @@ namespace eloo::math {
             return normalize(xy.x(), xy.y());
         }
 
-        // CODE REVIEW: Same division by zero risk as float2 version above
         ELOO_FORCE_INLINE float3_v normalize(float x, float y, float z) {
             const float mag = magnitude(x, y, z);
+            if (mag < f32::EPSILON) {
+                return float3::ZERO;
+            }
             return { x / mag, y / mag, z / mag };
         }
 
@@ -646,9 +644,11 @@ namespace eloo::math {
             return normalize(xyz.x(), xyz.y(), xyz.z());
         }
 
-        // CODE REVIEW: Same division by zero risk as float2 version above
         ELOO_FORCE_INLINE float4_v normalize(float x, float y, float z, float w) {
             const float mag = magnitude(x, y, z, w);
+            if (mag < f32::EPSILON) {
+                return float4::ZERO;
+            }
             return { x / mag, y / mag, z / mag, w / mag };
         }
 

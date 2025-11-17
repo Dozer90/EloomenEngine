@@ -172,6 +172,10 @@ int3::values& int3::values::operator = (int val) {
     return *this;
 }
 
+int3::values& int3::values::operator + () {
+    return *this;
+}
+
 int3::values& int3::values::operator - () {
     this->mX = -this->mX;
     this->mY = -this->mY;

@@ -169,6 +169,10 @@ float3::values& float3::values::operator = (float val) {
     return *this;
 }
 
+float3::values& float3::values::operator + () {
+    return *this;
+}
+
 float3::values& float3::values::operator - () {
     this->mX = -this->mX;
     this->mY = -this->mY;

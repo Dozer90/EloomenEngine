@@ -190,6 +190,10 @@ float4::values& float4::values::operator = (float val) {
     return *this;
 }
 
+float4::values& float4::values::operator + () {
+    return *this;
+}
+
 float4::values& float4::values::operator - () {
     this->mX = -this->mX;
     this->mY = -this->mY;

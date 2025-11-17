@@ -149,12 +149,9 @@ float2::values& float2::values::operator = (float val) {
     return *this;
 }
 
-// CODE REVIEW: Missing implementation for operator+()
-// The header declares 'values& operator + ()' at float2.h:65, but it's not implemented here.
-// This will cause linker errors. Add implementation:
-// float2::values& float2::values::operator + () {
-//     return *this;  // Unary + returns the value unchanged
-// }
+float2::values& float2::values::operator + () {
+    return *this;
+}
 
 float2::values& float2::values::operator - () {
     this->mX = -this->mX;
