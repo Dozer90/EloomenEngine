@@ -12,6 +12,16 @@ EloomenEngine is a **learning-focused game engine** designed to explore:
 
 This project prioritizes understanding and experimentation over production-readiness. It's a playground for learning how AAA game engines work under the hood.
 
+### 🤖 Development Approach
+
+This project is being developed **with AI assistance** (Claude by Anthropic) to help with:
+- Code reviews and catching potential bugs early
+- Architectural guidance and best practices
+- Staying organized as the codebase grows
+- Learning resources and explanations of complex concepts
+
+**Important:** The AI serves as a **mentor and code reviewer**, not a replacement for learning. All architectural decisions, implementations, and understanding come from hands-on work. The goal is to learn engine development deeply, with AI helping to navigate the complexity and maintain code quality - similar to having an experienced developer available for questions and reviews.
+
 ---
 
 ## 🚀 Current Status
