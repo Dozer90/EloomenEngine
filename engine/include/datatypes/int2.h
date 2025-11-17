@@ -49,25 +49,38 @@ namespace eloo::int2 {
 
     public:
         values& operator = (const values& other);
+        // CODE REVIEW: Parameter name 'values' shadows the struct name 'values'
+        // This makes the code confusing. Consider renaming to 'value' or 'scalar'.
         values& operator = (int values);
 
+        // CODE REVIEW: Missing implementation for operator+()
+        // This is declared but not implemented in int2.cpp, same issue as float2.
+        // This will cause linker errors when used.
         values& operator + ();
         values& operator - ();
 
         values& operator /= (const values& other);
         values& operator /= (int values);
+        // CODE REVIEW: Missing implementation for float overload
+        // Declared here but not implemented in int2.cpp. Only int versions exist (lines 185-192).
         values& operator /= (float values);
 
         values& operator *= (const values& other);
         values& operator *= (int values);
+        // CODE REVIEW: Missing implementation for float overload
+        // Declared here but not implemented in int2.cpp. Only int versions exist (lines 194-201).
         values& operator *= (float values);
 
         values& operator += (const values& other);
         values& operator += (int values);
+        // CODE REVIEW: Missing implementation for float overload
+        // Declared here but not implemented in int2.cpp. Only int versions exist (lines 203-210).
         values& operator += (float values);
 
         values& operator -= (const values& other);
         values& operator -= (int values);
+        // CODE REVIEW: Missing implementation for float overload
+        // Declared here but not implemented in int2.cpp. Only int versions exist (lines 212-219).
         values& operator -= (float values);
     };
 

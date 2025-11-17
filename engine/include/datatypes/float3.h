@@ -66,8 +66,11 @@ namespace eloo::float3 {
 
     public:
         values& operator = (const values& other);
+        // CODE REVIEW: Parameter name 'values' shadows struct name
         values& operator = (float values);
 
+        // CODE REVIEW: Missing implementation (same as float2)
+        // Declared but not implemented in float3.cpp - will cause linker errors
         values& operator + ();
         values& operator - ();
 

@@ -25,6 +25,9 @@ namespace eloo {
         const int2::values& size() const    { return mSize; }
         const float2::values& dpi() const   { return mDPI; }
 
+        // CODE REVIEW: No error handling/return values
+        // These methods return void, so callers cannot determine if operations succeeded.
+        // Consider returning bool to indicate success/failure for better error handling.
         void hide();
         void show();
         void restore();

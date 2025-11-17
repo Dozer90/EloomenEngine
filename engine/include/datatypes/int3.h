@@ -35,20 +35,28 @@ namespace eloo::int3 {
 
         friend values operator / (const values& lhs, const values& rhs);
         friend values operator / (const values& lhs, int rhs);
+        // CODE REVIEW: Missing float overload declarations (like int2 has)
+        // int2.h has float overloads for all operators. Consider adding for consistency.
 
         friend values operator * (const values& lhs, const values& rhs);
         friend values operator * (const values& lhs, int rhs);
+        // CODE REVIEW: Missing float overload (see int2.h:40 for reference)
 
         friend values operator + (const values& lhs, const values& rhs);
         friend values operator + (const values& lhs, int rhs);
+        // CODE REVIEW: Missing float overload (see int2.h:44 for reference)
 
         friend values operator - (const values& lhs, const values& rhs);
         friend values operator - (const values& lhs, int rhs);
+        // CODE REVIEW: Missing float overload (see int2.h:48 for reference)
 
     public:
         values& operator = (const values& other);
+        // CODE REVIEW: Parameter name 'values' shadows struct name
         values& operator = (int values);
 
+        // CODE REVIEW: Missing implementation (same as int2)
+        // Declared but not implemented - will cause linker errors
         values& operator + ();
         values& operator - ();
 

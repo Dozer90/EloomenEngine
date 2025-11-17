@@ -176,6 +176,9 @@ int2::values& int2::values::operator = (int val) {
     return *this;
 }
 
+// CODE REVIEW: Missing implementation for operator+()
+// The header declares it at int2.h:54, but it's not implemented here. Will cause linker errors.
+
 int2::values& int2::values::operator - () {
     this->mX = -this->mX;
     this->mY = -this->mY;
@@ -190,6 +193,12 @@ int2::values& int2::values::operator /= (int val) {
     *this = *this / val;
     return *this;
 }
+// CODE REVIEW: Missing operator/=(float) implementation
+// Declared in int2.h:59 but not implemented. Add:
+// int2::values& int2::values::operator /= (float val) {
+//     *this = *this / val;
+//     return *this;
+// }
 
 int2::values& int2::values::operator *= (const values& other) {
     *this = *this * other;
@@ -199,6 +208,8 @@ int2::values& int2::values::operator *= (int val) {
     *this = *this * val;
     return *this;
 }
+// CODE REVIEW: Missing operator*=(float) implementation
+// Declared in int2.h:63 but not implemented.
 
 int2::values& int2::values::operator += (const values& other) {
     *this = *this + other;
@@ -208,6 +219,8 @@ int2::values& int2::values::operator += (int val) {
     *this = *this + val;
     return *this;
 }
+// CODE REVIEW: Missing operator+=(float) implementation
+// Declared in int2.h:67 but not implemented.
 
 int2::values& int2::values::operator -= (const values& other) {
     *this = *this - other;
@@ -217,3 +230,5 @@ int2::values& int2::values::operator -= (int val) {
     *this = *this - val;
     return *this;
 }
+// CODE REVIEW: Missing operator-=(float) implementation
+// Declared in int2.h:71 but not implemented.

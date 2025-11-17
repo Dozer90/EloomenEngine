@@ -27,6 +27,11 @@ namespace eloo {
             if (useIDPool && !mUnusedIDs.empty()) {
                 id = *mUnusedIDs.begin();
                 mUnusedIDs.erase(mUnusedIDs.begin());
+            // CODE REVIEW: Potential race condition and boundary issue
+            // mSize is incremented BEFORE checking, then expansion happens.
+            // In a single-threaded context this is fine, but the logic is subtle.
+            // Also, if mSize is incremented but id comes from the pool, we grow unnecessarily.
+            // Suggested fix: Check size first, expand if needed, THEN increment mSize.
             } else if (++mSize >= mData.size()) {
                 expand();
             }

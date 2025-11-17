@@ -27,6 +27,15 @@ namespace eloo {
     public:
         virtual ~renderer_interface() = default;
 
+        // CODE REVIEW: Design issue - constexpr virtual functions
+        // While C++20 allows this, it's problematic because:
+        // 1. constexpr evaluation happens at compile-time, virtual dispatch at runtime
+        // 2. Defeats the purpose of virtual polymorphism for string literals
+        // 3. Derived classes may not be able to provide constexpr implementations
+        // Suggested fix: Choose one approach:
+        //   - Remove 'constexpr' to keep runtime polymorphism: virtual const char* renderer_name() const = 0;
+        //   - OR make these non-virtual constexpr (breaks polymorphism)
+        //   - OR use compile-time polymorphism with templates/CRTP instead
         virtual constexpr const char* renderer_name() const = 0;
         virtual constexpr const char* platform_name() const = 0;
         virtual constexpr const char* vendor_name() const = 0;

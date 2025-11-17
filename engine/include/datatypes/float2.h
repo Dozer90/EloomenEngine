@@ -60,8 +60,18 @@ namespace eloo::float2 {
 
     public:
         values& operator = (const values& other);
+        // CODE REVIEW: Parameter name 'values' shadows the struct name 'values'
+        // This makes the code confusing and harder to read. Consider renaming to 'value' or 'scalar'.
+        // Suggested fix: values& operator = (float value);
         values& operator = (float values);
 
+        // CODE REVIEW: Missing implementation for operator+()
+        // This unary operator is declared but not implemented in float2.cpp (line 152-156 only has operator-())
+        // This will cause linker errors when used. Either implement it or remove the declaration.
+        // Suggested fix: Add implementation in float2.cpp:
+        //   float2::values& float2::values::operator + () {
+        //       return *this;  // Unary + typically returns a copy or reference to self
+        //   }
         values& operator + ();
         values& operator - ();
 
