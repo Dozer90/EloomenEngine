@@ -1,7 +1,5 @@
-#include "dx12/include/rendering/renderer_dx12.h"
-
-#include "core/interfaces/renderer_interface.h"
-#include "core/interfaces/window_interface.h"
+#include "renderer_dx12.h"
+#include "window_dx12.h"
 
 #include "utility/defines.h"
 #include "utility/colour.h"
@@ -15,7 +13,7 @@
 using namespace Microsoft::WRL;
 using namespace eloo;
 
-renderer_dx12::renderer_dx12(window_interface* wnd) {
+renderer_dx12::renderer_dx12(window_dx12* wnd) {
 
     //////////////////////////////////////////////////////////////////////////
     // Step 1: Create the factory

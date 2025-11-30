@@ -1,6 +1,5 @@
 #pragma once
-
-#include "renderer_interface.h"
+#include "renderer.h"
 
 #include "utility/defines.h"
 #include "datatypes/int2.h"
@@ -11,25 +10,13 @@
 
 using Microsoft::WRL::ComPtr;
 
-namespace eloo {
-    class window_interface;
-
-    class renderer_dx12 : public renderer_interface {
+namespace eloo::dx12 {
+    class window;
+    class renderer : public eloo::renderer<eloo::dx12::renderer> {
     public:
-        explicit renderer_dx12(window_interface* wnd);
-        renderer_dx12(const renderer_dx12&) = delete;
-        renderer_dx12& operator=(const renderer_dx12&) = delete;
-        renderer_dx12(renderer_dx12&&) = delete;
-        renderer_dx12& operator=(renderer_dx12&&) = delete;
+        explicit renderer(window* wnd);
 
-        virtual inline constexpr const char* renderer_name() const override  { return "DirectX"; }
-        virtual inline constexpr const char* platform_name() const override  { return "Windows"; }
-        virtual inline constexpr const char* vendor_name()   const override  { return "Microsoft"; }
-        virtual inline constexpr unsigned major_version()    const override  { return 12; }
-        virtual inline constexpr unsigned minor_version()    const override  { return 0; }
-        virtual inline constexpr unsigned patch_version()    const override  { return 0; }
-
-        virtual void render() override;
+        void render();
 
     private:
         void create_swap_chain(
@@ -39,7 +26,7 @@ namespace eloo {
             int2::values                size        = int2::ZERO
         );
 
-        virtual void on_window_resized(int width, int height) override;
+        void on_window_resized(int width, int height);
 
     private:
         static constexpr UINT               FRAME_COUNT = 2;

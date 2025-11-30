@@ -1,5 +1,9 @@
 #if !defined (ELOO_ASSERT)
 
+// CRTP shortcut
+#define ELOO_CRPT_CALL(_T) static_cast<_T*>(this)
+#define ELOO_CRPT_CALL_T ELOO_CRPT_CALL(T)
+
 // Asserts
 #if defined(ELOO_ASSERTS_ENABLED)
 namespace eloo {

@@ -1,6 +1,5 @@
-#include "dx12/include/window_dx12.h"
+#include "window_dx12.h"
 
-#include "rendering/window.h"
 #include "utility/defines.h"
 
 #include <EASTL/string.h>
@@ -13,8 +12,9 @@ namespace {
     constexpr LPCWCH WINDOW_CLASS_NAME = L"EloomEngineWindow";
 }
 
-window_dx12::window_dx12(HINSTANCE instance, const eastl::wstring& title, int width, int height) :
-    mInstance(instance), window_interface(title, width, height) {
+dx12::window::window(HINSTANCE instance, const wchar_t* title, int width, int height) :
+  mInstance(instance),
+  window<dx12::window>(title, width, height) {
 
     // Get DPI
     HDC screen = GetDC(0);
@@ -76,43 +76,43 @@ window_dx12::window_dx12(HINSTANCE instance, const eastl::wstring& title, int wi
     mActive = true;
 }
 
-window_dx12::~window_dx12() {
+dx12::window::~window() {
     if (mHandle != nullptr) {
         DestroyWindow(mHandle);
         mHandle = nullptr;
     }
 }
 
-void window_dx12::on_show() {
+void dx12::window::on_show() {
     ShowWindow(mHandle, SW_SHOW);
 }
 
-void window_dx12::on_hide() {
+void dx12::window::on_hide() {
     ShowWindow(mHandle, SW_HIDE);
 }
 
-void window_dx12::on_restore() {
+void dx12::window::on_restore() {
     ShowWindow(mHandle, SW_RESTORE);
 }
 
-void window_dx12::on_minimize() {
+void dx12::window::on_minimize() {
     ShowWindow(mHandle, SW_MINIMIZE);
 }
 
-void window_dx12::on_maximize() {
+void dx12::window::on_maximize() {
     ShowWindow(mHandle, SW_MAXIMIZE);
 }
 
-void window_dx12::on_resize(int width, int height) {
+void dx12::window::on_resize(int width, int height) {
     mSize = int2::values(width, height);
     SetWindowPos(mHandle, nullptr, 0, 0, width, height, SWP_NOZORDER | SWP_NOMOVE);
 }
 
-void window_dx12::on_move(int x, int y) {
+void dx12::window::on_move(int x, int y) {
     SetWindowPos(mHandle, nullptr, x, y, mSize.x(), mSize.y(), SWP_NOZORDER | SWP_NOSIZE);
 }
 
-bool window_dx12::process_messages() {
+bool dx12::window::process_messages() {
     MSG msg{};
     while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);
@@ -125,7 +125,7 @@ bool window_dx12::process_messages() {
     return true;
 }
 
-bool window_dx12::process_command(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+bool dx12::window::process_command(UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
         case WM_CLOSE: {
             DestroyWindow(mHandle);
@@ -152,7 +152,7 @@ bool window_dx12::process_command(UINT uMsg, WPARAM wParam, LPARAM lParam) {
     return false;
 }
 
-LRESULT CALLBACK window_dx12::WindowProc(HWND handle, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK dx12::window::WindowProc(HWND handle, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     if (uMsg == WM_NCCREATE) {
         // Store the window pointer in user data
         CREATESTRUCTW* create = reinterpret_cast<CREATESTRUCTW*>(lParam);

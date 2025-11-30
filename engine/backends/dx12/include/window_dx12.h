@@ -1,6 +1,6 @@
 #pragma once
 
-#include "window_interface.h"
+#include "window.h"
 
 #include <EASTL/string.h>
 
@@ -18,28 +18,28 @@ using WPARAM  = std::uintptr_t;
 using LPARAM  = std::intptr_t;
 using LRESULT = std::intptr_t;
 
-namespace eloo {
-    class window_dx12 : public window_interface {
+namespace eloo::dx12 {
+    class window : public eloo::window<eloo::dx12::window> {
     public:
-        window_dx12(HINSTANCE instance,
-                    const eastl::wstring& title,
-                    int width,
-                    int height);
-        ~window_dx12();
+        window(HINSTANCE instance,
+               const wchar_t* title,
+               int width,
+               int height);
+        ~window();
 
-        void on_hide() override;
-        void on_show() override;
-        void on_restore() override;
-        void on_minimize() override;
-        void on_maximize() override;
-        void on_resize(int width, int height) override;
-        void on_move(int x, int y) override;
+    private:
+        void hide();
+        void show();
+        void restore();
+        void minimize();
+        void maximize();
+        void resize(int width, int height);
+        void move(int x, int y);
 
         inline HWND handle() const { return mHandle; }
 
-        bool process_messages() override;
+        bool process_messages();
 
-    private:
         static LRESULT __stdcall
         WindowProc(HWND   handle,
                    UINT   uMsg,
