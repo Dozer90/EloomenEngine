@@ -1,6 +1,6 @@
 #pragma once
 
-#include "template_base/window.h"
+#include "backend/core/window.h"
 
 #include <EASTL/string.h>
 
@@ -19,7 +19,7 @@ using LPARAM  = std::intptr_t;
 using LRESULT = std::intptr_t;
 
 namespace eloo::dx12 {
-    class window : public eloo::template_base::window<window> {
+    class window : public eloo::core::window<window> {
     public:
         window(HINSTANCE instance,
                const wchar_t* title,

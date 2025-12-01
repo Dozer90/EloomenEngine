@@ -4,7 +4,7 @@
 #include "datatypes/int2.h"
 
 
-namespace eloo::template_base {
+namespace eloo::core {
     template <typename T>
     class window {
         friend T;
@@ -28,7 +28,7 @@ namespace eloo::template_base {
         window(const window&) = delete;
         window& operator=(const window&) = delete;
         window(window&&) = delete;
-        window& operator=(window7&) = delete;
+        window& operator=(window&&) = delete;
 
     public:
         const wchar_t* title() const        { return mTitle; }

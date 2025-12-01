@@ -1,5 +1,5 @@
-#include "dx12/renderer.h"
-#include "dx12/window.h"
+#include "backend/dx12/renderer.h"
+#include "backend/dx12/window.h"
 
 #include "utility/defines.h"
 #include "utility/colour.h"

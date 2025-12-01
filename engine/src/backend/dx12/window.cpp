@@ -1,4 +1,4 @@
-#include "window_dx12.h"
+#include "backend/dx12/window.h"
 
 #include "utility/defines.h"
 
@@ -28,7 +28,7 @@ dx12::window::window(HINSTANCE instance, const wchar_t* title, int width, int he
         WNDCLASSEXW wc{};
         wc.cbSize = sizeof(WNDCLASSEXW);
         wc.style = CS_HREDRAW | CS_VREDRAW;
-        wc.lpfnWndProc = Window::WindowProc;
+        wc.lpfnWndProc = dx12::window::WindowProc;
         wc.hInstance = mInstance;
         wc.lpszClassName = WINDOW_CLASS_NAME;
         wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
