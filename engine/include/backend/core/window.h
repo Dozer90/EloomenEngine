@@ -3,12 +3,11 @@
 #include "datatypes/float2.h"
 #include "datatypes/int2.h"
 
-#include <EASTL/unique_ptr.h>
 
-
-namespace eloo {
+namespace eloo::template_base {
     template <typename T>
     class window {
+        friend T;
 
     public:
         enum class state : int {
@@ -20,16 +19,21 @@ namespace eloo {
             COUNT
         };
 
-    public:
-        window(const wchar_t* title, int width, int height) {
+    protected:
+        explicit window(const wchar_t* title, int width, int height) {
             mTitle = title;
             mSize = int2::values(width, height);
             mDPI = float2::values(1.0f, 1.0f); // Default DPI scaling to 100%
         }
+        window(const window&) = delete;
+        window& operator=(const window&) = delete;
+        window(window&&) = delete;
+        window& operator=(window7&) = delete;
 
-        const wchar_t* title() const    { return mTitle; }
-        const int2::values& size()      { return mSize; }
-        const float2::values& dpi()     { return mDPI; }
+    public:
+        const wchar_t* title() const        { return mTitle; }
+        const int2::values& size() const    { return mSize; }
+        const float2::values& dpi() const   { return mDPI; }
 
         bool set_state(state newState) {
             if (mState == newState) {
@@ -39,12 +43,10 @@ namespace eloo {
             bool result = false;
             switch (mState) {
                 case state::hidden: {
-                    if (newState == window::state::normal) {
-                        result = ELOO_CRPT_CALL_T->show();
-                    }
+                    result = ELOO_CRPT_CALL_T->show();
                     break;
                 }
-                case window::state::normal: {
+                case state::normal: {
                     if (newState == state::hidden) {
                         result = ELOO_CRPT_CALL_T->hide();
                     } else if (newState == state::minimized) {
@@ -69,14 +71,12 @@ namespace eloo {
             return result;
         }
 
-        bool set_active(bool active) {
-            if (active != mActive) {
-                if (ELOO_CRPT_CALL_T->set_active(active)) {
-                    mActive = active;
-                    return true;
-                }
-            }
-            return false;
+        bool resize(int width, int height) {
+            return ELOO_CRPT_CALL_T->resize(width, height);
+        }
+
+        bool set_position(int x, int y, float xPivot, float yPivot) {
+            return ELOO_CRPT_CALL_T->set_position(x, y, xPivot, yPivot);
         }
 
         inline bool is_active() const       { return mActive; }

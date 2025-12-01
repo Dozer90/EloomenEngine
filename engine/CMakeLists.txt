@@ -25,14 +25,14 @@ endif()
 
 set(ELOO_RENDERER_BACKEND
     ${ELOO_DEFAULT_BACKEND}
-    CACHE STRING "Select the renderer backend to use. Options: DX12, Vulkan, OpenGL, Metal"
+    CACHE STRING "Select the renderer backend to use. Options: DX12, Vulkan, Metal"
 )
 
-set_property(CACHE ELOO_RENDERER_BACKEND PROPERTY STRINGS DX12 Vulkan OpenGL Metal None)
+set_property(CACHE ELOO_RENDERER_BACKEND PROPERTY STRINGS DX12 Vulkan Metal None)
 
 if(ELOO_RENDERER_BACKEND STREQUAL "DX12")
-    set(ELOO_BACKEND_PRE_INCLUDE "backends/dx12/dx12_pre.cmake")
-    set(ELOO_BACKEND_POST_INCLUDE "backends/dx12/dx12_post.cmake")
+    set(ELOO_BACKEND_PRE_INCLUDE "include/backend/dx12/dx12_pre.cmake")
+    set(ELOO_BACKEND_POST_INCLUDE "include/backend/dx12/dx12_post.cmake")
 else()
     message(FATAL_ERROR "============= Unsupported backend chosen =============")
 endif()
@@ -44,9 +44,10 @@ endif()
 set(ELOO_PUBLIC_INCLUDE_DIRECTORIES
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
-    "${CMAKE_CURRENT_SOURCE_DIR}/backends/core/interfaces"
 )
-set(ELOO_PRIVATE_INCLUDE_DIRECTORIES)
+set(ELOO_PRIVATE_INCLUDE_DIRECTORIES
+    "${CMAKE_CURRENT_SOURCE_DIR}/"
+)
 set(ELOO_PUBLIC_SYSTEM_INCLUDE_DIRECTORIES)
 set(ELOO_PRIVATE_SYSTEM_INCLUDE_DIRECTORIES)
 
@@ -75,8 +76,6 @@ set(ELOO_DATATYPE_SOURCE_FILES
 
 set(ELOO_RENDERING_SOURCE_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/rendering/camera.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/rendering/renderer.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/rendering/window.cpp"
 )
 
 set (ELOO_MATH_SOURCE_FILES

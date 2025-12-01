@@ -28,9 +28,12 @@ Uses the CRT (Curiously Recursive Template) pattern to define a common interface
 
 */
 
-namespace eloo {
+namespace eloo::core {
     template<typename T>
     class renderer {
+        friend T;
+
+    protected:
         explicit renderer(const char* name, const char* platform, const char* vendor, unsigned int majorVersion, unsigned int minorVersion, unsigned int patchVersion) {
             mName = name;
             mPlatform = platform;

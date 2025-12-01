@@ -1,11 +1,20 @@
 #pragma once
 
-#include "window_interface.h"
-#include "renderer_interface.h"
-
-#include <EASTL/unique_ptr.h>
-
+#if defined(ELOO_BACKEND_DX12)
+#include "backend/dx12/renderer.h"
 namespace eloo {
-    using renderer_ptr = eastl::unique_ptr<renderer_interface>;
-    renderer_ptr create_renderer(window_interface* wnd);
+    using renderer = eloo::dx12::renderer;
 }
+#elif defined(ELOO_BACKEND_VULKAN)
+#include "backend/vulkan/renderer.h"
+namespace eloo {
+    using renderer = eloo::vulkan::renderer;
+}
+#elif defined(ELOO_BACKEND_METAL)
+#include "backend/metal/renderer.h"
+namespace eloo {
+    using renderer = eloo::metal::renderer;
+}
+#else
+static_assert(false, "No rendering backend defined!");
+#endif

@@ -1,10 +1,20 @@
 #pragma once
 
-#include "window_interface.h"
-
-#include <EASTL/unique_ptr.h>
-
+#if defined(ELOO_BACKEND_DX12)
+#include "backend/dx12/window.h"
 namespace eloo {
-    using window_ptr = eastl::unique_ptr<window_interface>;
-    window_ptr create_window(const wchar_t* title, int width, int height);
+    using window = eloo::dx12::window;
 }
+#elif defined(ELOO_BACKEND_VULKAN)
+#include "backend/vulkan/window.h"
+namespace eloo {
+    using window = eloo::vulkan::window;
+}
+#elif defined(ELOO_BACKEND_METAL)
+#include "backend/metal/window.h"
+namespace eloo {
+    using window = eloo::metal::window;
+}
+#else
+static_assert(false, "No rendering backend defined!");
+#endif

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "window.h"
+#include "template_base/window.h"
 
 #include <EASTL/string.h>
 
@@ -19,7 +19,7 @@ using LPARAM  = std::intptr_t;
 using LRESULT = std::intptr_t;
 
 namespace eloo::dx12 {
-    class window : public eloo::window<eloo::dx12::window> {
+    class window : public eloo::template_base::window<window> {
     public:
         window(HINSTANCE instance,
                const wchar_t* title,
@@ -28,13 +28,13 @@ namespace eloo::dx12 {
         ~window();
 
     private:
-        void hide();
-        void show();
-        void restore();
-        void minimize();
-        void maximize();
-        void resize(int width, int height);
-        void move(int x, int y);
+        bool hide();
+        bool show();
+        bool restore();
+        bool minimize();
+        bool maximize();
+        bool resize(int width, int height);
+        bool move(int x, int y, float xPivot = 0.0f, float yPivot = 0.0f);
 
         inline HWND handle() const { return mHandle; }
 

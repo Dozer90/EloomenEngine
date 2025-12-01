@@ -1,5 +1,5 @@
 #pragma once
-#include "renderer.h"
+#include "backend/core/renderer.h"
 
 #include "utility/defines.h"
 #include "datatypes/int2.h"
@@ -11,8 +11,7 @@
 using Microsoft::WRL::ComPtr;
 
 namespace eloo::dx12 {
-    class window;
-    class renderer : public eloo::renderer<eloo::dx12::renderer> {
+    class renderer : public eloo::core::renderer<renderer> {
     public:
         explicit renderer(window* wnd);
 

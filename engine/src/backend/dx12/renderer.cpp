@@ -1,5 +1,5 @@
-#include "renderer_dx12.h"
-#include "window_dx12.h"
+#include "dx12/renderer.h"
+#include "dx12/window.h"
 
 #include "utility/defines.h"
 #include "utility/colour.h"
@@ -13,7 +13,8 @@
 using namespace Microsoft::WRL;
 using namespace eloo;
 
-renderer_dx12::renderer_dx12(window_dx12* wnd) {
+dx12::renderer::renderer(dx12::window* wnd)
+  : template_base::renderer<dx12::renderer>("DirectX", "Windows", "Microsoft", 12, 0, 0) {
 
     //////////////////////////////////////////////////////////////////////////
     // Step 1: Create the factory
@@ -234,7 +235,7 @@ renderer_dx12::renderer_dx12(window_dx12* wnd) {
     mVertexBufferView.SizeInBytes = vertexBufferSize;
 }
 
-void renderer_dx12::shutdown() {
+void dx12::renderer::shutdown() {
     mSwapChain.Reset();
     mCommandQueue.Reset();
     mDevice.Reset();
@@ -243,7 +244,7 @@ void renderer_dx12::shutdown() {
     mWindow->hide();
 }
 
-void renderer_dx12::create_swap_chain(ComPtr<ID3D12CommandQueue> cmdQueue,
+void dx12::renderer::create_swap_chain(ComPtr<ID3D12CommandQueue> cmdQueue,
                                       UINT bufferCount,
                                       DXGI_FORMAT format,
                                       int2::values size) {
@@ -316,7 +317,7 @@ void renderer_dx12::create_swap_chain(ComPtr<ID3D12CommandQueue> cmdQueue,
     }
 }
 
-void renderer_dx12::render() {
+void dx12::renderer::render() {
     const UINT backBufferIndex = mSwapChain->GetCurrentBackBufferIndex();
 
     // Reset the command allocator and command list
@@ -396,7 +397,7 @@ void renderer_dx12::render() {
     increment_frame();
 }
 
-void renderer_dx12::on_window_resized(int width, int height) {
+void dx12::renderer::on_window_resized(int width, int height) {
     // 1) Wait for the GPU to finish with all frames
     const UINT64 fence = ++mFenceValue[current_frame() % FRAME_COUNT];
     mCommandQueue->Signal(mFence.Get(), fence);

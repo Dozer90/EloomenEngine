@@ -14,7 +14,7 @@ namespace {
 
 dx12::window::window(HINSTANCE instance, const wchar_t* title, int width, int height) :
   mInstance(instance),
-  window<dx12::window>(title, width, height) {
+  template_base::window<dx12::window>(title, width, height) {
 
     // Get DPI
     HDC screen = GetDC(0);
@@ -83,33 +83,42 @@ dx12::window::~window() {
     }
 }
 
-void dx12::window::on_show() {
+bool dx12::window::show() {
     ShowWindow(mHandle, SW_SHOW);
+    return true;
 }
 
-void dx12::window::on_hide() {
+bool dx12::window::hide() {
     ShowWindow(mHandle, SW_HIDE);
+    return true;
 }
 
-void dx12::window::on_restore() {
+bool dx12::window::restore() {
     ShowWindow(mHandle, SW_RESTORE);
+    return true;
 }
 
-void dx12::window::on_minimize() {
+bool dx12::window::minimize() {
     ShowWindow(mHandle, SW_MINIMIZE);
+    return true;
 }
 
-void dx12::window::on_maximize() {
+bool dx12::window::maximize() {
     ShowWindow(mHandle, SW_MAXIMIZE);
+    return true;
 }
 
-void dx12::window::on_resize(int width, int height) {
+bool dx12::window::resize(int width, int height) {
     mSize = int2::values(width, height);
     SetWindowPos(mHandle, nullptr, 0, 0, width, height, SWP_NOZORDER | SWP_NOMOVE);
+    return true;
 }
 
-void dx12::window::on_move(int x, int y) {
+void dx12::window::move(int x, int y, float xPivot, float yPivot) {
+    x += mSize.x() * xPivot;
+    y += mSize.y() * yPivot;
     SetWindowPos(mHandle, nullptr, x, y, mSize.x(), mSize.y(), SWP_NOZORDER | SWP_NOSIZE);
+    return true;
 }
 
 bool dx12::window::process_messages() {
@@ -140,7 +149,7 @@ bool dx12::window::process_command(UINT uMsg, WPARAM wParam, LPARAM lParam) {
             return true;
         }
         case WM_ACTIVATE: {
-            mActive = (LOWORD(wParam) != WA_INACTIVE);
+            set_active(LOWORD(wParam) != WA_INACTIVE);
             return false;
         }
         case WM_PAINT: {
@@ -158,7 +167,7 @@ LRESULT CALLBACK dx12::window::WindowProc(HWND handle, UINT uMsg, WPARAM wParam,
         CREATESTRUCTW* create = reinterpret_cast<CREATESTRUCTW*>(lParam);
         SetWindowLongPtrW(handle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(create->lpCreateParams));
     }
-    Window* wnd = reinterpret_cast<Window*>(GetWindowLongPtrW(handle, GWLP_USERDATA));
+    dx12::window* wnd = reinterpret_cast<dx12::window*>(GetWindowLongPtrW(handle, GWLP_USERDATA));
     if (wnd != nullptr && wnd->process_command(uMsg, wParam, lParam)) {
         return 0;
     }
