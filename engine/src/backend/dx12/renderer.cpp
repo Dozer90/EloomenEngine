@@ -73,10 +73,7 @@ dx12::renderer::renderer(dx12::window* wnd)
     //////////////////////////////////////////////////////////////////////////
     // Step 4: Create a swap chain
 
-    {
-        const int2::values& size = wnd->size();
-        create_swap_chain(mCommandQueue, 2, DXGI_FORMAT_B8G8R8A8_UNORM, size.x(), size.y());
-    }
+    create_swap_chain(mCommandQueue, 2, DXGI_FORMAT_B8G8R8A8_UNORM, wnd->size());
 
 
     //////////////////////////////////////////////////////////////////////////
@@ -129,7 +126,7 @@ dx12::renderer::renderer(dx12::window* wnd)
     //////////////////////////////////////////////////////////////////////////
     // Step 8: Bind the window resize callback
 
-    events::engine::on_window_resized.subscribe(&on_window_resized, this);
+    //events::engine::on_window_resized.subscribe(&on_window_resized, this);
 
 
     //////////////////////////////////////////////////////////////////////////

@@ -49,6 +49,10 @@ namespace eloo::core {
         renderer(renderer&&) = delete;
         renderer& operator=(renderer&&) = delete;
 
+        ~renderer() {
+            ELOO_CRPT_CALL_T->cleanup();
+        }
+
     public:
         const char* renderer_name() const   { return mName; }
         const char* platform_name() const   { return mPlatform; }

@@ -19,6 +19,9 @@ namespace eloo::dx12 {
         void render();
 
     private:
+        void cleanup();
+
+    private:
         void create_swap_chain(
             ComPtr<ID3D12CommandQueue>  cmdQueue,
             unsigned int                bufferCount = 2,

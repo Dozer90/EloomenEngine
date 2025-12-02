@@ -99,6 +99,8 @@ namespace eloo::int2 {
 
     bool try_get_values(id_t id, values& vals);
 
+    bool set(id_t id, int x, int y);
+
     int& x(id_t id);
     int& y(id_t id);
 

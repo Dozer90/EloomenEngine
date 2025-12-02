@@ -1,5 +1,7 @@
 #pragma once
 
+#include "events/engine/events.h"
+
 #include "datatypes/float2.h"
 #include "datatypes/int2.h"
 
@@ -22,8 +24,8 @@ namespace eloo::core {
     protected:
         explicit window(const wchar_t* title, int width, int height) {
             mTitle = title;
-            mSize = int2::values(width, height);
-            mDPI = float2::values(1.0f, 1.0f); // Default DPI scaling to 100%
+            mSize = int2::create(width, height);
+            mDPI = float2::create(1.0f, 1.0f); // Default DPI scaling to 100%
         }
         window(const window&) = delete;
         window& operator=(const window&) = delete;
@@ -31,9 +33,11 @@ namespace eloo::core {
         window& operator=(window&&) = delete;
 
     public:
-        const wchar_t* title() const        { return mTitle; }
-        const int2::values& size() const    { return mSize; }
-        const float2::values& dpi() const   { return mDPI; }
+        const wchar_t* get_title() const    { return mTitle; }
+        const int get_width() const         { return int2::const_x(mSize); }
+        const int get_height() const        { return int2::const_y(mSize); }
+        const float get_dpi_x() const       { return float2::const_x(mDPI); }
+        const float get_dpi_y() const       { return float2::const_y(mDPI); }
 
         bool set_active(bool active) {
             mActive = active;
@@ -48,23 +52,23 @@ namespace eloo::core {
             bool result = false;
             switch (mState) {
                 case state::hidden: {
-                    result = ELOO_CRPT_CALL_T->show();
+                    result = ELOO_CRPT_CALL_T->show_impl();
                     break;
                 }
                 case state::normal: {
                     if (newState == state::hidden) {
-                        result = ELOO_CRPT_CALL_T->hide();
+                        result = ELOO_CRPT_CALL_T->hide_impl();
                     } else if (newState == state::minimized) {
-                        result = ELOO_CRPT_CALL_T->minimize();
+                        result = ELOO_CRPT_CALL_T->minimize_impl();
                     } else if (newState == state::maximized) {
-                        result = ELOO_CRPT_CALL_T->maximize();
+                        result = ELOO_CRPT_CALL_T->maximize_impl();
                     }
                     break;
                 }
                 case state::minimized:
                 case state::maximized: {
                     if (newState == state::normal) {
-                        result = ELOO_CRPT_CALL_T->restore();
+                        result = ELOO_CRPT_CALL_T->restore_impl();
                     }
                     break;
                 }
@@ -77,11 +81,23 @@ namespace eloo::core {
         }
 
         bool resize(int width, int height) {
-            return ELOO_CRPT_CALL_T->resize(width, height);
+            if (ELOO_CRPT_CALL_T->resize_impl(width, height)) {
+                int2::set(mSize, width, height);
+                ELOO_BROADCAST_EVENT_WITH_DATA(engine, window_resized, width, height);
+                return true;
+            }
+            return false;
         }
 
         bool set_position(int x, int y, float xPivot, float yPivot) {
-            return ELOO_CRPT_CALL_T->set_position(x, y, xPivot, yPivot);
+            int adjustedX = x + static_cast<int>(int2::x(mSize) * xPivot);
+            int adjustedY = y + static_cast<int>(int2::y(mSize) * yPivot);
+            if (ELOO_CRPT_CALL_T->set_position_impl(adjustedX, adjustedY)) {
+                int2::set(mPosition, adjustedX, adjustedY);
+                ELOO_BROADCAST_EVENT_WITH_DATA(engine, window_moved, adjustedX, adjustedY);
+                return true;
+            }
+            return false;
         }
 
         inline bool is_active() const       { return mActive; }
@@ -90,14 +106,15 @@ namespace eloo::core {
         inline bool is_maximized() const    { return mState == state::maximized; }
 
         bool process_messages() {
-            return ELOO_CRPT_CALL_T->process_messages();
+            return ELOO_CRPT_CALL_T->process_messages_impl();
         }
 
     protected:
         const wchar_t* mTitle = L"";
         state mState = state::invalid;
         bool mActive = false;
-        int2::values mSize = int2::ZERO;
-        float2::values mDPI = float2::ONE;
+        int2::id_t mSize;
+        int2::id_t mPosition;
+        float2::id_t mDPI;
     };
 }

@@ -46,6 +46,15 @@ inline bool int2::try_get_values(id_t id, int2::values& vals) {
 inline int& int2::x(id_t id) { return gMemoryBlockX.get(id); }
 inline int& int2::y(id_t id) { return gMemoryBlockY.get(id); }
 
+bool int2::set(id_t id, int x, int y) {
+    if (!is_valid(id)) {
+        return false;
+    }
+    gMemoryBlockX.get(id) = x;
+    gMemoryBlockY.get(id) = y;
+    return true;
+}
+
 inline const int& int2::const_x(id_t id) { return gMemoryBlockX.get(id); }
 inline const int& int2::const_y(id_t id) { return gMemoryBlockY.get(id); }
 

@@ -25,17 +25,17 @@ namespace eloo::dx12 {
         ~window();
 
     private:
-        bool hide();
-        bool show();
-        bool restore();
-        bool minimize();
-        bool maximize();
+        bool hide_impl();
+        bool show_impl();
+        bool restore_impl();
+        bool minimize_impl();
+        bool maximize_impl();
         bool resize(int width, int height);
         bool move(int x, int y, float xPivot = 0.0f, float yPivot = 0.0f);
 
         inline HWND handle() const { return mHandle; }
 
-        bool process_messages();
+        bool process_messages_impl();
 
         static LRESULT __stdcall
         WindowProc(HWND   handle,
@@ -44,8 +44,8 @@ namespace eloo::dx12 {
                    LPARAM lParam);
 
         bool process_command(UINT   uMsg,
-                             WPARAM wParam,
-                             LPARAM lParam);
+                            WPARAM wParam,
+                            LPARAM lParam);
 
     private:
         HINSTANCE mInstance = nullptr;

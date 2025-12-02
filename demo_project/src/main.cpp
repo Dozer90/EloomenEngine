@@ -7,8 +7,8 @@
 int main() {
     constexpr eloo::int2::values windowSize(1920, 1080);
 
-    eloo::window* wnd = new eloo::window(L"Eloom Engine", windowSize.x(), windowSize.y());
-    eloo::renderer* rnd = new eloo::renderer(wnd);
+    eastl::unique_ptr<eloo::window> wnd = eastl::make_unique<eloo::window>(L"Eloom Engine", windowSize.x(), windowSize.y());
+    eastl::unique_ptr<eloo::renderer> rnd = eastl::make_unique<eloo::renderer>(wnd.get());
     while (wnd->process_messages()) {
         rnd->render();
     }

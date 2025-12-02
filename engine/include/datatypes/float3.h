@@ -25,7 +25,7 @@
 namespace eloo::float3 {
     ELOO_DECLARE_ID_T;
 
-    // OOP style container for float2
+    // OOP style container for float3
     struct values {
     private:
         float mX, mY, mZ;
@@ -66,25 +66,22 @@ namespace eloo::float3 {
 
     public:
         values& operator = (const values& other);
-        // CODE REVIEW: Parameter name 'values' shadows struct name
-        values& operator = (float values);
+        values& operator = (float val);
 
-        // CODE REVIEW: Missing implementation (same as float2)
-        // Declared but not implemented in float3.cpp - will cause linker errors
         values& operator + ();
         values& operator - ();
 
         values& operator /= (const values& other);
-        values& operator /= (float values);
+        values& operator /= (float val);
 
         values& operator *= (const values& other);
-        values& operator *= (float values);
+        values& operator *= (float val);
 
         values& operator += (const values& other);
-        values& operator += (float values);
+        values& operator += (float val);
 
         values& operator -= (const values& other);
-        values& operator -= (float values);
+        values& operator -= (float val);
     };
 
     template <typename T> concept storage_t = eastl::is_same_v<T, values>;

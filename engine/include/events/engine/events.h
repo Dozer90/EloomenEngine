@@ -38,4 +38,11 @@ namespace eloo::events::engine
 #undef ELOO_DEFINE_EVENT
 #undef ELOO_DEFINE_EVENT_WITH_DATA
 #undef ELOO_DEFINE_EVENT_DEFINITIONS
+
+#define ELOO_BROADCAST_EVENT(_catagory, _event) eloo::events::_catagory::on_##_event.broadcast();
+#define ELOO_BROADCAST_EVENT_WITH_DATA(_catagory, _event, ...) \
+    { \
+        eloo::events::_catagory::_event##_data _catagory##_##_event##_event_data(__VA_ARGS__); \
+        eloo::events::_catagory::on_##_event.broadcast(_catagory##_##_event##_event_data); \
+    }
 }

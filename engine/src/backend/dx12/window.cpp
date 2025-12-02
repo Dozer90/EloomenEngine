@@ -2,8 +2,6 @@
 
 #include "utility/defines.h"
 
-#include <EASTL/string.h>
-
 #include <Windows.h>
 
 using namespace eloo;
@@ -18,8 +16,9 @@ dx12::window::window(const wchar_t* title, int width, int height) :
 
     // Get DPI
     HDC screen = GetDC(0);
-    mDPI.x() = GetDeviceCaps(screen, LOGPIXELSX) / 96.0f;
-    mDPI.y() = GetDeviceCaps(screen, LOGPIXELSY) / 96.0f;
+    mDPI = float2::create(
+        GetDeviceCaps(screen, LOGPIXELSX) / 96.0f,
+        GetDeviceCaps(screen, LOGPIXELSY) / 96.0f);
     ReleaseDC(0, screen);
 
     // Ensure the window class is registered
@@ -43,8 +42,8 @@ dx12::window::window(const wchar_t* title, int width, int height) :
     RECT rect = {
         0,
         0,
-        static_cast<LONG>(mSize.x() * mDPI.x()),
-        static_cast<LONG>(mSize.y() * mDPI.y())
+        static_cast<LONG>(int2::x(mSize) * float2::x(mDPI)),
+        static_cast<LONG>(int2::y(mSize) * float2::y(mDPI))
     };
     AdjustWindowRectEx(&rect, WS_OVERLAPPEDWINDOW, FALSE, 0);
 
@@ -83,45 +82,49 @@ dx12::window::~window() {
     }
 }
 
-bool dx12::window::show() {
+bool dx12::window::show_impl() {
     ShowWindow(mHandle, SW_SHOW);
     return true;
 }
 
-bool dx12::window::hide() {
+bool dx12::window::hide_impl() {
     ShowWindow(mHandle, SW_HIDE);
     return true;
 }
 
-bool dx12::window::restore() {
+bool dx12::window::restore_impl() {
     ShowWindow(mHandle, SW_RESTORE);
     return true;
 }
 
-bool dx12::window::minimize() {
+bool dx12::window::minimize_impl() {
     ShowWindow(mHandle, SW_MINIMIZE);
     return true;
 }
 
-bool dx12::window::maximize() {
+bool dx12::window::maximize_impl() {
     ShowWindow(mHandle, SW_MAXIMIZE);
     return true;
 }
 
 bool dx12::window::resize(int width, int height) {
-    mSize = int2::values(width, height);
-    SetWindowPos(mHandle, nullptr, 0, 0, width, height, SWP_NOZORDER | SWP_NOMOVE);
+    if (width <= 0 || height <= 0) {
+        return false;
+    }
+
+    if (is_active() && !is_hidden() && !is_maximized() && !is_minimized()) {
+        SetWindowPos(mHandle, nullptr, 0, 0, width, height, SWP_NOZORDER | SWP_NOMOVE);
+        return true;
+    }
+    return false;
+}
+
+bool dx12::window::move(int x, int y) {
+    SetWindowPos(mHandle, nullptr, x, y, get_width(), get_height(), SWP_NOZORDER | SWP_NOSIZE);
     return true;
 }
 
-bool dx12::window::move(int x, int y, float xPivot, float yPivot) {
-    x += mSize.x() * xPivot;
-    y += mSize.y() * yPivot;
-    SetWindowPos(mHandle, nullptr, x, y, mSize.x(), mSize.y(), SWP_NOZORDER | SWP_NOSIZE);
-    return true;
-}
-
-bool dx12::window::process_messages() {
+bool dx12::window::process_messages_impl() {
     MSG msg{};
     while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);
