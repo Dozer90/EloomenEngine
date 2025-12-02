@@ -82,59 +82,59 @@ dx12::window::~window() {
     }
 }
 
-bool dx12::window::show_impl() {
+eloo::core::void_r dx12::window::show_impl() {
     ShowWindow(mHandle, SW_SHOW);
-    return true;
+    return {};
 }
 
-bool dx12::window::hide_impl() {
+eloo::core::void_r dx12::window::hide_impl() {
     ShowWindow(mHandle, SW_HIDE);
-    return true;
+    return {};
 }
 
-bool dx12::window::restore_impl() {
+eloo::core::void_r dx12::window::restore_impl() {
     ShowWindow(mHandle, SW_RESTORE);
-    return true;
+    return {};
 }
 
-bool dx12::window::minimize_impl() {
+eloo::core::void_r dx12::window::minimize_impl() {
     ShowWindow(mHandle, SW_MINIMIZE);
-    return true;
+    return {};
 }
 
-bool dx12::window::maximize_impl() {
+eloo::core::void_r dx12::window::maximize_impl() {
     ShowWindow(mHandle, SW_MAXIMIZE);
-    return true;
+    return {};
 }
 
-bool dx12::window::resize(int width, int height) {
+eloo::core::void_r dx12::window::resize_impl(int width, int height) {
     if (width <= 0 || height <= 0) {
-        return false;
+        return std::unexpected(rendering::errc::resize_failed);
     }
 
     if (is_active() && !is_hidden() && !is_maximized() && !is_minimized()) {
         SetWindowPos(mHandle, nullptr, 0, 0, width, height, SWP_NOZORDER | SWP_NOMOVE);
-        return true;
+        return {};
     }
-    return false;
+    return std::unexpected(rendering::errc::unsupported_operation);
 }
 
-bool dx12::window::move(int x, int y) {
+eloo::core::void_r dx12::window::set_position_impl(int x, int y) {
     SetWindowPos(mHandle, nullptr, x, y, get_width(), get_height(), SWP_NOZORDER | SWP_NOSIZE);
-    return true;
+    return {};
 }
 
-bool dx12::window::process_messages_impl() {
+eloo::core::void_r dx12::window::process_messages_impl() {
     MSG msg{};
     while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);
         DispatchMessageW(&msg);
 
         if (msg.message == WM_QUIT) {
-            return false;
+            return std::unexpected(rendering::errc::unsupported_operation); // Or create a "window_closed" error
         }
     }
-    return true;
+    return {};
 }
 
 bool dx12::window::process_command(UINT uMsg, WPARAM wParam, LPARAM lParam) {

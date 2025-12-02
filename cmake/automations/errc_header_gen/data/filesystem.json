@@ -1,0 +1,133 @@
+{
+    "category": "Filesystem",
+    "codes": [
+        {
+            "id": "access_denied",
+            "msg": "Access to the file or directory was denied"
+        },
+        {
+            "id": "not_found",
+            "msg": "The specified file or directory was not found"
+        },
+        {
+            "id": "already_exists",
+            "msg": "The file or directory already exists"
+        },
+        {
+            "id": "invalid_id",
+            "msg": "The specified ID is invalid"
+        },
+        {
+            "id": "insufficient_space",
+            "msg": "There is not enough space to complete the operation"
+        },
+        {
+            "id": "file_creation_failed",
+            "msg": "Failed to create the file"
+        },
+        {
+            "id": "path_too_long",
+            "msg": "The specified path is too long"
+        },
+        {
+            "id": "invalid_path_format",
+            "msg": "The specified path format is invalid"
+        },
+        {
+            "id": "invalid_name",
+            "msg": "The specified directory name or file name is invalid"
+        },
+        {
+            "id": "invalid_file_type",
+            "msg": "The specified file type is invalid"
+        },
+        {
+            "id": "path_resolution_failed",
+            "msg": "Failed to resolve to an absolute path"
+        },
+        {
+            "id": "invalid_root_path",
+            "msg": "The specified root path is invalid"
+        },
+        {
+            "id": "invalid_path",
+            "msg": "The specified path is invalid"
+        },
+        {
+            "id": "invalid_source_path",
+            "msg": "The source path is invalid (move/copy)"
+        },
+        {
+            "id": "invalid_dest_path",
+            "msg": "The destination path is invalid (move/copy)"
+        },
+        {
+            "id": "not_a_file",
+            "msg": "The specified path is not a file"
+        },
+        {
+            "id": "file_already_open",
+            "msg": "The file is already open and cannot be accessed"
+        },
+        {
+            "id": "file_not_open",
+            "msg": "The file is not open and cannot be accessed"
+        },
+        {
+            "id": "file_too_large",
+            "msg": "The file exceeds the maximum allowed size"
+        },
+        {
+            "id": "read_only_stream",
+            "msg": "The file stream is read-only and cannot be modified"
+        },
+        {
+            "id": "write_only_stream",
+            "msg": "The file stream is write-only and cannot be read"
+        },
+        {
+            "id": "buffer_overflow",
+            "msg": "The operation would cause a buffer overflow"
+        },
+        {
+            "id": "not_a_directory",
+            "msg": "The specified path is not a directory"
+        },
+        {
+            "id": "already_mounted",
+            "msg": "The directory is already mounted"
+        },
+        {
+            "id": "not_mounted",
+            "msg": "The directory is not mounted"
+        },
+        {
+            "id": "already_monitored",
+            "msg": "The directory or file is already being monitored"
+        },
+        {
+            "id": "not_monitored",
+            "msg": "The directory or file is not being monitored"
+        },
+        {
+            "id": "no_data",
+            "msg": "No data was found in the file or directory"
+        },
+        {
+            "id": "data_size_mismatch",
+            "msg": "The deserialized data size does not match the expected type size"
+        },
+        {
+            "id": "data_type_mismatch",
+            "msg": "The deserialized data type does not match the expected type"
+        },
+        {
+            "id": "unsupported_operation",
+            "msg": "The operation is not supported"
+        },
+        {
+            "id": "filesystem_null",
+            "msg": "The filesystem interface is null or not initialized"
+        }
+    ]
+}

@@ -1,0 +1,25 @@
+{
+    "category": "Serialization",
+    "codes": [
+        {
+            "id": "null_data",
+            "msg": "No data was provided"
+        },
+        {
+            "id": "null_buffer",
+            "msg": "No buffer was provided"
+        },
+        {
+            "id": "buffer_overflow",
+            "msg": "Attempting to access data beyond the buffer limit"
+        },
+        {
+            "id": "string_type_mismatch",
+            "msg": "String type does not match requested type (wide/narrow)"
+        },
+        {
+            "id": "string_hash_mismatch",
+            "msg": "Extracted string hash does not match expected hash value"
+        }
+    ]
+}

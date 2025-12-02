@@ -7,6 +7,22 @@ message("============= Active config: ${CMAKE_BUILD_TYPE} =============")
 
 
 ###########################################
+# Automations
+
+file(GLOB_RECURSE ELOO_AUTOMATIONS
+    CONFIGURE_DEPENDS
+    "${CMAKE_SOURCE_DIR}/cmake/automations/*/automate.cmake"
+)
+
+foreach(ELOO_AUTOMATION IN LISTS ELOO_AUTOMATIONS)
+    get_filename_component(ELOO_CURRENT_AUTOMATION_DIR  ${ELOO_AUTOMATION} DIRECTORY)
+    get_filename_component(ELOO_CURRENT_AUTOMATION_NAME ${ELOO_CURRENT_AUTOMATION_DIR} NAME)
+    message("Running '${ELOO_CURRENT_AUTOMATION_NAME}' automation...")
+    include(${ELOO_AUTOMATION})
+endforeach()
+
+
+###########################################
 # Platform selection
 
 if(WIN32)

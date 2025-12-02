@@ -25,17 +25,17 @@ namespace eloo::dx12 {
         ~window();
 
     private:
-        bool hide_impl();
-        bool show_impl();
-        bool restore_impl();
-        bool minimize_impl();
-        bool maximize_impl();
-        bool resize(int width, int height);
-        bool move(int x, int y, float xPivot = 0.0f, float yPivot = 0.0f);
+        eloo::core::void_r hide_impl();
+        eloo::core::void_r show_impl();
+        eloo::core::void_r restore_impl();
+        eloo::core::void_r minimize_impl();
+        eloo::core::void_r maximize_impl();
+        eloo::core::void_r resize_impl(int width, int height);
+        eloo::core::void_r set_position_impl(int x, int y);
 
         inline HWND handle() const { return mHandle; }
 
-        bool process_messages_impl();
+        eloo::core::void_r process_messages_impl();
 
         static LRESULT __stdcall
         WindowProc(HWND   handle,

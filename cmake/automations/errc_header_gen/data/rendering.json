@@ -1,0 +1,73 @@
+{
+    "category": "Rendering",
+    "codes": [
+        {
+            "id": "invalid_window",
+            "msg": "Window handle is invalid or null"
+        },
+        {
+            "id": "window_creation_failed",
+            "msg": "Failed to create window"
+        },
+        {
+            "id": "device_creation_failed",
+            "msg": "Failed to create graphics device"
+        },
+        {
+            "id": "adapter_not_found",
+            "msg": "No suitable graphics adapter found"
+        },
+        {
+            "id": "swap_chain_creation_failed",
+            "msg": "Failed to create swap chain"
+        },
+        {
+            "id": "command_queue_creation_failed",
+            "msg": "Failed to create command queue"
+        },
+        {
+            "id": "command_allocator_creation_failed",
+            "msg": "Failed to create command allocator"
+        },
+        {
+            "id": "command_list_creation_failed",
+            "msg": "Failed to create command list"
+        },
+        {
+            "id": "descriptor_heap_creation_failed",
+            "msg": "Failed to create descriptor heap"
+        },
+        {
+            "id": "fence_creation_failed",
+            "msg": "Failed to create fence"
+        },
+        {
+            "id": "buffer_creation_failed",
+            "msg": "Failed to create vertex or index buffer"
+        },
+        {
+            "id": "shader_compilation_failed",
+            "msg": "Shader compilation failed"
+        },
+        {
+            "id": "pipeline_state_creation_failed",
+            "msg": "Failed to create pipeline state"
+        },
+        {
+            "id": "root_signature_creation_failed",
+            "msg": "Failed to create root signature"
+        },
+        {
+            "id": "resize_failed",
+            "msg": "Failed to resize swap chain or buffers"
+        },
+        {
+            "id": "present_failed",
+            "msg": "Failed to present frame to display"
+        },
+        {
+            "id": "unsupported_operation",
+            "msg": "The requested operation is not supported"
+        }
+    ]
+}

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "error_codes/rendering_errc.h"
+
 #include "events/engine/events.h"
 
 #include "datatypes/float2.h"
@@ -7,6 +9,7 @@
 
 
 namespace eloo::core {
+    using void_r = std::expected<void, std::error_code>;
     template <typename T>
     class window {
         friend T;
@@ -39,17 +42,17 @@ namespace eloo::core {
         const float get_dpi_x() const       { return float2::const_x(mDPI); }
         const float get_dpi_y() const       { return float2::const_y(mDPI); }
 
-        bool set_active(bool active) {
+        void_r set_active(bool active) {
             mActive = active;
-            return true;
+            return {};
         }
 
-        bool set_state(state newState) {
+        void_r set_state(state newState) {
             if (mState == newState) {
-                return false; // No state change
+                return {}; // No state change needed
             }
 
-            bool result = false;
+            void_r result = std::unexpected(rendering::errc::unsupported_operation);
             switch (mState) {
                 case state::hidden: {
                     result = ELOO_CRPT_CALL_T->show_impl();
@@ -80,24 +83,24 @@ namespace eloo::core {
             return result;
         }
 
-        bool resize(int width, int height) {
-            if (ELOO_CRPT_CALL_T->resize_impl(width, height)) {
+        void_r resize(int width, int height) {
+            auto result = ELOO_CRPT_CALL_T->resize_impl(width, height);
+            if (result) {
                 int2::set(mSize, width, height);
                 ELOO_BROADCAST_EVENT_WITH_DATA(engine, window_resized, width, height);
-                return true;
             }
-            return false;
+            return result;
         }
 
-        bool set_position(int x, int y, float xPivot, float yPivot) {
+        void_r set_position(int x, int y, float xPivot, float yPivot) {
             int adjustedX = x + static_cast<int>(int2::x(mSize) * xPivot);
             int adjustedY = y + static_cast<int>(int2::y(mSize) * yPivot);
-            if (ELOO_CRPT_CALL_T->set_position_impl(adjustedX, adjustedY)) {
+            auto result = ELOO_CRPT_CALL_T->set_position_impl(adjustedX, adjustedY);
+            if (result) {
                 int2::set(mPosition, adjustedX, adjustedY);
                 ELOO_BROADCAST_EVENT_WITH_DATA(engine, window_moved, adjustedX, adjustedY);
-                return true;
             }
-            return false;
+            return result;
         }
 
         inline bool is_active() const       { return mActive; }
@@ -105,7 +108,7 @@ namespace eloo::core {
         inline bool is_minimized() const    { return mState == state::minimized; }
         inline bool is_maximized() const    { return mState == state::maximized; }
 
-        bool process_messages() {
+        void_r process_messages() {
             return ELOO_CRPT_CALL_T->process_messages_impl();
         }
 
