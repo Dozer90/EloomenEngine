@@ -1,6 +1,11 @@
 # DIRECTX 12
 
 
+list(APPEND ELOO_SOURCE_FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/backend/dx12/window.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/backend/dx12/renderer.cpp"
+)
+
 ###########################################
 # Package Dependencies
 

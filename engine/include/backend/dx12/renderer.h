@@ -11,6 +11,7 @@
 using Microsoft::WRL::ComPtr;
 
 namespace eloo::dx12 {
+    class window;
     class renderer : public eloo::core::renderer<renderer> {
     public:
         explicit renderer(window* wnd);

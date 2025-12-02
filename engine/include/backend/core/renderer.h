@@ -1,5 +1,7 @@
 #pragma once
 
+#include "utility/defines.h"
+
 #include <EASTL/unique_ptr.h>
 
 

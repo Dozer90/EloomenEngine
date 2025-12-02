@@ -35,6 +35,11 @@ namespace eloo::core {
         const int2::values& size() const    { return mSize; }
         const float2::values& dpi() const   { return mDPI; }
 
+        bool set_active(bool active) {
+            mActive = active;
+            return true;
+        }
+
         bool set_state(state newState) {
             if (mState == newState) {
                 return false; // No state change

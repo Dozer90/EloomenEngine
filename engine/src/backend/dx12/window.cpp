@@ -14,7 +14,7 @@ namespace {
 
 dx12::window::window(HINSTANCE instance, const wchar_t* title, int width, int height) :
   mInstance(instance),
-  template_base::window<dx12::window>(title, width, height) {
+  eloo::core::window<dx12::window>(title, width, height) {
 
     // Get DPI
     HDC screen = GetDC(0);
@@ -51,7 +51,7 @@ dx12::window::window(HINSTANCE instance, const wchar_t* title, int width, int he
     mHandle = CreateWindowExW(
         0,
         WINDOW_CLASS_NAME,
-        mTitle.c_str(),
+        mTitle,
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
@@ -114,7 +114,7 @@ bool dx12::window::resize(int width, int height) {
     return true;
 }
 
-void dx12::window::move(int x, int y, float xPivot, float yPivot) {
+bool dx12::window::move(int x, int y, float xPivot, float yPivot) {
     x += mSize.x() * xPivot;
     y += mSize.y() * yPivot;
     SetWindowPos(mHandle, nullptr, x, y, mSize.x(), mSize.y(), SWP_NOZORDER | SWP_NOSIZE);

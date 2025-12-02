@@ -14,7 +14,7 @@ using namespace Microsoft::WRL;
 using namespace eloo;
 
 dx12::renderer::renderer(dx12::window* wnd)
-  : template_base::renderer<dx12::renderer>("DirectX", "Windows", "Microsoft", 12, 0, 0) {
+  : eloo::core::renderer<dx12::renderer>("DirectX", "Windows", "Microsoft", 12, 0, 0) {
 
     //////////////////////////////////////////////////////////////////////////
     // Step 1: Create the factory
