@@ -12,8 +12,8 @@ namespace {
     constexpr LPCWCH WINDOW_CLASS_NAME = L"EloomEngineWindow";
 }
 
-dx12::window::window(HINSTANCE instance, const wchar_t* title, int width, int height) :
-  mInstance(instance),
+dx12::window::window(const wchar_t* title, int width, int height) :
+  mInstance(GetModuleHandle(nullptr)),
   eloo::core::window<dx12::window>(title, width, height) {
 
     // Get DPI

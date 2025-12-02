@@ -21,7 +21,7 @@ using LRESULT = std::intptr_t;
 namespace eloo::dx12 {
     class window : public eloo::core::window<window> {
     public:
-        explicit window(HINSTANCE instance, const wchar_t* title, int width, int height);
+        explicit window(const wchar_t* title, int width, int height);
         ~window();
 
     private:
