@@ -32,8 +32,8 @@
     matVar[matrix2x2::R2C1], matVar[matrix2x2::R2C2]
 
 
-namespace eloo::matrix2x2 {
-    ELOO_DECLARE_ID_T;
+namespace sge::matrix2x2 {
+    SGE_DECLARE_ID_T;
 
     enum cell_index {
         R1C1, R1C2,
@@ -146,4 +146,4 @@ namespace eloo::matrix2x2 {
     const float2::values const_column(id_t id, int index);
 }
 
-using matrix2x2_v = eloo::matrix2x2::values;
+using matrix2x2_v = sge::matrix2x2::values;

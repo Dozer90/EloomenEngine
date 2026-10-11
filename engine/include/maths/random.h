@@ -5,7 +5,7 @@
 
 #define NUMERIC_TEMPLATE template<typename T> inline eastl::enable_if<eastl::is_arithmetic<T>::value, T>::type
 
-namespace eloo::Maths::Random {
+namespace sge::Maths::Random {
 namespace {
 unsigned int gSeed = static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count());
 std::mt19937 gRandomGenerator(gSeed);

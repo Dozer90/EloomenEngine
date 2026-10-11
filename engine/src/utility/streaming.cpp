@@ -1,8 +1,8 @@
 #pragma once
 
-#include "utility/streaming.h"
+#include "streaming/streaming.h"
 
-using namespace eloo;
+using namespace sge;
 
 
 // ==============================================================================
@@ -10,17 +10,17 @@ using namespace eloo;
 
 streaming::istream::istream(const data_vector* targetBuffer)
     : buffer(targetBuffer) {
-    ELOO_ASSERT(targetBuffer != nullptr, "Target buffer cannot be null");
+    SGE_ASSERT(targetBuffer != nullptr, "Target buffer cannot be null");
 }
 
-streaming::void_r streaming::istream::seek(size_t newPosition) ELOO_NOEXCEPT {
-    ELOO_RETURN_ERRC_IF(newPosition >= buffer->size(), error_id::buffer_overflow);
+streaming::void_r streaming::istream::seek(size_t newPosition) SGE_NOEXCEPT {
+    SGE_RETURN_ERRC_IF(newPosition >= buffer->size(), errc::buffer_overflow);
     position = newPosition;
     return {};
 }
 
 streaming::data_span_r streaming::istream::read(size_t length) {
-    ELOO_RETURN_ERRC_IF(position + length > buffer->size(), error_id::buffer_overflow);
+    SGE_RETURN_ERRC_IF(position + length > buffer->size(), errc::buffer_overflow);
     const size_t spanStart = position;
     position += length;
     return data_span(buffer->data() + spanStart, length);
@@ -72,7 +72,7 @@ streaming::void_r streaming::ostream::seek(size_t newPosition) {
     bool memsetRequired = newPosition < position;
     if (!memsetRequired) {
         if (newPosition > buffer.size()) {
-            ELOO_RETURN_ERRC_IF_FUNC_FAILED(ensure_data_can_fit(newPosition - position));
+            SGE_RETURN_ERRC_IF_FUNC_FAILED(ensure_data_can_fit(newPosition - position));
             memsetRequired = true;
         }
     }
@@ -85,8 +85,8 @@ streaming::void_r streaming::ostream::seek(size_t newPosition) {
 }
 
 streaming::void_r streaming::ostream::write(const data_t* data, size_t size) {
-    ELOO_RETURN_ERRC_IF(data == nullptr || size == 0, error_id::null_data);
-    ELOO_RETURN_ERRC_IF_FUNC_FAILED(ensure_data_can_fit(size));
+    SGE_RETURN_ERRC_IF(data == nullptr || size == 0, errc::null_data);
+    SGE_RETURN_ERRC_IF_FUNC_FAILED(ensure_data_can_fit(size));
     memcpy(buffer.data() + position, data, size);
     position += size;
     return {};
@@ -97,7 +97,7 @@ streaming::void_r streaming::ostream::write_ln() {
 }
 
 streaming::void_r streaming::ostream::write_ln(const data_t* data, size_t size) {
-    ELOO_RETURN_ERRC_IF_FUNC_FAILED(write(data, size));
+    SGE_RETURN_ERRC_IF_FUNC_FAILED(write(data, size));
     return write_ln();
 }
 
@@ -105,9 +105,17 @@ streaming::void_r streaming::ostream::ensure_data_can_fit(size_t size) {
     if (position + size < buffer.size()) {
         return {};
     }
-    ELOO_RETURN_ERRC_IF(!allowExpansion, error_id::buffer_overflow);
+    SGE_RETURN_ERRC_IF(!allowExpansion, errc::buffer_overflow);
     while (position + size > buffer.size()) {
-        buffer.resize(static_cast<size_t>(buffer.size() * OSTREAM_EXPANSION_FACTOR));
+        buffer.resize(eastl::max(buffer.size() + 1, static_cast<size_t>(buffer.size() * OSTREAM_EXPANSION_FACTOR)));
     }
     return {};
+}
+streaming::iostream::iostream(size_t size, bool expand) {
+    o = eastl::make_unique<ostream>(size, expand);
+    i = eastl::make_unique<istream>(o->storage());
+}
+streaming::iostream::iostream(data_vector&& data, bool expand) {
+    o = eastl::make_unique<ostream>(eastl::move(data), expand);
+    i = eastl::make_unique<istream>(o->storage());
 }

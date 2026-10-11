@@ -4,7 +4,7 @@
 
 #include "utility/managed_memory_block.h"
 
-using namespace eloo;
+using namespace sge;
 
 namespace {
     constexpr int MEMORY_BLOCK_INITIAL_SIZE = 50;
@@ -15,8 +15,8 @@ namespace {
 
 int3::id_t int3::create(int x, int y, int z) {
     id_t id = gMemoryBlockX.push(x);
-    ELOO_ASSERT_FATAL(id == gMemoryBlockY.push(y), "ID mismatch between X and Y memory blocks");
-    ELOO_ASSERT_FATAL(id == gMemoryBlockZ.push(z), "ID mismatch between X and Z memory blocks");
+    SGE_ASSERT_FATAL(id == gMemoryBlockY.push(y), "ID mismatch between X and Y memory blocks");
+    SGE_ASSERT_FATAL(id == gMemoryBlockZ.push(z), "ID mismatch between X and Z memory blocks");
     return id;
 }
 
@@ -214,3 +214,4 @@ int3::values& int3::values::operator -= (int val) {
     *this = *this - val;
     return *this;
 }
+bool int3::is_valid(id_t id) { return gMemoryBlockX.is_valid(id) && gMemoryBlockY.is_valid(id) && gMemoryBlockZ.is_valid(id); }

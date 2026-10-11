@@ -7,8 +7,8 @@
 #include "utility/defines.h"
 
 
-namespace eloo::material {
-    ELOO_DECLARE_ID_T;
+namespace sge::material {
+    SGE_DECLARE_ID_T;
 
     struct properties {
         colour_t albedo;
@@ -22,10 +22,10 @@ namespace eloo::material {
         float roughnessFactor;
     };
 
-    id_t create(const properties& props) ELOO_NOEXCEPT;
-    bool release(id_t id) ELOO_NOEXCEPT;
+    id_t create(const properties& props) SGE_NOEXCEPT;
+    bool release(id_t id) SGE_NOEXCEPT;
 
-    bool is_valid(id_t id) ELOO_NOEXCEPT;
+    bool is_valid(id_t id) SGE_NOEXCEPT;
 
-    bool try_get_properties(id_t id, properties& props) ELOO_NOEXCEPT;
+    bool try_get_properties(id_t id, properties& props) SGE_NOEXCEPT;
 }

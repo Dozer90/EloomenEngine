@@ -4,7 +4,7 @@
 
 #include "utility/managed_memory_block.h"
 
-using namespace eloo;
+using namespace sge;
 
 namespace {
     constexpr int MEMORY_BLOCK_INITIAL_SIZE = 50;
@@ -15,11 +15,11 @@ namespace {
 
 int2::id_t int2::create(int x, int y) {
     id_t id = gMemoryBlockX.push(x);
-    ELOO_ASSERT_FATAL(id == gMemoryBlockY.push(y), "ID mismatch between X and Y memory blocks");
+    SGE_ASSERT_FATAL(id == gMemoryBlockY.push(y), "ID mismatch between X and Y memory blocks");
     return id;
 }
 
-inline int2::id_t int2::create(const values& vals) {
+int2::id_t int2::create(const values& vals) {
     return create(vals.x(), vals.y());
 }
 
@@ -32,7 +32,7 @@ bool int2::release(id_t id) {
     return true;
 }
 
-inline bool int2::try_get_values(id_t id, int2::values& vals) {
+bool int2::try_get_values(id_t id, int2::values& vals) {
     if (is_valid(id)) {
         vals = {
             gMemoryBlockX.get(id),
@@ -43,8 +43,8 @@ inline bool int2::try_get_values(id_t id, int2::values& vals) {
     return false;
 }
 
-inline int& int2::x(id_t id) { return gMemoryBlockX.get(id); }
-inline int& int2::y(id_t id) { return gMemoryBlockY.get(id); }
+int& int2::x(id_t id) { return gMemoryBlockX.get(id); }
+int& int2::y(id_t id) { return gMemoryBlockY.get(id); }
 
 inline const int& int2::const_x(id_t id) { return gMemoryBlockX.get(id); }
 inline const int& int2::const_y(id_t id) { return gMemoryBlockY.get(id); }
@@ -217,3 +217,4 @@ int2::values& int2::values::operator -= (int val) {
     *this = *this - val;
     return *this;
 }
+bool int2::is_valid(id_t id) { return gMemoryBlockX.is_valid(id) && gMemoryBlockY.is_valid(id); }

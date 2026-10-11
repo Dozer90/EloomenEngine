@@ -8,7 +8,7 @@
 #include <EASTL/unique_ptr.h>
 
 
-namespace eloo {
+namespace sge {
     class window_interface {
     public:
         enum class state : int {

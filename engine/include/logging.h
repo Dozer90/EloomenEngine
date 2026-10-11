@@ -11,7 +11,7 @@
 #include <cstdio>
 
 
-namespace eloo::logging {
+namespace sge::logging {
     enum class level : uint8_t {
         trace,
         debug,
@@ -22,73 +22,76 @@ namespace eloo::logging {
         _count
     };
 
-    void set_log_level(level lvl) ELOO_NOEXCEPT;
+    void set_log_level(level lvl);
 
     class logger {
     public:
-        explicit logger(const char* name) ELOO_NOEXCEPT;
-        explicit logger(const char* name, level lvl) ELOO_NOEXCEPT;
-        ~logger() ELOO_NOEXCEPT;
+        explicit logger(const char* name);
+        explicit logger(const char* name, level lvl);
+        ~logger();
 
         template <typename... Args>
-        void log(level lvl, const char* fmt, Args&&... args) ELOO_NOEXCEPT {
-            std::string fmtMsg = std::vformat(fmt, std::make_format_args(std::forward<Args>(args)...));
+        void log(level lvl, const char* fmt, Args&&... args) {
+            if (!can_log(lvl)) { return; }
+            std::string fmtMsg = std::vformat(fmt, std::make_format_args(args...));
             fmtMsg = std::format("{}{} :: {}", get_tag(lvl), mName, fmtMsg);
 
-            // Output to console
-            if (mFile) {
-                mFile->write(fmtMsg.c_str(), fmtMsg.size());
-                mFile->flush();
+            std::fwrite(fmtMsg.data(), 1, fmtMsg.size(), stdout);
+            std::fputc('\n', stdout);
+            // Output to file
+            if (mFilestream) {
+                auto result = mFilestream->write(fmtMsg.c_str(), fmtMsg.size()); if (!result) { throw std::system_error(result.error()); }
+                auto flushed = mFilestream->flush(); if (!flushed) { throw std::system_error(flushed.error()); }
             }
 
             // Output to file
         }
 
         template <typename... Args>
-        void log_trace(const char* fmt, Args&&... args) ELOO_NOEXCEPT {
+        void log_trace(const char* fmt, Args&&... args) {
             log(level::trace, fmt, std::forward<Args>(args)...);
         }
 
         template <typename... Args>
-        void log_debug(const char* fmt, Args&&... args) ELOO_NOEXCEPT {
+        void log_debug(const char* fmt, Args&&... args) {
             log(level::debug, fmt, std::forward<Args>(args)...);
         }
 
         template <typename... Args>
-        void log_info(const char* fmt, Args&&... args) ELOO_NOEXCEPT {
+        void log_info(const char* fmt, Args&&... args) {
             log(level::info, fmt, std::forward<Args>(args)...);
         }
 
         template <typename... Args>
-        void log_warning(const char* fmt, Args&&... args) ELOO_NOEXCEPT {
+        void log_warning(const char* fmt, Args&&... args) {
             log(level::warning, fmt, std::forward<Args>(args)...);
         }
 
         template <typename... Args>
-        void log_error(const char* fmt, Args&&... args) ELOO_NOEXCEPT {
+        void log_error(const char* fmt, Args&&... args) {
             log(level::error, fmt, std::forward<Args>(args)...);
         }
 
         template <typename... Args>
-        void log_critical(const char* fmt, Args&&... args) ELOO_NOEXCEPT {
+        void log_critical(const char* fmt, Args&&... args) {
             log(level::critical, fmt, std::forward<Args>(args)...);
         }
 
-        const std::string_view get_name() const ELOO_NOEXCEPT {
+        const std::string_view get_name() const {
             return mName;
         }
 
-        void set_log_level(level lvl) ELOO_NOEXCEPT {
+        void set_log_level(level lvl) {
             mLogLevel = lvl;
         }
 
-        level get_log_level() const ELOO_NOEXCEPT {
+        level get_log_level() const {
             return mLogLevel;
         }
 
     private:
-        ELOO_NODISCARD bool can_log(level lvl) const ELOO_NOEXCEPT;
-        ELOO_NODISCARD std::string_view get_tag(level lvl) const ELOO_NOEXCEPT;
+        SGE_NODISCARD bool can_log(level lvl) const;
+        SGE_NODISCARD std::string_view get_tag(level lvl) const;
 
     private:
         std::string mName;

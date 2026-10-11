@@ -22,8 +22,9 @@
 #include <system_error>
 #include <expected>
 
-namespace eloo::serialization {
+namespace sge::serialization {
     enum class errc : uint8_t {
+        success = 0,
         null_data,
         null_buffer,
         buffer_overflow,
@@ -37,6 +38,7 @@ namespace eloo::serialization {
             const char* name() const noexcept override { return "Serialization"; }
             std::string message(int ev) const override {
                 switch(static_cast<errc>(ev)) {
+                    case errc::success: return "Success";
                     case errc::null_data: return "No data was provided";
                     case errc::null_buffer: return "No buffer was provided";
                     case errc::buffer_overflow: return "Attempting to access data beyond the buffer limit";
@@ -52,14 +54,14 @@ namespace eloo::serialization {
 }
 
 namespace std {
-    template <> struct is_error_code_enum<eloo::serialization::errc> : true_type {};
+    template <> struct is_error_code_enum<sge::serialization::errc> : true_type {};
 }
 
 
 
-#if !defined (ELOO_DECLARE_RESULT_TYPE)
-#define ELOO_DECLARE_RESULT_TYPE(_t) std::expected<_t, std::error_code>;
-#define ELOO_RETURN_ERRC_IF(_cond, _e) if (_cond) { return std::unexpected(_e); }
-#define ELOO_RETURN_ERRC_IF_FAILED(_e) if (!_e) { return std::unexpected(_e); }
-#define ELOO_RETURN_ERRC_IF_FUNC_FAILED(_r) ELOO_RETURN_ERRC_IF(!(_r), _r.error())
+#if !defined (SGE_DECLARE_RESULT_TYPE)
+#define SGE_DECLARE_RESULT_TYPE(_t) std::expected<_t, std::error_code>;
+#define SGE_RETURN_ERRC_IF(_cond, _e) if (_cond) { return std::unexpected(_e); }
+#define SGE_RETURN_ERRC_IF_FAILED(_e) if ((_e) != errc::success) { return std::unexpected(_e); }
+#define SGE_RETURN_ERRC_IF_FUNC_FAILED(_r) SGE_RETURN_ERRC_IF(!(_r), _r.error())
 #endif

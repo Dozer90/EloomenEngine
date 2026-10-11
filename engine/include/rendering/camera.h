@@ -3,7 +3,7 @@
 #include "datatypes/matrix4x4.h"
 #include "datatypes/float2.h"
 
-namespace eloo {
+namespace sge {
 
 	class Camera {
 	public:

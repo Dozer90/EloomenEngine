@@ -19,10 +19,10 @@
 #include <filesystem>
 
 
-namespace eloo::filesystem {
+namespace sge::filesystem {
 
-    namespace directory { ELOO_DECLARE_ID_T; }
-    namespace file      { ELOO_DECLARE_ID_T; }
+    namespace directory { SGE_DECLARE_ID_T; }
+    namespace file      { SGE_DECLARE_ID_T; }
 
     using path_t = std::filesystem::path;
     using path_list_t = eastl::vector<path_t>;
@@ -32,16 +32,16 @@ namespace eloo::filesystem {
     using perms = std::filesystem::perms;
     using copy_opts = std::filesystem::copy_options;
 
-    using void_r            = ELOO_DECLARE_RESULT_TYPE(void);
-    using file_id_r         = ELOO_DECLARE_RESULT_TYPE(file::id_t);
-    using directory_id_r    = ELOO_DECLARE_RESULT_TYPE(directory::id_t);
-    using directory_r       = ELOO_DECLARE_RESULT_TYPE(path_list_t);
-    using bool_r            = ELOO_DECLARE_RESULT_TYPE(bool);
-    using path_r            = ELOO_DECLARE_RESULT_TYPE(path_t);
-    using path_list_r       = ELOO_DECLARE_RESULT_TYPE(path_list_t);
-    using file_time_r       = ELOO_DECLARE_RESULT_TYPE(file_time_t);
-    using perms_r           = ELOO_DECLARE_RESULT_TYPE(perms);
-    using size_r            = ELOO_DECLARE_RESULT_TYPE(eastl_size_t);
+    using void_r            = SGE_DECLARE_RESULT_TYPE(void);
+    using file_id_r         = SGE_DECLARE_RESULT_TYPE(file::id_t);
+    using directory_id_r    = SGE_DECLARE_RESULT_TYPE(directory::id_t);
+    using directory_r       = SGE_DECLARE_RESULT_TYPE(path_list_t);
+    using bool_r            = SGE_DECLARE_RESULT_TYPE(bool);
+    using path_r            = SGE_DECLARE_RESULT_TYPE(path_t);
+    using path_list_r       = SGE_DECLARE_RESULT_TYPE(path_list_t);
+    using file_time_r       = SGE_DECLARE_RESULT_TYPE(file_time_t);
+    using perms_r           = SGE_DECLARE_RESULT_TYPE(perms);
+    using size_r            = SGE_DECLARE_RESULT_TYPE(eastl_size_t);
 
 
     // ==============================================================================
@@ -581,7 +581,7 @@ namespace eloo::filesystem {
     //$ arg2:   int recursionDepth => The maximum depth of recursion for the search. Use -1 for complete recursion.
     //$ arg3:   bool includeIgnored => Whether to include ignored paths in the search (default is false).
     //$ return: path_list_r => The list of paths that match the names.
-    path_list_r search_by_name(
+    inline path_list_r search_by_name(
         path_t rootPath,
         const eastl::vector<const wchar_t*>& names,
         int recursionDepth,
@@ -601,7 +601,7 @@ namespace eloo::filesystem {
     //$ arg2:   int recursionDepth => The maximum depth of recursion for the search. Use -1 for complete recursion.
     //$ arg3:   bool includeIgnored => Whether to include ignored paths in the search (default is false).
     //$ return: path_list_r => The list of paths that match the names.
-    path_list_r search_by_name(
+    inline path_list_r search_by_name(
         directory::id_t rootDirID,
         const eastl::vector<const wchar_t*>& names,
         int recursionDepth,
@@ -622,7 +622,7 @@ namespace eloo::filesystem {
     //$ arg2:   int recursionDepth => The maximum depth of recursion for the search. Use -1 for complete recursion.
     //$ arg3:   bool includeIgnored => Whether to include ignored paths in the search (default is false).
     //$ return: path_list_r => The list of paths that match the extensions.
-    path_list_r search_by_extension(
+    inline path_list_r search_by_extension(
         directory::id_t rootDirID,
         const eastl::vector<const wchar_t*>& extensions,
         int recursionDepth,
@@ -642,7 +642,7 @@ namespace eloo::filesystem {
     //$ arg2:   int recursionDepth => The maximum depth of recursion for the search. Use -1 for complete recursion.
     //$ arg3:   bool includeIgnored => Whether to include ignored paths in the search (default is false).
     //$ return: path_list_r => The list of paths that match the extensions.
-    path_list_r search_by_extension(
+    inline path_list_r search_by_extension(
         path_t rootPath,
         const eastl::vector<const wchar_t*>& extensions,
         int recursionDepth,
@@ -663,7 +663,7 @@ namespace eloo::filesystem {
     //$ arg2:   int recursionDepth => The maximum depth of recursion for the search. Use -1 for complete recursion.
     //$ arg3:   bool includeIgnored => Whether to include ignored paths in the search (default is false).
     //$ return: path_list_r => The list of subdirectories that match the names.
-    path_list_r search_for_subdirectories(
+    inline path_list_r search_for_subdirectories(
         path_t rootPath,
         search_predicate predicate,
         int recursionDepth,
@@ -681,7 +681,7 @@ namespace eloo::filesystem {
     //$ arg2:   int recursionDepth => The maximum depth of recursion for the search. Use -1 for complete recursion.
     //$ arg3:   bool includeIgnored => Whether to include ignored paths in the search (default is false).
     //$ return: path_list_r => The list of subdirectories that match the names.
-    path_list_r search_for_subdirectories(
+    inline path_list_r search_for_subdirectories(
         directory::id_t rootDirID,
         search_predicate predicate,
         int recursionDepth,
@@ -700,7 +700,7 @@ namespace eloo::filesystem {
     //$ arg2:   int recursionDepth => The maximum depth of recursion for the search. Use -1 for complete recursion.
     //$ arg3:   bool includeIgnored => Whether to include ignored paths in the search (default is false).
     //$ return: path_list_r => The list of files that match the predicate.
-    path_list_r search_for_files(
+    inline path_list_r search_for_files(
         path_t rootPath,
         search_predicate predicate,
         int recursionDepth,
@@ -718,7 +718,7 @@ namespace eloo::filesystem {
     //$ arg2:   int recursionDepth => The maximum depth of recursion for the search. Use -1 for complete recursion.
     //$ arg3:   bool includeIgnored => Whether to include ignored paths in the search (default is false).
     //$ return: path_list_r => The list of files that match the predicate.
-    path_list_r search_for_files(
+    inline path_list_r search_for_files(
         directory::id_t rootDirID,
         search_predicate predicate,
         int recursionDepth,
@@ -739,7 +739,7 @@ namespace eloo::filesystem {
     //$ arg1:   int recursionDepth => The maximum depth of recursion for the listing. Use -1 for complete recursion.
     //$ arg2:   bool includeIgnored => Whether to include ignored paths in the listing (default is false).
     //$ return: path_list_r => The list of all files and directories in the specified path.
-    path_list_r list_all(
+    inline path_list_r list_all(
         path_t rootPath,
         int recursionDepth,
         bool includeIgnored = false
@@ -752,7 +752,7 @@ namespace eloo::filesystem {
     //$ arg1:   int recursionDepth => The maximum depth of recursion for the listing. Use -1 for complete recursion.
     //$ arg2:   bool includeIgnored => Whether to include ignored paths in the listing (default is false).
     //$ return: path_list_r => The list of all files and directories in the specified directory.
-    path_list_r list_all(
+    inline path_list_r list_all(
         directory::id_t rootDirID,
         int recursionDepth,
         bool includeIgnored = false
@@ -766,7 +766,7 @@ namespace eloo::filesystem {
     //$ arg1:   int recursionDepth => The maximum depth of recursion for the listing. Use -1 for complete recursion.
     //$ arg2:   bool includeIgnored => Whether to include ignored paths in the listing (default is false).
     //$ return: path_list_r => The list of all directories in the specified path.
-    path_list_r list_directories(
+    inline path_list_r list_directories(
         path_t rootPath,
         int recursionDepth,
         bool includeIgnored = false
@@ -779,7 +779,7 @@ namespace eloo::filesystem {
     //$ arg1:   int recursionDepth => The maximum depth of recursion for the listing. Use -1 for complete recursion.
     //$ arg2:   bool includeIgnored => Whether to include ignored paths in the listing (default is false).
     //$ return: path_list_r => The list of all directories in the specified directory.
-    path_list_r list_directories(
+    inline path_list_r list_directories(
         directory::id_t rootDirID,
         int recursionDepth,
         bool includeIgnored = false
@@ -793,7 +793,7 @@ namespace eloo::filesystem {
     //$ arg1:   int recursionDepth => The maximum depth of recursion for the listing. Use -1 for complete recursion.
     //$ arg2:   bool includeIgnored => Whether to include ignored paths in the listing (default is false).
     //$ return: path_list_r => The list of all files in the specified path.
-    path_list_r list_files(
+    inline path_list_r list_files(
         path_t rootPath,
         int recursionDepth,
         bool includeIgnored = false
@@ -806,7 +806,7 @@ namespace eloo::filesystem {
     //$ arg1:   int recursionDepth => The maximum depth of recursion for the listing. Use -1 for complete recursion.
     //$ arg2:   bool includeIgnored => Whether to include ignored paths in the listing (default is false).
     //$ return: path_list_r => The list of all files in the specified directory.
-    path_list_r list_files(
+    inline path_list_r list_files(
         directory::id_t rootDirID,
         int recursionDepth,
         bool includeIgnored = false

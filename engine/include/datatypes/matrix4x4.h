@@ -40,12 +40,12 @@
     matVar[matrix4x4::R4C1], matVar[matrix4x4::R4C2], matVar[matrix4x4::R4C3], matVar[matrix4x4::R4C4]
 
 
-namespace eloo::float3 {
+namespace sge::float3 {
     struct values;
 }
 
-namespace eloo::matrix4x4 {
-    ELOO_DECLARE_ID_T;
+namespace sge::matrix4x4 {
+    SGE_DECLARE_ID_T;
 
     enum cell_index {
         R1C1, R1C2, R1C3, R1C4,
@@ -167,4 +167,4 @@ namespace eloo::matrix4x4 {
     const float4::values const_column(id_t id, int index);
 }
 
-using matrix4x4_v = eloo::matrix4x4::values;
+using matrix4x4_v = sge::matrix4x4::values;

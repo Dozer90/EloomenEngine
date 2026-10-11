@@ -1,5 +1,5 @@
-#include "renderer_dx12.h"
-#include "window_dx12.h"
+#include "dx12/renderer_dx12.h"
+#include "dx12/window_dx12.h"
 
 #include "renderer_interface.h"
 #include "window_interface.h"
@@ -9,25 +9,28 @@
 #include "datatypes/int2.h"
 #include "events/engine/events.h"
 
+#include <stdexcept>
+#include "rendering/mesh.h"
 #include <d3dcompiler.h>
 #include <directx/d3dx12.h>
 
 
 using namespace Microsoft::WRL;
-using namespace eloo;
+using namespace sge;
 
 renderer_dx12::renderer_dx12(const window_dx12* wnd) {
-    if (!initilize_factory())       { return; }
-    if (!initilize_device())        { return; }
+    if (!initilize_factory()) { throw std::runtime_error("DXGI initialization failed"); }
+    if (!initilize_device()) { throw std::runtime_error("D3D12 initialization failed"); }
 
     // Disable ALT+Enter fullscreen toggle
     mFactory->MakeWindowAssociation(wnd->handle(), DXGI_MWA_NO_ALT_ENTER);
 
-    if (!create_command_queue())    { return; }
-    if (!create_command_objects())  { return; }
-    if (!create_swap_chain(wnd))    { return; }
+    if (!create_command_queue()) { throw std::runtime_error("Command queue initialization failed"); }
+    if (!create_command_objects()) { throw std::runtime_error("Command object initialization failed"); }
+    if (!create_swap_chain(wnd))    { throw std::runtime_error("Swap-chain creation failed"); }
+    if (!create_render_target_heap()) { throw std::runtime_error("RTV creation failed"); }
 
-    events::engine::on_window_resized.subscribe(&on_window_resized, this);
+
 
     // Root signature (empty for now)
     {
@@ -37,7 +40,7 @@ renderer_dx12::renderer_dx12(const window_dx12* wnd) {
 
         ComPtr<ID3D10Blob> signature;
         ComPtr<ID3D10Blob> error;
-        ELOO_ASSERT_FATAL(
+        SGE_ASSERT_FATAL(
           SUCCEEDED(D3D12SerializeRootSignature(
             &desc,
             D3D_ROOT_SIGNATURE_VERSION_1,
@@ -47,7 +50,7 @@ renderer_dx12::renderer_dx12(const window_dx12* wnd) {
           "Unable to serialize root signature"
         );
 
-        ELOO_ASSERT_FATAL(
+        SGE_ASSERT_FATAL(
           SUCCEEDED(
             mDevice->CreateRootSignature(
               0,
@@ -60,8 +63,8 @@ renderer_dx12::renderer_dx12(const window_dx12* wnd) {
     }
 
     // Load precompiled shaders
-    auto vsBlob = D3DReadFileToBlob(L"shaders/vertex.cso");
-    auto psBlob = D3DReadFileToBlob(L"shaders/fragment.cso");
+    ComPtr<ID3DBlob> vsBlob; if (FAILED(D3DReadFileToBlob(L"shaders/vertex.cso", vsBlob.GetAddressOf()))) { throw std::runtime_error("Unable to read vertex shader"); }
+    ComPtr<ID3DBlob> psBlob; if (FAILED(D3DReadFileToBlob(L"shaders/fragment.cso", psBlob.GetAddressOf()))) { throw std::runtime_error("Unable to read fragment shader"); }
 
     // Describe the input layout
     D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
@@ -81,25 +84,25 @@ renderer_dx12::renderer_dx12(const window_dx12* wnd) {
     psoDesc.SampleMask                  = UINT_MAX;
     psoDesc.PrimitiveTopologyType       = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     psoDesc.NumRenderTargets            = 1;
-    psoDesc.RTVFormats[0]               = DXGI_FORMAT_B8G8R8A8_UNORM;
+    psoDesc.RTVFormats[0]               = DXGI_FORMAT_R8G8B8A8_UNORM;
     psoDesc.SampleDesc.Count            = 1;
     mDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPipelineState));
 
     // Create a vertex buffer
     struct vertex {
-        float3::values p;
-        colour_t c;
+        float p[3];
+        float c[4];
     };
     vertex vertices[] = {
-        { {  0.00f,  0.25f, 0.0f }, C_RED },
-        { {  0.25f, -0.25f, 0.0f }, C_GREEN },
-        { { -0.25f, -0.25f, 0.0f }, C_BLUE }
+        { {  0.00f,  0.25f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
+        { {  0.25f, -0.25f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
+        { { -0.25f, -0.25f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } }
     };
 
     const UINT vertexBufferSize = sizeof(vertices);
     CD3DX12_HEAP_PROPERTIES heapProps(D3D12_HEAP_TYPE_UPLOAD);
     CD3DX12_RESOURCE_DESC bufferDesc = CD3DX12_RESOURCE_DESC::Buffer(vertexBufferSize);
-    ELOO_ASSERT_FATAL(
+    SGE_ASSERT_FATAL(
       SUCCEEDED(
         mDevice->CreateCommittedResource(
           &heapProps,
@@ -114,7 +117,7 @@ renderer_dx12::renderer_dx12(const window_dx12* wnd) {
 
     // Copy the vertex data to the buffer
     UINT8* mappedData;
-    ELOO_ASSERT_FATAL(
+    SGE_ASSERT_FATAL(
       SUCCEEDED(
         mVertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mappedData))
       ),
@@ -127,9 +130,12 @@ renderer_dx12::renderer_dx12(const window_dx12* wnd) {
     mVertexBufferView.BufferLocation = mVertexBuffer->GetGPUVirtualAddress();
     mVertexBufferView.StrideInBytes = sizeof(vertex);
     mVertexBufferView.SizeInBytes = vertexBufferSize;
+    mResizeSubscription = events::engine::on_window_resized.subscribe([this](events::engine::window_resized_data data) { on_window_resized(data.width, data.height); });
 }
 
 renderer_dx12::~renderer_dx12() {
+    if (mResizeSubscription) { events::engine::on_window_resized.unsubscribe(*mResizeSubscription); }
+
     mSwapChain.Reset();
     mCommandQueue.Reset();
     mDevice.Reset();
@@ -147,12 +153,12 @@ bool renderer_dx12::initilize_factory() {
         debugController->EnableDebugLayer();
         dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
     } else {
-        ELOO_ASSERT_FALSE("D3D12 debug layer is not available. Ensure you have the Windows SDK installed with the debug layer enabled.");
+        SGE_ASSERT_FALSE("D3D12 debug layer is not available. Ensure you have the Windows SDK installed with the debug layer enabled.");
     }
 #endif
 
     const bool success = SUCCEEDED(CreateDXGIFactory2(dxgiFactoryFlags, IID_PPV_ARGS(&mFactory)));
-    ELOO_ASSERT_FATAL(success, "Unable to create DXGI factory");
+    SGE_ASSERT_FATAL(success, "Unable to create DXGI factory");
     return success;
 }
 
@@ -166,8 +172,8 @@ bool renderer_dx12::initilize_device() {
             break;
         }
 
-        DXGI_ADAPTER_DEsC adapterDesc;
-        currentAdapter->GetDesc(&adapterDesc);
+        DXGI_ADAPTER_DESC1 adapterDesc{};
+        currentAdapter->GetDesc1(&adapterDesc);
         if (adapterDesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) {
             // Avoid software adapters
             continue;
@@ -180,7 +186,7 @@ bool renderer_dx12::initilize_device() {
             mAdapter = currentAdapter;
         }
     }
-    ELOO_ASSERT_FATAL(mDevice != nullptr, "Unable to find a GPU that supports DX12");
+    SGE_ASSERT_FATAL(mDevice != nullptr, "Unable to find a GPU that supports DX12");
     return mDevice != nullptr;
 }
 
@@ -188,7 +194,7 @@ bool renderer_dx12::create_command_queue() {
     D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
     commandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
     const bool success = SUCCEEDED(mDevice->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&mCommandQueue)));
-    ELOO_ASSERT_FATAL(success, "Unable to create command queue");
+    SGE_ASSERT_FATAL(success, "Unable to create command queue");
     return success;
 }
 
@@ -196,21 +202,21 @@ bool renderer_dx12::create_command_objects() {
     // Create command allocators for each frame
     for (UINT i = 0; i < BACK_BUFFER_COUNT; ++i) {
         if (FAILED(mDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&mCommandAllocator[i])))) {
-            ELOO_ASSERT_FATAL_FALSE("Unable to create command allocator for frame %u", i);
+            SGE_ASSERT_FATAL_FALSE("Unable to create command allocator for frame %u", i);
             return false;
         }
     }
 
     // Create a command list
     if (FAILED(mDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, mCommandAllocator[0].Get(), nullptr, IID_PPV_ARGS(&mCommandList)))) {
-        ELOO_ASSERT_FATAL_FALSE("Unable to create command list");
+        SGE_ASSERT_FATAL_FALSE("Unable to create command list");
         return false;
     }
     mCommandList->Close(); // Close the command list to prepare it for execution
 
     // Create a fence for synchronization
     if (FAILED(mDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&mFence)))) {
-        ELOO_ASSERT_FATAL_FALSE("Unable to create fence");
+        SGE_ASSERT_FATAL_FALSE("Unable to create fence");
         return false;
     }
     mFenceEvent = CreateEvent(nullptr, false, false, nullptr);
@@ -220,7 +226,7 @@ bool renderer_dx12::create_command_objects() {
 
 bool renderer_dx12::create_swap_chain(const window_dx12* wnd) {
     // Describe swap-chain
-    DXGI_SWAP_CHAIN_DESC scDesc{};
+    DXGI_SWAP_CHAIN_DESC1 scDesc{};
     scDesc.Width = wnd->size().x();
     scDesc.Height = wnd->size().y();
     scDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -228,7 +234,7 @@ bool renderer_dx12::create_swap_chain(const window_dx12* wnd) {
     scDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     scDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     scDesc.SampleDesc.Count = 1;
-    scDesc.Flags = (mVsyncEnabled) ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+    scDesc.Flags = 0;
 
     // Optional: allow tearing (if supported)
     mFactory->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &mTearingSupported, sizeof(mTearingSupported));
@@ -239,13 +245,13 @@ bool renderer_dx12::create_swap_chain(const window_dx12* wnd) {
     // Create the swap-chain
     Microsoft::WRL::ComPtr<IDXGISwapChain1> swapChain1;
     if (FAILED(mFactory->CreateSwapChainForHwnd(mCommandQueue.Get(), wnd->handle(), &scDesc, nullptr, nullptr, &swapChain1))) {
-        ELOO_ASSERT_FATAL_FALSE("Failed to create swap-chain");
+        SGE_ASSERT_FATAL_FALSE("Failed to create swap-chain");
         return false;
     }
 
     // Upgrade to IDXGISwapChain3
     if (FAILED(swapChain1.As(&mSwapChain))) {
-        ELOO_ASSERT_FATAL_FALSE("Failed to query IDXGISwapChain3");
+        SGE_ASSERT_FATAL_FALSE("Failed to query IDXGISwapChain3");
         return false;
     }
 
@@ -258,17 +264,17 @@ bool renderer_dx12::create_render_target_heap() {
     heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
     heapDesc.NumDescriptors = BACK_BUFFER_COUNT;
     if (FAILED(mDevice->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&mRTVHeap)))) {
-        ELOO_ASSERT_FATAL_FALSE("Failed to create RTV descriptor heap");
+        SGE_ASSERT_FATAL_FALSE("Failed to create RTV descriptor heap");
         return false;
     }
 
     // Create one RTV per back-buffer
     auto rtvHandle = mRTVHeap->GetCPUDescriptorHandleForHeapStart();
-    const UINT rtvStride = mDevice->GetDescriptorHandleIncrementSize(heapDesc.Type);
+    const UINT rtvStride = mRenderTargetDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(heapDesc.Type);
     for (UINT i = 0; i < BACK_BUFFER_COUNT; ++i) {
         Microsoft::WRL::ComPtr<ID3D12Resource> backBuffer;
         if (FAILED(mSwapChain->GetBuffer(i, IID_PPV_ARGS(&backBuffer)))) {
-            ELOO_ASSERT_FATAL_FALSE("Failed to get swap-chain buffer %u", i);
+            SGE_ASSERT_FATAL_FALSE("Failed to get swap-chain buffer %u", i);
             return false;
         }
         mBackBuffers[i] = backBuffer;
@@ -298,6 +304,7 @@ void renderer_dx12::render(const window_interface* wnd) {
     D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = mRTVHeap->GetCPUDescriptorHandleForHeapStart();
     rtvHandle.ptr += backBufferIndex * mRenderTargetDescriptorSize;
     const FLOAT clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    mCommandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
     mCommandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 
 
@@ -347,20 +354,20 @@ void renderer_dx12::render(const window_interface* wnd) {
     mCommandList->ResourceBarrier(1, &barrier);
 
     // Execute the command list and present
-    ELOO_ASSERT_FATAL(
+    SGE_ASSERT_FATAL(
       SUCCEEDED(mCommandList->Close()),
       "Failed to close command list"
     );
     ID3D12CommandList* commandLists[] = { mCommandList.Get() };
     mCommandQueue->ExecuteCommandLists(1, commandLists);
-    ELOO_ASSERT_FATAL(
+    SGE_ASSERT_FATAL(
       SUCCEEDED(mSwapChain->Present(1, 0)),
       "Failed to present swap-chain"
     );
 
     // Wait for the GPU to finish
-    const int fenceIndex = (mFrameIndex + 1) % BACK_BUFFER_COUNT;
-    const UINT64 fence = ++mFenceValue[fenceIndex];
+
+    const UINT64 fence = ++mNextFenceValue;
     mCommandQueue->Signal(mFence.Get(), fence);
     if (mFence->GetCompletedValue() < fence) {
         mFence->SetEventOnCompletion(fence, mFenceEvent);
@@ -371,8 +378,9 @@ void renderer_dx12::render(const window_interface* wnd) {
 }
 
 void renderer_dx12::on_window_resized(int width, int height) {
+    if (width <= 0 || height <= 0 || !mSwapChain) { return; }
     // 1) Wait for the GPU to finish with all frames
-    const UINT64 fence = ++mFenceValue[current_frame() % BACK_BUFFER_COUNT];
+    const UINT64 fence = ++mNextFenceValue;
     mCommandQueue->Signal(mFence.Get(), fence);
     if (mFence->GetCompletedValue() < fence) {
         mFence->SetEventOnCompletion(fence, mFenceEvent);
@@ -386,8 +394,8 @@ void renderer_dx12::on_window_resized(int width, int height) {
     mRTVHeap.Reset();
 
     // 3) Resize the swap-chain
-    DXGI_SWAP_CHAIN_DESC desc = mSwapChain->GetDesc();
-    ELOO_ASSERT_FATAL(
+    DXGI_SWAP_CHAIN_DESC1 desc{}; if (FAILED(mSwapChain->GetDesc1(&desc))) { return; }
+    SGE_ASSERT_FATAL(
       SUCCEEDED(
         mSwapChain->ResizeBuffers(
         BACK_BUFFER_COUNT,
@@ -418,4 +426,40 @@ void renderer_dx12::on_window_resized(int width, int height) {
         handle.ptr += mRenderTargetDescriptorSize;
     }
 }
+namespace {
+ComPtr<ID3D12Resource> upload_buffer(ID3D12Device* device, const void* data, size_t size) {
+    if (!device || !data || !size) { throw std::invalid_argument("Invalid GPU buffer input"); }
+    auto heap = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+    auto desc = CD3DX12_RESOURCE_DESC::Buffer(size);
+    ComPtr<ID3D12Resource> resource;
+    if (FAILED(device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &desc,
+        D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&resource)))) {
+        throw std::runtime_error("GPU buffer allocation failed");
+    }
+    void* mapped = nullptr;
+    D3D12_RANGE range{0, 0};
+    if (FAILED(resource->Map(0, &range, &mapped))) { throw std::runtime_error("GPU buffer map failed"); }
+    memcpy(mapped, data, size);
+    resource->Unmap(0, nullptr);
+    return resource;
 }
+}
+vertex_buffer::id_t renderer_dx12::create_vertex_buffer(const void* data, size_t size, bool) {
+    mVertexBuffers.push_back(upload_buffer(mDevice.Get(), data, size));
+    return mVertexBuffers.size() - 1;
+}
+index_buffer::id_t renderer_dx12::create_index_buffer(const void* data, size_t size, bool) {
+    mIndexBuffers.push_back(upload_buffer(mDevice.Get(), data, size));
+    return mIndexBuffers.size() - 1;
+}
+void renderer_dx12::destroy_vertex_buffer(vertex_buffer::id_t id) {
+    if (static_cast<size_t>(id) < mVertexBuffers.size()) { mVertexBuffers[id].Reset(); }
+}
+void renderer_dx12::destroy_index_buffer(index_buffer::id_t id) {
+    if (static_cast<size_t>(id) < mIndexBuffers.size()) { mIndexBuffers[id].Reset(); }
+}
+// The current demo draws its own triangle. General mesh submission is unsupported.
+bool renderer_dx12::register_mesh(mesh::id_t) { return false; }
+bool renderer_dx12::deregister_mesh(mesh::id_t) { return false; }
+bool renderer_dx12::submit_for_draw(mesh::id_t) { return false; }
+bool renderer_dx12::submit_for_draw(mesh::id_t, const entity::id_t&) { return false; }

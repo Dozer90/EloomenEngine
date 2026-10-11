@@ -1,6 +1,6 @@
 #pragma once
 
-namespace eloo::input {
+namespace sge::input {
     enum class keyboard_key {
         unknown = -1,
 

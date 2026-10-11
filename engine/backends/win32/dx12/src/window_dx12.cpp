@@ -1,18 +1,18 @@
-#include "window_dx12.h"
+#include "dx12/window_dx12.h"
 
 #include "rendering/window.h"
 #include "utility/defines.h"
 
 #include <Windows.h>
 
-using namespace eloo;
+using namespace sge;
 
 namespace {
-    constexpr LPCWCH WINDOW_CLASS_NAME = L"EloomEngineWindow";
+    constexpr LPCWCH WINDOW_CLASS_NAME = L"ShineGEWindow";
 }
 
 window_dx12::window_dx12(HINSTANCE instance, const eastl::wstring& title, int width, int height) :
-    mInstance(instance), window_interface(title, width, height) {
+    mInstance(instance), window_interface(title.c_str(), width, height) {
 
     // Get DPI
     HDC screen = GetDC(0);
@@ -26,12 +26,12 @@ window_dx12::window_dx12(HINSTANCE instance, const eastl::wstring& title, int wi
         WNDCLASSEXW wc{};
         wc.cbSize = sizeof(WNDCLASSEXW);
         wc.style = CS_HREDRAW | CS_VREDRAW;
-        wc.lpfnWndProc = Window::WindowProc;
+        wc.lpfnWndProc = window_dx12::WindowProc;
         wc.hInstance = mInstance;
         wc.lpszClassName = WINDOW_CLASS_NAME;
         wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
         if (!RegisterClassExW(&wc)) {
-            ELOO_ASSERT_FATAL_FALSE("Failed to register window class");
+            SGE_ASSERT_FATAL_FALSE("Failed to register window class");
             return;
         }
         registered = true;
@@ -49,7 +49,7 @@ window_dx12::window_dx12(HINSTANCE instance, const eastl::wstring& title, int wi
     mHandle = CreateWindowExW(
         0,
         WINDOW_CLASS_NAME,
-        mTitle.c_str(),
+        title.c_str(),
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
@@ -62,7 +62,7 @@ window_dx12::window_dx12(HINSTANCE instance, const eastl::wstring& title, int wi
     );
 
     if (mHandle == nullptr) {
-        ELOO_ASSERT_FATAL_FALSE("Failed to create window");
+        SGE_ASSERT_FATAL_FALSE("Failed to create window");
         return;
     }
 
@@ -156,7 +156,7 @@ LRESULT CALLBACK window_dx12::WindowProc(HWND handle, UINT uMsg, WPARAM wParam, 
         CREATESTRUCTW* create = reinterpret_cast<CREATESTRUCTW*>(lParam);
         SetWindowLongPtrW(handle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(create->lpCreateParams));
     }
-    Window* wnd = reinterpret_cast<Window*>(GetWindowLongPtrW(handle, GWLP_USERDATA));
+    window_dx12 *wnd = reinterpret_cast<window_dx12*>(GetWindowLongPtrW(handle, GWLP_USERDATA));
     if (wnd != nullptr && wnd->process_command(uMsg, wParam, lParam)) {
         return 0;
     }

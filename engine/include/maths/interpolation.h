@@ -2,7 +2,7 @@
 
 #include <EASTL/variant.h>
 
-namespace eloo::math::interpolation {
+namespace sge::math::interpolation {
     enum class blend_func {
         // No params
         lerp,

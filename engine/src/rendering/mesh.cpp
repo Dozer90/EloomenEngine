@@ -3,7 +3,7 @@
 #include "utility/managed_memory_block.h"
 
 
-using namespace eloo;
+using namespace sge;
 
 namespace {
     struct mesh_metadata {
@@ -31,7 +31,7 @@ namespace {
     static managed_memory_block<uint32_t, MEMORY_BLOCK_INITIAL_SIZE, MEMORY_BLOCK_EXPANSION>            gIndexBlock;
 }
 
-mesh::id_t mesh::create(const mesh::data& meshData, renderer_interface* renderer) ELOO_NOEXCEPT {
+mesh::id_t mesh::create(const mesh::data& meshData, renderer_interface* renderer) SGE_NOEXCEPT {
 
     // Store vertices
     const size_t vertCount = meshData.vertices.size();
@@ -72,7 +72,7 @@ mesh::id_t mesh::create(const mesh::data& meshData, renderer_interface* renderer
     return meshID;
 }
 
-bool mesh::release(mesh::id_t meshID, renderer_interface* renderer) ELOO_NOEXCEPT {
+bool mesh::release(mesh::id_t meshID, renderer_interface* renderer) SGE_NOEXCEPT {
     if (!is_valid(meshID)) {
         return false; // Invalid mesh ID
     }
@@ -85,13 +85,13 @@ bool mesh::release(mesh::id_t meshID, renderer_interface* renderer) ELOO_NOEXCEP
     return true;
 }
 
-bool mesh::is_valid(mesh::id_t meshID, int submesh) ELOO_NOEXCEPT {
+bool mesh::is_valid(mesh::id_t meshID, int submesh) SGE_NOEXCEPT {
     return gMeshMetadataBlock.is_valid(meshID) &&
         (submesh <= 0 || submesh < gMeshMetadataBlock[meshID].submeshCount);
 }
 
 #if defined(MATERIALS_IMPLEMENTED)
-bool mesh::try_set_material(mesh::id_t meshID, int submeshIndex, material::id_t materialID) ELOO_NOEXCEPT {
+bool mesh::try_set_material(mesh::id_t meshID, int submeshIndex, material::id_t materialID) SGE_NOEXCEPT {
     if (!is_valid(meshID) || !material::is_valid(materialID)) {
         return false;
     }

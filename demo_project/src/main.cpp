@@ -5,12 +5,12 @@
 
 
 int main() {
-    constexpr eloo::int2::values windowSize(1920, 1080);
+    constexpr sge::int2::values windowSize(1920, 1080);
 
-    eloo::window_ptr wnd = eloo::create_window(L"Eloom Engine", windowSize.x(), windowSize.y());
-    eloo::renderer_ptr rnd = eloo::create_renderer(wnd.get());
+    sge::window_ptr wnd = sge::create_window(L"Shine Game Engine", windowSize.x(), windowSize.y());
+    sge::renderer_ptr rnd = sge::create_renderer(wnd.get());
     while (wnd->process_messages()) {
-        rnd->render();
+        rnd->render(wnd.get());
     }
     return 0;
 }

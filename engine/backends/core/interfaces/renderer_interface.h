@@ -22,11 +22,11 @@ Result:
 */
 
 
-namespace eloo {
+namespace sge {
     namespace mesh          { struct id_t; }
     namespace entity        { struct id_t; }
-    namespace vertex_buffer { ELOO_DECLARE_ID_T; }
-    namespace index_buffer  { ELOO_DECLARE_ID_T; }
+    namespace vertex_buffer { SGE_DECLARE_ID_T; }
+    namespace index_buffer  { SGE_DECLARE_ID_T; }
 
     class window_interface;
     class renderer_interface {
@@ -49,7 +49,7 @@ namespace eloo {
         virtual bool deregister_mesh(mesh::id_t meshID) = 0;
 
         virtual bool submit_for_draw(mesh::id_t meshID) = 0;
-        virtual bool submit_for_draw(mesh::id_t meshID, entity::id_t ownerTransformID) = 0;
+        virtual bool submit_for_draw(mesh::id_t meshID, const entity::id_t& ownerTransformID) = 0;
 
         virtual void render(const window_interface* wnd) = 0;
 

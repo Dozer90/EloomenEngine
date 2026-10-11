@@ -1,6 +1,6 @@
 #pragma once
 
-// #define ELOO_USE_EXTRA_CHRONO_TYPES
+// #define SGE_USE_EXTRA_CHRONO_TYPES
 
 #include "utility/defines.h"
 
@@ -8,7 +8,7 @@
 #include <EASTL/string.h>
 #include <chrono>
 
-#if defined(ELOO_USE_EXTRA_CHRONO_TYPES)
+#if defined(SGE_USE_EXTRA_CHRONO_TYPES)
 #include <compare>
 
 namespace eastl {
@@ -63,27 +63,27 @@ namespace eastl::chrono {
     class day {
     public:
         day() = default;
-        constexpr explicit day(unsigned int d) ELOO_NOEXCEPT : mDay(static_cast<unsigned char>(d)) {}
+        constexpr explicit day(unsigned int d) SGE_NOEXCEPT : mDay(static_cast<unsigned char>(d)) {}
 
-        constexpr day& operator ++ () ELOO_NOEXCEPT { *this += days{1}; return *this; }
-        constexpr day& operator -- () ELOO_NOEXCEPT { *this -= days{1}; return *this; }
-        constexpr day operator ++ (int) ELOO_NOEXCEPT { day temp{*this}; ++(*this); return temp; }
-        constexpr day operator -- (int) ELOO_NOEXCEPT { day temp{*this}; --(*this); return temp; }
+        constexpr day& operator ++ () SGE_NOEXCEPT { *this += days{1}; return *this; }
+        constexpr day& operator -- () SGE_NOEXCEPT { *this -= days{1}; return *this; }
+        constexpr day operator ++ (int) SGE_NOEXCEPT { day temp{*this}; ++(*this); return temp; }
+        constexpr day operator -- (int) SGE_NOEXCEPT { day temp{*this}; --(*this); return temp; }
 
-        constexpr day& operator += (const days& d) ELOO_NOEXCEPT {
+        constexpr day& operator += (const days& d) SGE_NOEXCEPT {
             mDay += static_cast<unsigned char>(d.count());
             return *this;
         }
-        constexpr day& operator -= (const days& d) ELOO_NOEXCEPT {
+        constexpr day& operator -= (const days& d) SGE_NOEXCEPT {
             mDay -= static_cast<unsigned char>(d.count());
             return *this;
         }
 
-        ELOO_NODISCARD constexpr explicit operator unsigned int() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr explicit operator unsigned int() const SGE_NOEXCEPT {
             return mDay;
         }
 
-        ELOO_NODISCARD constexpr bool ok() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr bool ok() const SGE_NOEXCEPT {
             return mDay >= 1 && mDay <= 31; // Valid days are from 1 to 31.
         }
 
@@ -91,23 +91,23 @@ namespace eastl::chrono {
         unsigned char mDay = 1;
     };
 
-    ELOO_NODISCARD constexpr bool operator == (const day& lhs, const day& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr bool operator == (const day& lhs, const day& rhs) SGE_NOEXCEPT {
         return static_cast<unsigned int>(lhs) == static_cast<unsigned int>(rhs);
     }
-    ELOO_NODISCARD constexpr strong_ordering operator <=> (const day& lhs, const day& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr strong_ordering operator <=> (const day& lhs, const day& rhs) SGE_NOEXCEPT {
         return static_cast<unsigned int>(lhs) <=> static_cast<unsigned int>(rhs);
     }
 
-    ELOO_NODISCARD constexpr day operator + (const day& lhs, const days& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr day operator + (const day& lhs, const days& rhs) SGE_NOEXCEPT {
         return day{ static_cast<unsigned int>(lhs) + rhs.count() };
     }
-    ELOO_NODISCARD constexpr day operator + (const days& lhs, const day& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr day operator + (const days& lhs, const day& rhs) SGE_NOEXCEPT {
         return rhs + lhs;
     }
-    ELOO_NODISCARD constexpr day operator - (const day& lhs, const days& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr day operator - (const day& lhs, const days& rhs) SGE_NOEXCEPT {
         return day{ static_cast<unsigned int>(lhs) - rhs.count() };
     }
-    ELOO_NODISCARD constexpr days operator - (const day& lhs, const day& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr days operator - (const day& lhs, const day& rhs) SGE_NOEXCEPT {
         return days{ static_cast<unsigned int>(lhs) - static_cast<unsigned int>(rhs) };
     }
 
@@ -118,20 +118,20 @@ namespace eastl::chrono {
     class month {
     public:
         month() = default;
-        constexpr explicit month(unsigned int m) ELOO_NOEXCEPT : mMonth(static_cast<unsigned char>(m)) {}
+        constexpr explicit month(unsigned int m) SGE_NOEXCEPT : mMonth(static_cast<unsigned char>(m)) {}
 
-        constexpr month& operator ++ () ELOO_NOEXCEPT { *this += months{1}; return *this; }
-        constexpr month& operator -- () ELOO_NOEXCEPT { *this -= months{1}; return *this; }
-        constexpr month operator ++ (int) ELOO_NOEXCEPT { month temp{*this}; ++(*this); return temp; }
-        constexpr month operator -- (int) ELOO_NOEXCEPT { month temp{*this}; --(*this); return temp; }
+        constexpr month& operator ++ () SGE_NOEXCEPT { *this += months{1}; return *this; }
+        constexpr month& operator -- () SGE_NOEXCEPT { *this -= months{1}; return *this; }
+        constexpr month operator ++ (int) SGE_NOEXCEPT { month temp{*this}; ++(*this); return temp; }
+        constexpr month operator -- (int) SGE_NOEXCEPT { month temp{*this}; --(*this); return temp; }
 
-        constexpr month& operator += (const months& m) ELOO_NOEXCEPT;
-        constexpr month& operator -= (const months& m) ELOO_NOEXCEPT;
+        constexpr month& operator += (const months& m) SGE_NOEXCEPT;
+        constexpr month& operator -= (const months& m) SGE_NOEXCEPT;
 
-        ELOO_NODISCARD constexpr explicit operator unsigned int() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr explicit operator unsigned int() const SGE_NOEXCEPT {
             return mMonth;
         }
-        ELOO_NODISCARD constexpr bool ok() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr bool ok() const SGE_NOEXCEPT {
             return mMonth >= 1 && mMonth <= 12; // Valid months are from 1 to 12.
         }
 
@@ -139,34 +139,34 @@ namespace eastl::chrono {
         unsigned char mMonth = 1;
     };
 
-    ELOO_NODISCARD constexpr bool operator == (const month& lhs, const month& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr bool operator == (const month& lhs, const month& rhs) SGE_NOEXCEPT {
         return static_cast<unsigned int>(lhs) == static_cast<unsigned int>(rhs);
     }
-    ELOO_NODISCARD constexpr strong_ordering operator <=> (const month& lhs, const month& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr strong_ordering operator <=> (const month& lhs, const month& rhs) SGE_NOEXCEPT {
         return static_cast<unsigned int>(lhs) <=> static_cast<unsigned int>(rhs);
     }
 
-    ELOO_NODISCARD constexpr month operator + (const month& lhs, const months& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr month operator + (const month& lhs, const months& rhs) SGE_NOEXCEPT {
         const auto _Mo = static_cast<long long>(static_cast<unsigned int>(lhs)) + (rhs.count() - 1);
         const auto _Div = (_Mo >= 0 ? _Mo : _Mo - 11) / 12;
         return month{ static_cast<unsigned int>(_Mo - _Div * 12 + 1) };
     }
-    ELOO_NODISCARD constexpr month operator + (const months& lhs, const month& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr month operator + (const months& lhs, const month& rhs) SGE_NOEXCEPT {
         return rhs + lhs;
     }
-    ELOO_NODISCARD constexpr months operator - (const month& lhs, const month& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr months operator - (const month& lhs, const month& rhs) SGE_NOEXCEPT {
         const auto _Mo = static_cast<unsigned int>(lhs) - static_cast<unsigned int>(rhs);
         return months{ _Mo <= 11 ? _Mo : _Mo + 12 };
     }
-    ELOO_NODISCARD constexpr month operator - (const month& lhs, const months& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr month operator - (const month& lhs, const months& rhs) SGE_NOEXCEPT {
         return lhs + -rhs;
     }
 
-    constexpr month& month::operator += (const months& m) ELOO_NOEXCEPT {
+    constexpr month& month::operator += (const months& m) SGE_NOEXCEPT {
         *this = *this + m;
         return *this;
     }
-    constexpr month& month::operator -= (const months& m) ELOO_NOEXCEPT {
+    constexpr month& month::operator -= (const months& m) SGE_NOEXCEPT {
         *this = *this - m;
         return *this;
     }
@@ -178,14 +178,14 @@ namespace eastl::chrono {
     class year {
     public:
         year() = default;
-        constexpr explicit year(int y) ELOO_NOEXCEPT : mYear(static_cast<short>(y)) {}
+        constexpr explicit year(int y) SGE_NOEXCEPT : mYear(static_cast<short>(y)) {}
 
-        constexpr year& operator ++ () ELOO_NOEXCEPT { *this += years{1}; return *this; }
-        constexpr year& operator -- () ELOO_NOEXCEPT { *this -= years{1}; return *this; }
-        constexpr year operator ++ (int) ELOO_NOEXCEPT { year temp{*this}; ++(*this); return temp; }
-        constexpr year operator -- (int) ELOO_NOEXCEPT { year temp{*this}; --(*this); return temp; }
+        constexpr year& operator ++ () SGE_NOEXCEPT { *this += years{1}; return *this; }
+        constexpr year& operator -- () SGE_NOEXCEPT { *this -= years{1}; return *this; }
+        constexpr year operator ++ (int) SGE_NOEXCEPT { year temp{*this}; ++(*this); return temp; }
+        constexpr year operator -- (int) SGE_NOEXCEPT { year temp{*this}; --(*this); return temp; }
 
-        constexpr year& operator += (const years& y) ELOO_NOEXCEPT {
+        constexpr year& operator += (const years& y) SGE_NOEXCEPT {
 #ifdef __EDG__ // TRANSITION, VSO-1271098
             mYear = static_cast<short>(mYear + y.count());
 #else // ^^^ workaround / no workaround vvv
@@ -194,7 +194,7 @@ namespace eastl::chrono {
             return *this;
         }
 
-        constexpr year& operator -= (const years& y) ELOO_NOEXCEPT {
+        constexpr year& operator -= (const years& y) SGE_NOEXCEPT {
 #ifdef __EDG__ // TRANSITION, VSO-1271098
             mYear = static_cast<short>(mYear - y.count());
 #else // ^^^ workaround / no workaround vvv
@@ -203,30 +203,30 @@ namespace eastl::chrono {
             return *this;
         }
 
-        ELOO_NODISCARD constexpr year operator + () const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr year operator + () const SGE_NOEXCEPT {
             return *this;
         }
-        ELOO_NODISCARD constexpr year operator - () const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr year operator - () const SGE_NOEXCEPT {
             return year{ -mYear };
         }
 
-        ELOO_NODISCARD constexpr bool is_leap() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr bool is_leap() const SGE_NOEXCEPT {
             // A year is a leap year if it is divisible by 4, except for end-of-century years, which must be divisible by 400.
             return (mYear % 4 == 0 && mYear % 100 != 0) || (mYear % 400 == 0);
         }
 
-        ELOO_NODISCARD constexpr explicit operator int() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr explicit operator int() const SGE_NOEXCEPT {
             return mYear;
         }
 
-        ELOO_NODISCARD constexpr bool ok() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr bool ok() const SGE_NOEXCEPT {
             return mYear >= __min_year && mYear <= __max_year; // Valid years are from -32767 to 32767.
         }
 
-        ELOO_NODISCARD static constexpr year(min)() ELOO_NOEXCEPT {
+        SGE_NODISCARD static constexpr year(min)() SGE_NOEXCEPT {
             return year{ __min_year };
         }
-        ELOO_NODISCARD static constexpr year(max)() ELOO_NOEXCEPT {
+        SGE_NODISCARD static constexpr year(max)() SGE_NOEXCEPT {
             return year{ __max_year };
         }
 
@@ -236,23 +236,23 @@ namespace eastl::chrono {
         static constexpr int __max_year = 32767; // Maximum year value, inclusive.
     };
 
-    ELOO_NODISCARD constexpr bool operator == (const year& lhs, const year& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr bool operator == (const year& lhs, const year& rhs) SGE_NOEXCEPT {
         return static_cast<int>(lhs) == static_cast<int>(rhs);
     }
-    ELOO_NODISCARD constexpr strong_ordering operator <=> (const year& lhs, const year& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr strong_ordering operator <=> (const year& lhs, const year& rhs) SGE_NOEXCEPT {
         return static_cast<int>(lhs) <=> static_cast<int>(rhs);
     }
 
-    ELOO_NODISCARD constexpr year operator + (const year& lhs, const years& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr year operator + (const year& lhs, const years& rhs) SGE_NOEXCEPT {
         return year{ static_cast<int>(lhs) + rhs.count() };
     }
-    ELOO_NODISCARD constexpr year operator + (const years& lhs, const year& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr year operator + (const years& lhs, const year& rhs) SGE_NOEXCEPT {
         return rhs + lhs;
     }
-    ELOO_NODISCARD constexpr year operator - (const year& lhs, const years& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr year operator - (const year& lhs, const years& rhs) SGE_NOEXCEPT {
         return lhs + -rhs;
     }
-    ELOO_NODISCARD constexpr years operator - (const year& lhs, const year& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr years operator - (const year& lhs, const year& rhs) SGE_NOEXCEPT {
         return years{ static_cast<int>(lhs) - static_cast<int>(rhs) };
     }
 
@@ -266,42 +266,42 @@ namespace eastl::chrono {
     class weekday {
     public:
         constexpr weekday() = default;
-        constexpr explicit weekday(unsigned int wd) ELOO_NOEXCEPT : mWeekday(static_cast<unsigned char>(wd % 7)) {}
-        constexpr weekday(const sys_days& d) ELOO_NOEXCEPT
+        constexpr explicit weekday(unsigned int wd) SGE_NOEXCEPT : mWeekday(static_cast<unsigned char>(wd % 7)) {}
+        constexpr weekday(const sys_days& d) SGE_NOEXCEPT
             : mWeekday(static_cast<unsigned char>(_Weekday_from_days(d.time_since_epoch().count()))) {}
-        constexpr explicit weekday(const local_days& d) ELOO_NOEXCEPT
+        constexpr explicit weekday(const local_days& d) SGE_NOEXCEPT
             : mWeekday(static_cast<unsigned char>(_Weekday_from_days(d.time_since_epoch().count()))) {}
 
-        constexpr weekday& operator ++ () ELOO_NOEXCEPT {
+        constexpr weekday& operator ++ () SGE_NOEXCEPT {
             *this += days{ 1 }; return *this;
         }
-        constexpr weekday& operator -- () ELOO_NOEXCEPT {
+        constexpr weekday& operator -- () SGE_NOEXCEPT {
             *this -= days{ 1 }; return *this;
         }
-        constexpr weekday operator ++ (int) ELOO_NOEXCEPT {
+        constexpr weekday operator ++ (int) SGE_NOEXCEPT {
             weekday temp{ *this }; ++(*this); return temp;
         }
-        constexpr weekday operator -- (int) ELOO_NOEXCEPT {
+        constexpr weekday operator -- (int) SGE_NOEXCEPT {
             weekday temp{ *this }; --(*this); return temp;
         }
 
-        constexpr weekday& operator += (const days& d) ELOO_NOEXCEPT;
-        constexpr weekday& operator -= (const days& d) ELOO_NOEXCEPT;
+        constexpr weekday& operator += (const days& d) SGE_NOEXCEPT;
+        constexpr weekday& operator -= (const days& d) SGE_NOEXCEPT;
 
-        ELOO_NODISCARD constexpr unsigned int c_encoding() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr unsigned int c_encoding() const SGE_NOEXCEPT {
             return mWeekday;
         }
 
-        ELOO_NODISCARD constexpr unsigned int iso_encoding() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr unsigned int iso_encoding() const SGE_NOEXCEPT {
             return (mWeekday + 6) % 7;
         }
 
-        ELOO_NODISCARD constexpr bool ok() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr bool ok() const SGE_NOEXCEPT {
             return mWeekday <= 6;
         }
 
-        ELOO_NODISCARD constexpr weekday_indexed operator [] (unsigned int index) const ELOO_NOEXCEPT;
-        ELOO_NODISCARD constexpr weekday_last operator [] (last_spec) const ELOO_NOEXCEPT;
+        SGE_NODISCARD constexpr weekday_indexed operator [] (unsigned int index) const SGE_NOEXCEPT;
+        SGE_NODISCARD constexpr weekday_last operator [] (last_spec) const SGE_NOEXCEPT;
 
     private:
         // courtesy of Howard Hinnant
@@ -314,35 +314,35 @@ namespace eastl::chrono {
         unsigned char mWeekday = 0;
     };
 
-    ELOO_NODISCARD constexpr bool operator == (const weekday& lhs, const weekday& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr bool operator == (const weekday& lhs, const weekday& rhs) SGE_NOEXCEPT {
         return lhs.c_encoding() == rhs.c_encoding();
     }
-    ELOO_NODISCARD constexpr strong_ordering operator <=> (const weekday& lhs, const weekday& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr strong_ordering operator <=> (const weekday& lhs, const weekday& rhs) SGE_NOEXCEPT {
         return lhs.c_encoding() <=> rhs.c_encoding();
     }
 
-    ELOO_NODISCARD constexpr weekday operator + (const weekday& lhs, const days& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr weekday operator + (const weekday& lhs, const days& rhs) SGE_NOEXCEPT {
         const auto _Wd = static_cast<long long>(lhs.c_encoding()) + rhs.count();
         const auto _Div = (_Wd >= 0 ? _Wd : _Wd - 6) / 7;
         return weekday{ static_cast<unsigned int>(_Wd - _Div * 7) };
     }
-    ELOO_NODISCARD constexpr weekday operator + (const days& lhs, const weekday& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr weekday operator + (const days& lhs, const weekday& rhs) SGE_NOEXCEPT {
         return rhs + lhs;
     }
-    ELOO_NODISCARD constexpr weekday operator - (const weekday& lhs, const days& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr weekday operator - (const weekday& lhs, const days& rhs) SGE_NOEXCEPT {
         return lhs + -rhs;
     }
-    ELOO_NODISCARD constexpr days operator - (const weekday& lhs, const weekday& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr days operator - (const weekday& lhs, const weekday& rhs) SGE_NOEXCEPT {
         const auto _Wd = lhs.c_encoding() - rhs.c_encoding();
         const auto _Wk = _Wd <= 6 ? _Wd : _Wd + 7;
         return days{ _Wk };
     }
 
-    inline constexpr weekday& weekday::operator += (const days& d) ELOO_NOEXCEPT {
+    inline constexpr weekday& weekday::operator += (const days& d) SGE_NOEXCEPT {
         *this = *this + d;
         return *this;
     }
-    inline constexpr weekday& weekday::operator -= (const days& d) ELOO_NOEXCEPT {
+    inline constexpr weekday& weekday::operator -= (const days& d) SGE_NOEXCEPT {
         *this = *this - d;
         return *this;
     }
@@ -351,17 +351,17 @@ namespace eastl::chrono {
     class weekday_indexed {
     public:
         weekday_indexed() = default;
-        constexpr weekday_indexed(const chrono::weekday& wd, unsigned int idx) ELOO_NOEXCEPT
+        constexpr weekday_indexed(const chrono::weekday& wd, unsigned int idx) SGE_NOEXCEPT
             : mWeekday(wd), mIndex(static_cast<unsigned char>(idx)) {}
 
-        ELOO_NODISCARD constexpr chrono::weekday weekday() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr chrono::weekday weekday() const SGE_NOEXCEPT {
             return mWeekday;
         }
-        ELOO_NODISCARD constexpr unsigned int index() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr unsigned int index() const SGE_NOEXCEPT {
             return mIndex;
         }
 
-        ELOO_NODISCARD constexpr bool ok() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr bool ok() const SGE_NOEXCEPT {
             return mWeekday.ok() && mIndex >= 1 && mIndex <= 5; // Valid indices are from 1 to 5.
         }
 
@@ -370,22 +370,22 @@ namespace eastl::chrono {
         unsigned char mIndex = 1; // The index of the weekday, 1-based (1 = first occurrence, 2 = second occurrence, etc.).
     };
 
-    ELOO_NODISCARD constexpr bool operator == (const weekday_indexed& lhs, const weekday_indexed& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr bool operator == (const weekday_indexed& lhs, const weekday_indexed& rhs) SGE_NOEXCEPT {
         return lhs.weekday() == rhs.weekday() && lhs.index() == rhs.index();
     }
-    ELOO_NODISCARD constexpr bool operator != (const weekday_indexed& lhs, const weekday_indexed& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr bool operator != (const weekday_indexed& lhs, const weekday_indexed& rhs) SGE_NOEXCEPT {
         return !(lhs == rhs);
     }
 
     // weekday_last
     class weekday_last {
     public:
-        constexpr explicit weekday_last(const chrono::weekday& wd) ELOO_NOEXCEPT : mWeekday(wd) {}
+        constexpr explicit weekday_last(const chrono::weekday& wd) SGE_NOEXCEPT : mWeekday(wd) {}
 
-        ELOO_NODISCARD constexpr eastl::chrono::weekday weekday() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr eastl::chrono::weekday weekday() const SGE_NOEXCEPT {
             return mWeekday;
         }
-        ELOO_NODISCARD constexpr bool ok() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr bool ok() const SGE_NOEXCEPT {
             return mWeekday.ok();
         }
 
@@ -393,17 +393,17 @@ namespace eastl::chrono {
         chrono::weekday mWeekday; // The weekday for the last occurrence in the month.
     };
 
-    ELOO_NODISCARD constexpr bool operator == (const weekday_last& lhs, const weekday_last& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr bool operator == (const weekday_last& lhs, const weekday_last& rhs) SGE_NOEXCEPT {
         return lhs.weekday() == rhs.weekday();
     }
-    ELOO_NODISCARD constexpr bool operator != (const weekday_last& lhs, const weekday_last& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr bool operator != (const weekday_last& lhs, const weekday_last& rhs) SGE_NOEXCEPT {
         return !(lhs == rhs);
     }
 
-    inline constexpr weekday_indexed weekday::operator [] (unsigned int index) const ELOO_NOEXCEPT {
+    inline constexpr weekday_indexed weekday::operator [] (unsigned int index) const SGE_NOEXCEPT {
         return weekday_indexed{ *this, index };
     }
-    inline constexpr weekday_last weekday::operator [] (last_spec) const ELOO_NOEXCEPT {
+    inline constexpr weekday_last weekday::operator [] (last_spec) const SGE_NOEXCEPT {
         return weekday_last{ *this };
     }
 
@@ -415,16 +415,16 @@ namespace eastl::chrono {
     class month_day {
     public:
         month_day() = default;
-        constexpr month_day(const month& m, const day& d) ELOO_NOEXCEPT : mMonth(m), mDay(d) {}
+        constexpr month_day(const month& m, const day& d) SGE_NOEXCEPT : mMonth(m), mDay(d) {}
 
-        ELOO_NODISCARD constexpr month month() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr month month() const SGE_NOEXCEPT {
             return mMonth;
         }
-        ELOO_NODISCARD constexpr day day() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr day day() const SGE_NOEXCEPT {
             return mDay;
         }
 
-        ELOO_NODISCARD constexpr bool ok() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr bool ok() const SGE_NOEXCEPT {
             if (!mMonth.ok() || !mDay.ok()) {
                 return false; // If either month or day is invalid, the month_day is invalid.
             }
@@ -447,11 +447,11 @@ namespace eastl::chrono {
         chrono::day mDay; // The day of the month.
     };
 
-    ELOO_NODISCARD constexpr bool operator == (const month_day& lhs, const month_day& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr bool operator == (const month_day& lhs, const month_day& rhs) SGE_NOEXCEPT {
         return lhs.month() == rhs.month() && lhs.day() == rhs.day();
     }
 
-    ELOO_NODISCARD constexpr strong_ordering operator <=> (const month_day& lhs, const month_day& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr strong_ordering operator <=> (const month_day& lhs, const month_day& rhs) SGE_NOEXCEPT {
         const auto _Comp = lhs.month() <=> rhs.month();
         if (_Comp != 0) {
             return _Comp;
@@ -464,12 +464,12 @@ namespace eastl::chrono {
 
     class month_day_last {
     public:
-        constexpr explicit month_day_last(const month& m) ELOO_NOEXCEPT : mMonth(m) {}
+        constexpr explicit month_day_last(const month& m) SGE_NOEXCEPT : mMonth(m) {}
 
-        ELOO_NODISCARD constexpr month month() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr month month() const SGE_NOEXCEPT {
             return mMonth;
         }
-        ELOO_NODISCARD constexpr bool ok() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr bool ok() const SGE_NOEXCEPT {
             return mMonth.ok(); // Valid if the month is valid.
         }
 
@@ -477,10 +477,10 @@ namespace eastl::chrono {
         chrono::month mMonth; // The month of the year.
     };
 
-    ELOO_NODISCARD constexpr bool operator == (const month_day_last& lhs, const month_day_last& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr bool operator == (const month_day_last& lhs, const month_day_last& rhs) SGE_NOEXCEPT {
         return lhs.month() == rhs.month();
     }
-    ELOO_NODISCARD constexpr strong_ordering operator <=> (const month_day_last& lhs, const month_day_last& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr strong_ordering operator <=> (const month_day_last& lhs, const month_day_last& rhs) SGE_NOEXCEPT {
         return lhs.month() <=> rhs.month();
     }
 
@@ -488,17 +488,17 @@ namespace eastl::chrono {
 
     class month_weekday {
     public:
-        constexpr month_weekday(const month& m, const weekday_indexed& wdi) ELOO_NOEXCEPT
+        constexpr month_weekday(const month& m, const weekday_indexed& wdi) SGE_NOEXCEPT
             : mMonth(m), mWeekdayIndexed(wdi) {}
 
-        ELOO_NODISCARD constexpr month month() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr month month() const SGE_NOEXCEPT {
             return mMonth;
         }
-        ELOO_NODISCARD constexpr weekday_indexed weekday_indexed() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr weekday_indexed weekday_indexed() const SGE_NOEXCEPT {
             return mWeekdayIndexed;
         }
 
-        ELOO_NODISCARD constexpr bool ok() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr bool ok() const SGE_NOEXCEPT {
             return mMonth.ok() && mWeekdayIndexed.ok();
         }
 
@@ -507,7 +507,7 @@ namespace eastl::chrono {
         chrono::weekday_indexed mWeekdayIndexed;
     };
 
-    ELOO_NODISCARD constexpr bool operator == (const month_weekday& lhs, const month_weekday& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr bool operator == (const month_weekday& lhs, const month_weekday& rhs) SGE_NOEXCEPT {
         return lhs.month() == rhs.month() && lhs.weekday_indexed() == rhs.weekday_indexed();
     }
 
@@ -515,17 +515,17 @@ namespace eastl::chrono {
 
     class month_weekday_last {
     public:
-        constexpr month_weekday_last(const month& m, const weekday_last& wdl) ELOO_NOEXCEPT
+        constexpr month_weekday_last(const month& m, const weekday_last& wdl) SGE_NOEXCEPT
             : mMonth(m), mWeekdayLast(wdl) {}
 
-        ELOO_NODISCARD constexpr month month() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr month month() const SGE_NOEXCEPT {
             return mMonth;
         }
-        ELOO_NODISCARD constexpr weekday_last weekday_last() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr weekday_last weekday_last() const SGE_NOEXCEPT {
             return mWeekdayLast;
         }
 
-        ELOO_NODISCARD constexpr bool ok() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr bool ok() const SGE_NOEXCEPT {
             return mMonth.ok() && mWeekdayLast.ok();
         }
 
@@ -534,7 +534,7 @@ namespace eastl::chrono {
         chrono::weekday_last mWeekdayLast;
     };
 
-    ELOO_NODISCARD constexpr bool operator == (const month_weekday_last& lhs, const month_weekday_last& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr bool operator == (const month_weekday_last& lhs, const month_weekday_last& rhs) SGE_NOEXCEPT {
         return lhs.month() == rhs.month() && lhs.weekday_last() == rhs.weekday_last();
     }
 
@@ -543,23 +543,23 @@ namespace eastl::chrono {
     class year_month {
     public:
         year_month() = default;
-        constexpr year_month(const year& y, const month& m) ELOO_NOEXCEPT : mYear(y), mMonth(m) {}
+        constexpr year_month(const year& y, const month& m) SGE_NOEXCEPT : mYear(y), mMonth(m) {}
 
-        ELOO_NODISCARD constexpr year year() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr year year() const SGE_NOEXCEPT {
             return mYear;
         }
-        ELOO_NODISCARD constexpr month month() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr month month() const SGE_NOEXCEPT {
             return mMonth;
         }
 
         template <int = 0>
-        constexpr year_month& operator += (const months& m) ELOO_NOEXCEPT;
+        constexpr year_month& operator += (const months& m) SGE_NOEXCEPT;
         template <int = 0>
-        constexpr year_month& operator -= (const months& m) ELOO_NOEXCEPT;
-        constexpr year_month& operator += (const years& y) ELOO_NOEXCEPT;
-        constexpr year_month& operator -= (const years& y) ELOO_NOEXCEPT;
+        constexpr year_month& operator -= (const months& m) SGE_NOEXCEPT;
+        constexpr year_month& operator += (const years& y) SGE_NOEXCEPT;
+        constexpr year_month& operator -= (const years& y) SGE_NOEXCEPT;
 
-        ELOO_NODISCARD constexpr bool ok() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr bool ok() const SGE_NOEXCEPT {
             return mYear.ok() && mMonth.ok(); // Valid if both year and month are valid.
         }
 
@@ -568,10 +568,10 @@ namespace eastl::chrono {
         chrono::month mMonth;
     };
 
-    ELOO_NODISCARD constexpr bool operator == (const year_month& lhs, const year_month& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr bool operator == (const year_month& lhs, const year_month& rhs) SGE_NOEXCEPT {
         return lhs.year() == rhs.year() && lhs.month() == rhs.month();
     }
-    ELOO_NODISCARD constexpr strong_ordering operator <=> (const year_month& lhs, const year_month& rhs) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr strong_ordering operator <=> (const year_month& lhs, const year_month& rhs) SGE_NOEXCEPT {
         const auto _Comp = lhs.year() <=> rhs.year();
         if (_Comp != 0) {
             return _Comp;
@@ -580,51 +580,51 @@ namespace eastl::chrono {
     }
 
     template <int = 0>
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month operator + (const year_month& lhs, const months& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month operator + (const year_month& lhs, const months& rhs) SGE_NOEXCEPT {
         const auto _Mo = static_cast<long long>(static_cast<unsigned int>(lhs.month())) + (rhs.count() - 1);
         const auto _Div = (_Mo >= 0 ? _Mo : _Mo - 11) / 12;
         return year_month{ lhs.year() + years{_Div}, month{static_cast<unsigned int>(_Mo - _Div * 12 + 1)} };
     }
     template <int = 0>
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month operator + (const months& lhs, const year_month& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month operator + (const months& lhs, const year_month& rhs) SGE_NOEXCEPT {
         return rhs + lhs;
     }
     template <int = 0>
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month operator - (const year_month& lhs, const months& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month operator - (const year_month& lhs, const months& rhs) SGE_NOEXCEPT {
         return lhs + -rhs;
     }
 
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr months operator - (const year_month& lhs, const year_month& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr months operator - (const year_month& lhs, const year_month& rhs) SGE_NOEXCEPT {
         return lhs.year() - rhs.year()
             + months{ static_cast<int>(static_cast<unsigned int>(lhs.month()))
                      - static_cast<int>(static_cast<unsigned int>(rhs.month())) };
     }
 
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month operator + (const year_month& lhs, const years& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month operator + (const year_month& lhs, const years& rhs) SGE_NOEXCEPT {
         return year_month{ lhs.year() + rhs, lhs.month() };
     }
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month operator + (const years& lhs, const year_month& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month operator + (const years& lhs, const year_month& rhs) SGE_NOEXCEPT {
         return rhs + lhs;
     }
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month operator - (const year_month& lhs, const years& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month operator - (const year_month& lhs, const years& rhs) SGE_NOEXCEPT {
         return lhs + -rhs;
     }
 
     template <int>
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month& year_month::operator += (const months& m) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month& year_month::operator += (const months& m) SGE_NOEXCEPT {
         *this = *this + m;
         return *this;
     }
     template <int>
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month& year_month::operator -= (const months& m) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month& year_month::operator -= (const months& m) SGE_NOEXCEPT {
         *this = *this - m;
         return *this;
     }
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month& year_month::operator += (const years& y) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month& year_month::operator += (const years& y) SGE_NOEXCEPT {
         *this = *this + y;
         return *this;
     }
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month& year_month::operator -= (const years& y) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month& year_month::operator -= (const years& y) SGE_NOEXCEPT {
         *this = *this - y;
         return *this;
     }
@@ -637,7 +637,7 @@ namespace eastl::chrono {
         day{ 255 }, day{ 255 }, day{ 255 }, day{ 255 } // Extra invalid days to prevent UB.
     };
 
-    ELOO_FORCE_INLINE ELOO_NODISCARD day _Last_day(const year& y, const month& m) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD day _Last_day(const year& y, const month& m) SGE_NOEXCEPT {
         // Returns the last day of the month, accounting for leap years in February.
         if (m == February && y.is_leap()) {
             return day{ 29 };
@@ -652,39 +652,39 @@ namespace eastl::chrono {
     class year_month_day {
     public:
         year_month_day() = default;
-        constexpr year_month_day(const year& y, const month& m, const day& d) ELOO_NOEXCEPT
+        constexpr year_month_day(const year& y, const month& m, const day& d) SGE_NOEXCEPT
             : mYear(y), mMonth(m), mDay(d) {}
-        constexpr year_month_day(const year_month_day_last& ymdl) ELOO_NOEXCEPT;
-        constexpr year_month_day(const sys_days& d) ELOO_NOEXCEPT
+        constexpr year_month_day(const year_month_day_last& ymdl) SGE_NOEXCEPT;
+        constexpr year_month_day(const sys_days& d) SGE_NOEXCEPT
             : year_month_day{ _Civil_from_days(d.time_since_epoch().count()) } {}
-        constexpr explicit year_month_day(const local_days& d) ELOO_NOEXCEPT
+        constexpr explicit year_month_day(const local_days& d) SGE_NOEXCEPT
             : year_month_day{ _Civil_from_days(d.time_since_epoch().count()) } {}
 
         template <int = 0>
-        constexpr year_month_day& operator += (const months& d) ELOO_NOEXCEPT;
+        constexpr year_month_day& operator += (const months& d) SGE_NOEXCEPT;
         template <int = 0>
-        constexpr year_month_day& operator -= (const months& d) ELOO_NOEXCEPT;
-        constexpr year_month_day& operator += (const years& y) ELOO_NOEXCEPT;
-        constexpr year_month_day& operator -= (const years& y) ELOO_NOEXCEPT;
+        constexpr year_month_day& operator -= (const months& d) SGE_NOEXCEPT;
+        constexpr year_month_day& operator += (const years& y) SGE_NOEXCEPT;
+        constexpr year_month_day& operator -= (const years& y) SGE_NOEXCEPT;
 
-        ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year year() const ELOO_NOEXCEPT {
+        SGE_FORCE_INLINE SGE_NODISCARD constexpr year year() const SGE_NOEXCEPT {
             return mYear;
         }
-        ELOO_FORCE_INLINE ELOO_NODISCARD constexpr month month() const ELOO_NOEXCEPT {
+        SGE_FORCE_INLINE SGE_NODISCARD constexpr month month() const SGE_NOEXCEPT {
             return mMonth;
         }
-        ELOO_FORCE_INLINE ELOO_NODISCARD constexpr day day() const ELOO_NOEXCEPT {
+        SGE_FORCE_INLINE SGE_NODISCARD constexpr day day() const SGE_NOEXCEPT {
             return mDay;
         }
 
-        ELOO_FORCE_INLINE ELOO_NODISCARD constexpr operator sys_days() const ELOO_NOEXCEPT {
+        SGE_FORCE_INLINE SGE_NODISCARD constexpr operator sys_days() const SGE_NOEXCEPT {
             return sys_days{ _Days_from_civil() };
         }
-        ELOO_FORCE_INLINE ELOO_NODISCARD constexpr explicit operator local_days() const ELOO_NOEXCEPT {
+        SGE_FORCE_INLINE SGE_NODISCARD constexpr explicit operator local_days() const SGE_NOEXCEPT {
             return local_days{ static_cast<sys_days>(*this).time_since_epoch() };
         }
 
-        ELOO_FORCE_INLINE ELOO_NODISCARD constexpr bool ok() const ELOO_NOEXCEPT {
+        SGE_FORCE_INLINE SGE_NODISCARD constexpr bool ok() const SGE_NOEXCEPT {
             if (!mYear.ok() || !mMonth.ok()) {
                 return false;
             }
@@ -692,7 +692,7 @@ namespace eastl::chrono {
             return mDay >= chrono::day{ 1 } && mDay <= _Last_day(mYear, mMonth);
         }
 
-        ELOO_FORCE_INLINE ELOO_NODISCARD constexpr int _Calculate_weekday() const ELOO_NOEXCEPT {
+        SGE_FORCE_INLINE SGE_NODISCARD constexpr int _Calculate_weekday() const SGE_NOEXCEPT {
             const int _Day_int = static_cast<int>(static_cast<unsigned int>(mDay));
             const int _Month_int = static_cast<int>(static_cast<unsigned int>(mMonth));
 
@@ -821,7 +821,7 @@ namespace eastl::chrono {
 
         // courtesy of Howard Hinnant
         // https://howardhinnant.github.io/date_algorithms.html#civil_from_days
-        ELOO_NODISCARD static constexpr year_month_day _Civil_from_days(int _Tp) ELOO_NOEXCEPT {
+        SGE_NODISCARD static constexpr year_month_day _Civil_from_days(int _Tp) SGE_NOEXCEPT {
             static_assert(numeric_limits<unsigned int>::digits >= 32);
             static_assert(numeric_limits<int>::digits >= 26);
             const int _Zx = _Tp + 719468; // Shift epoch to 0000-03-01
@@ -845,7 +845,7 @@ namespace eastl::chrono {
 
         // courtesy of Howard Hinnant
         // https://howardhinnant.github.io/date_algorithms.html#days_from_civil
-        ELOO_NODISCARD constexpr days _Days_from_civil() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr days _Days_from_civil() const SGE_NOEXCEPT {
             static_assert(numeric_limits<unsigned int>::digits >= 18);
             static_assert(numeric_limits<int>::digits >= 26);
             const unsigned int _Mo = static_cast<unsigned int>(mMonth); // [1, 12]
@@ -864,10 +864,10 @@ namespace eastl::chrono {
         chrono::day mDay;
     };
 
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr bool operator == (const year_month_day& lhs, const year_month_day& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr bool operator == (const year_month_day& lhs, const year_month_day& rhs) SGE_NOEXCEPT {
         return lhs.year() == rhs.year() && lhs.month() == rhs.month() && lhs.day() == rhs.day();
     }
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr strong_ordering operator <=> (const year_month_day& lhs, const year_month_day& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr strong_ordering operator <=> (const year_month_day& lhs, const year_month_day& rhs) SGE_NOEXCEPT {
         auto _Comp = lhs.year() <=> rhs.year();
         if (_Comp != 0) {
             return _Comp;
@@ -880,44 +880,44 @@ namespace eastl::chrono {
     }
 
     template <int = 0>
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_day operator + (const year_month_day& lhs, const months& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_day operator + (const year_month_day& lhs, const months& rhs) SGE_NOEXCEPT {
         const auto _Ym = year_month{ lhs.year(), lhs.month() } + rhs;
         return { _Ym.year(), _Ym.month(), lhs.day() };
     }
     template <int = 0>
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_day operator + (const months& lhs, const year_month_day& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_day operator + (const months& lhs, const year_month_day& rhs) SGE_NOEXCEPT {
         return rhs + lhs;
     }
     template <int = 0>
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_day operator - (const year_month_day& lhs, const months& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_day operator - (const year_month_day& lhs, const months& rhs) SGE_NOEXCEPT {
         return lhs + -rhs;
     }
 
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_day operator + (const year_month_day& lhs, const years& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_day operator + (const year_month_day& lhs, const years& rhs) SGE_NOEXCEPT {
         return { lhs.year() + rhs, lhs.month(), lhs.day() };
     }
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_day operator + (const years& lhs, const year_month_day& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_day operator + (const years& lhs, const year_month_day& rhs) SGE_NOEXCEPT {
         return rhs + lhs;
     }
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_day operator - (const year_month_day& lhs, const years& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_day operator - (const year_month_day& lhs, const years& rhs) SGE_NOEXCEPT {
         return lhs + -rhs;
     }
 
     template <int>
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_day& year_month_day::operator += (const months& m) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_day& year_month_day::operator += (const months& m) SGE_NOEXCEPT {
         *this = *this + m;
         return *this;
     }
     template <int>
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_day& year_month_day::operator -= (const months& m) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_day& year_month_day::operator -= (const months& m) SGE_NOEXCEPT {
         *this = *this - m;
         return *this;
     }
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_day& year_month_day::operator += (const years& y) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_day& year_month_day::operator += (const years& y) SGE_NOEXCEPT {
         *this = *this + y;
         return *this;
     }
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_day& year_month_day::operator -= (const years& y) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_day& year_month_day::operator -= (const years& y) SGE_NOEXCEPT {
         *this = *this - y;
         return *this;
     }
@@ -926,37 +926,37 @@ namespace eastl::chrono {
 
     class year_month_day_last {
     public:
-        constexpr year_month_day_last(const year& y, const month_day_last& mdl) ELOO_NOEXCEPT
+        constexpr year_month_day_last(const year& y, const month_day_last& mdl) SGE_NOEXCEPT
             : mYear(y), mMonthDayLast(mdl) {}
 
         template <int = 0>
-        constexpr year_month_day_last& operator += (const months& d) ELOO_NOEXCEPT;
+        constexpr year_month_day_last& operator += (const months& d) SGE_NOEXCEPT;
         template <int = 0>
-        constexpr year_month_day_last& operator -= (const months& d) ELOO_NOEXCEPT;
-        constexpr year_month_day_last& operator += (const years& y) ELOO_NOEXCEPT;
-        constexpr year_month_day_last& operator -= (const years& y) ELOO_NOEXCEPT;
+        constexpr year_month_day_last& operator -= (const months& d) SGE_NOEXCEPT;
+        constexpr year_month_day_last& operator += (const years& y) SGE_NOEXCEPT;
+        constexpr year_month_day_last& operator -= (const years& y) SGE_NOEXCEPT;
 
-        ELOO_NODISCARD constexpr year year() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr year year() const SGE_NOEXCEPT {
             return mYear;
         }
-        ELOO_NODISCARD constexpr month month() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr month month() const SGE_NOEXCEPT {
             return mMonthDayLast.month();
         }
-        ELOO_NODISCARD constexpr month_day_last month_day_last() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr month_day_last month_day_last() const SGE_NOEXCEPT {
             return mMonthDayLast;
         }
-        ELOO_NODISCARD constexpr day day() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr day day() const SGE_NOEXCEPT {
             return _Last_day(year(), month());
         }
 
-        ELOO_NODISCARD constexpr operator sys_days() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr operator sys_days() const SGE_NOEXCEPT {
             return sys_days{ year_month_day{ year(), month(), day() } };
         }
-        ELOO_NODISCARD constexpr explicit operator local_days() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr explicit operator local_days() const SGE_NOEXCEPT {
             return local_days{ static_cast<sys_days>(*this).time_since_epoch() };
         }
 
-        ELOO_NODISCARD constexpr bool ok() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr bool ok() const SGE_NOEXCEPT {
             return mYear.ok() && mMonthDayLast.ok();
         }
 
@@ -965,10 +965,10 @@ namespace eastl::chrono {
         chrono::month_day_last mMonthDayLast;
     };
 
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr bool operator == (const year_month_day_last& lhs, const year_month_day_last& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr bool operator == (const year_month_day_last& lhs, const year_month_day_last& rhs) SGE_NOEXCEPT {
         return lhs.year() == rhs.year() && lhs.month_day_last() == rhs.month_day_last();
     }
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr strong_ordering operator <=> (const year_month_day_last& lhs, const year_month_day_last& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr strong_ordering operator <=> (const year_month_day_last& lhs, const year_month_day_last& rhs) SGE_NOEXCEPT {
         const auto _Comp = lhs.year() <=> rhs.year();
         if (_Comp != 0) {
             return _Comp;
@@ -977,49 +977,49 @@ namespace eastl::chrono {
     }
 
     template <int = 0>
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_day_last operator + (const year_month_day_last& lhs, const months& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_day_last operator + (const year_month_day_last& lhs, const months& rhs) SGE_NOEXCEPT {
         const auto _Ym = year_month{ lhs.year(), lhs.month() } + rhs;
         return { _Ym.year(), month_day_last{ _Ym.month() } };
     }
     template <int = 0>
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_day_last operator + (const months& lhs, const year_month_day_last& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_day_last operator + (const months& lhs, const year_month_day_last& rhs) SGE_NOEXCEPT {
         return rhs + lhs;
     }
     template <int = 0>
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_day_last operator - (const year_month_day_last& lhs, const months& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_day_last operator - (const year_month_day_last& lhs, const months& rhs) SGE_NOEXCEPT {
         return lhs + -rhs;
     }
 
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_day_last operator + (const year_month_day_last& lhs, const years& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_day_last operator + (const year_month_day_last& lhs, const years& rhs) SGE_NOEXCEPT {
         return { lhs.year() + rhs, lhs.month_day_last() };
     }
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_day_last operator + (const years& lhs, const year_month_day_last& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_day_last operator + (const years& lhs, const year_month_day_last& rhs) SGE_NOEXCEPT {
         return rhs + lhs;
     }
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_day_last operator - (const year_month_day_last& lhs, const years& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_day_last operator - (const year_month_day_last& lhs, const years& rhs) SGE_NOEXCEPT {
         return lhs + -rhs;
     }
 
     template <int>
-    ELOO_FORCE_INLINE constexpr year_month_day_last& year_month_day_last::operator += (const months& m) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE constexpr year_month_day_last& year_month_day_last::operator += (const months& m) SGE_NOEXCEPT {
         *this = *this + m;
         return *this;
     }
     template <int>
-    ELOO_FORCE_INLINE constexpr year_month_day_last& year_month_day_last::operator -= (const months& m) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE constexpr year_month_day_last& year_month_day_last::operator -= (const months& m) SGE_NOEXCEPT {
         *this = *this - m;
         return *this;
     }
-    ELOO_FORCE_INLINE constexpr year_month_day_last& year_month_day_last::operator += (const years& y) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE constexpr year_month_day_last& year_month_day_last::operator += (const years& y) SGE_NOEXCEPT {
         *this = *this + y;
         return *this;
     }
-    ELOO_FORCE_INLINE constexpr year_month_day_last& year_month_day_last::operator -= (const years& y) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE constexpr year_month_day_last& year_month_day_last::operator -= (const years& y) SGE_NOEXCEPT {
         *this = *this - y;
         return *this;
     }
 
-    ELOO_FORCE_INLINE constexpr year_month_day::year_month_day(const year_month_day_last& ymdl) ELOO_NOEXCEPT
+    SGE_FORCE_INLINE constexpr year_month_day::year_month_day(const year_month_day_last& ymdl) SGE_NOEXCEPT
         : mYear(ymdl.year()), mMonth(ymdl.month()), mDay(_Last_day(ymdl.year(), ymdl.month())) {}
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -1027,47 +1027,47 @@ namespace eastl::chrono {
     class year_month_weekday {
     public:
         year_month_weekday() = default;
-        constexpr year_month_weekday(const year& y, const month& m, const weekday_indexed& wdi) ELOO_NOEXCEPT
+        constexpr year_month_weekday(const year& y, const month& m, const weekday_indexed& wdi) SGE_NOEXCEPT
             : mYear(y), mMonth(m), mWeekdayIndexed(wdi) {}
-        constexpr year_month_weekday(const sys_days& d) ELOO_NOEXCEPT
+        constexpr year_month_weekday(const sys_days& d) SGE_NOEXCEPT
             : year_month_weekday{ _Ymwd_from_days(d.time_since_epoch()) } {}
-        constexpr year_month_weekday(const local_days& d) ELOO_NOEXCEPT
+        constexpr year_month_weekday(const local_days& d) SGE_NOEXCEPT
             : year_month_weekday{ _Ymwd_from_days(d.time_since_epoch()) } {}
 
         template <int = 0>
-        constexpr year_month_weekday& operator += (const months& m) ELOO_NOEXCEPT;
+        constexpr year_month_weekday& operator += (const months& m) SGE_NOEXCEPT;
         template <int = 0>
-        constexpr year_month_weekday& operator -= (const months& m) ELOO_NOEXCEPT;
-        constexpr year_month_weekday& operator += (const years& y) ELOO_NOEXCEPT;
-        constexpr year_month_weekday& operator -= (const years& y) ELOO_NOEXCEPT;
+        constexpr year_month_weekday& operator -= (const months& m) SGE_NOEXCEPT;
+        constexpr year_month_weekday& operator += (const years& y) SGE_NOEXCEPT;
+        constexpr year_month_weekday& operator -= (const years& y) SGE_NOEXCEPT;
 
-        ELOO_NODISCARD constexpr year year() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr year year() const SGE_NOEXCEPT {
             return mYear;
         }
-        ELOO_NODISCARD constexpr month month() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr month month() const SGE_NOEXCEPT {
             return mMonth;
         }
-        ELOO_NODISCARD constexpr weekday weekday() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr weekday weekday() const SGE_NOEXCEPT {
             return mWeekdayIndexed.weekday();
         }
-        ELOO_NODISCARD constexpr unsigned int index() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr unsigned int index() const SGE_NOEXCEPT {
             return mWeekdayIndexed.index();
         }
-        ELOO_NODISCARD constexpr weekday_indexed weekday_indexed() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr weekday_indexed weekday_indexed() const SGE_NOEXCEPT {
             return mWeekdayIndexed;
         }
 
-        ELOO_NODISCARD constexpr operator sys_days() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr operator sys_days() const SGE_NOEXCEPT {
             const sys_days _First = year_month_day{ mYear, mMonth, day{ 1 } };
             const days _Diff = weekday() - chrono::weekday{ _First };
             const days _Days = _Diff + days{ (static_cast<int>(index()) - 1) * 7 };
             return _First + _Days;
         }
-        ELOO_NODISCARD constexpr explicit operator local_days() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr explicit operator local_days() const SGE_NOEXCEPT {
             return local_days{ static_cast<sys_days>(*this).time_since_epoch() };
         }
 
-        ELOO_NODISCARD constexpr bool ok() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr bool ok() const SGE_NOEXCEPT {
             if (!mYear.ok() || !mMonth.ok() || !mWeekdayIndexed.ok()) {
                 return false;
             }
@@ -1085,7 +1085,7 @@ namespace eastl::chrono {
         }
 
     private:
-        ELOO_NODISCARD static constexpr year_month_weekday _Ymwd_from_days(days d) ELOO_NOEXCEPT {
+        SGE_NODISCARD static constexpr year_month_weekday _Ymwd_from_days(days d) SGE_NOEXCEPT {
             const chrono::year_month_day _Ymd   = sys_days{ d };
             const chrono::weekday _Wd           = sys_days{ d };
             const auto _Idx                     = ((static_cast<unsigned int>(_Ymd.day()) - 1) / 7) + 1;
@@ -1098,49 +1098,49 @@ namespace eastl::chrono {
         chrono::weekday_indexed mWeekdayIndexed;
     };
 
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr bool operator == (const year_month_weekday& lhs, const year_month_weekday& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr bool operator == (const year_month_weekday& lhs, const year_month_weekday& rhs) SGE_NOEXCEPT {
         return lhs.year() == rhs.year() && lhs.month() == rhs.month() && lhs.weekday_indexed() == rhs.weekday_indexed();
     }
 
     template <int = 0>
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_weekday operator + (const year_month_weekday& lhs, const months& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_weekday operator + (const year_month_weekday& lhs, const months& rhs) SGE_NOEXCEPT {
         const auto _Ym = year_month{ lhs.year(), lhs.month() } + rhs;
         return { _Ym.year(), _Ym.month(), lhs.weekday_indexed() };
     }
     template <int = 0>
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_weekday operator + (const months& lhs, const year_month_weekday& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_weekday operator + (const months& lhs, const year_month_weekday& rhs) SGE_NOEXCEPT {
         return rhs + lhs;
     }
     template <int = 0>
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_weekday operator - (const year_month_weekday& lhs, const months& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_weekday operator - (const year_month_weekday& lhs, const months& rhs) SGE_NOEXCEPT {
         return lhs + -rhs;
     }
 
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_weekday operator + (const year_month_weekday& lhs, const years& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_weekday operator + (const year_month_weekday& lhs, const years& rhs) SGE_NOEXCEPT {
         return { lhs.year() + rhs, lhs.month(), lhs.weekday_indexed() };
     }
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_weekday operator + (const years& lhs, const year_month_weekday& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_weekday operator + (const years& lhs, const year_month_weekday& rhs) SGE_NOEXCEPT {
         return rhs + lhs;
     }
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_weekday operator - (const year_month_weekday& lhs, const years& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_weekday operator - (const year_month_weekday& lhs, const years& rhs) SGE_NOEXCEPT {
         return lhs + -rhs;
     }
 
     template <int>
-    ELOO_FORCE_INLINE constexpr year_month_weekday& year_month_weekday::operator += (const months& m) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE constexpr year_month_weekday& year_month_weekday::operator += (const months& m) SGE_NOEXCEPT {
         *this = *this + m;
         return *this;
     }
     template <int>
-    ELOO_FORCE_INLINE constexpr year_month_weekday& year_month_weekday::operator -= (const months& m) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE constexpr year_month_weekday& year_month_weekday::operator -= (const months& m) SGE_NOEXCEPT {
         *this = *this - m;
         return *this;
     }
-    ELOO_FORCE_INLINE constexpr year_month_weekday& year_month_weekday::operator += (const years& y) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE constexpr year_month_weekday& year_month_weekday::operator += (const years& y) SGE_NOEXCEPT {
         *this = *this + y;
         return *this;
     }
-    ELOO_FORCE_INLINE constexpr year_month_weekday& year_month_weekday::operator -= (const years& y) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE constexpr year_month_weekday& year_month_weekday::operator -= (const years& y) SGE_NOEXCEPT {
         *this = *this - y;
         return *this;
     }
@@ -1149,39 +1149,39 @@ namespace eastl::chrono {
 
     class year_month_weekday_last {
     public:
-        constexpr year_month_weekday_last(const year& y, const month& m, const weekday_last& wdl) ELOO_NOEXCEPT
+        constexpr year_month_weekday_last(const year& y, const month& m, const weekday_last& wdl) SGE_NOEXCEPT
             : mYear(y), mMonth(m), mWeekdayLast(wdl) {}
 
         template <int = 0>
-        constexpr year_month_weekday_last& operator += (const months& m) ELOO_NOEXCEPT;
+        constexpr year_month_weekday_last& operator += (const months& m) SGE_NOEXCEPT;
         template <int = 0>
-        constexpr year_month_weekday_last& operator -= (const months& m) ELOO_NOEXCEPT;
-        constexpr year_month_weekday_last& operator += (const years& y) ELOO_NOEXCEPT;
-        constexpr year_month_weekday_last& operator -= (const years& y) ELOO_NOEXCEPT;
+        constexpr year_month_weekday_last& operator -= (const months& m) SGE_NOEXCEPT;
+        constexpr year_month_weekday_last& operator += (const years& y) SGE_NOEXCEPT;
+        constexpr year_month_weekday_last& operator -= (const years& y) SGE_NOEXCEPT;
 
-        ELOO_NODISCARD constexpr year year() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr year year() const SGE_NOEXCEPT {
             return mYear;
         }
-        ELOO_NODISCARD constexpr month month() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr month month() const SGE_NOEXCEPT {
             return mMonth;
         }
-        ELOO_NODISCARD constexpr weekday weekday() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr weekday weekday() const SGE_NOEXCEPT {
             return mWeekdayLast.weekday();
         }
-        ELOO_NODISCARD constexpr weekday_last weekday_last() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr weekday_last weekday_last() const SGE_NOEXCEPT {
             return mWeekdayLast;
         }
 
-        ELOO_NODISCARD constexpr operator sys_days() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr operator sys_days() const SGE_NOEXCEPT {
             const sys_days _Last        = year_month_day_last{ mYear, month_day_last{ mMonth } };
             const chrono::days _Diff    = chrono::weekday{ _Last } - weekday();
             return _Last - _Diff;
         }
-        ELOO_NODISCARD constexpr explicit operator local_days() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr explicit operator local_days() const SGE_NOEXCEPT {
             return local_days{ static_cast<sys_days>(*this).time_since_epoch() };
         }
 
-        ELOO_NODISCARD constexpr bool ok() const ELOO_NOEXCEPT {
+        SGE_NODISCARD constexpr bool ok() const SGE_NOEXCEPT {
             return mYear.ok() && mMonth.ok() && mWeekdayLast.ok();
         }
 
@@ -1191,49 +1191,49 @@ namespace eastl::chrono {
         chrono::weekday_last mWeekdayLast;
     };
 
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr bool operator == (const year_month_weekday_last& lhs, const year_month_weekday_last& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr bool operator == (const year_month_weekday_last& lhs, const year_month_weekday_last& rhs) SGE_NOEXCEPT {
         return lhs.year() == rhs.year() && lhs.month() == rhs.month() && lhs.weekday_last() == rhs.weekday_last();
     }
 
     template <int = 0>
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_weekday_last operator + (const year_month_weekday_last& lhs, const months& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_weekday_last operator + (const year_month_weekday_last& lhs, const months& rhs) SGE_NOEXCEPT {
         const auto _Ym = year_month{ lhs.year(), lhs.month() } + rhs;
         return { _Ym.year(), _Ym.month(), lhs.weekday_last() };
     }
     template <int = 0>
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_weekday_last operator + (const months& lhs, const year_month_weekday_last& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_weekday_last operator + (const months& lhs, const year_month_weekday_last& rhs) SGE_NOEXCEPT {
         return rhs + lhs;
     }
     template <int = 0>
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_weekday_last operator - (const year_month_weekday_last& lhs, const months& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_weekday_last operator - (const year_month_weekday_last& lhs, const months& rhs) SGE_NOEXCEPT {
         return lhs + -rhs;
     }
 
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_weekday_last operator + (const year_month_weekday_last& lhs, const years& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_weekday_last operator + (const year_month_weekday_last& lhs, const years& rhs) SGE_NOEXCEPT {
         return { lhs.year() + rhs, lhs.month(), lhs.weekday_last() };
     }
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_weekday_last operator + (const years& lhs, const year_month_weekday_last& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_weekday_last operator + (const years& lhs, const year_month_weekday_last& rhs) SGE_NOEXCEPT {
         return rhs + lhs;
     }
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr year_month_weekday_last operator - (const year_month_weekday_last& lhs, const years& rhs) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr year_month_weekday_last operator - (const year_month_weekday_last& lhs, const years& rhs) SGE_NOEXCEPT {
         return lhs + -rhs;
     }
 
     template <int>
-    ELOO_FORCE_INLINE constexpr year_month_weekday_last& year_month_weekday_last::operator += (const months& m) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE constexpr year_month_weekday_last& year_month_weekday_last::operator += (const months& m) SGE_NOEXCEPT {
         *this = *this + m;
         return *this;
     }
     template <int>
-    ELOO_FORCE_INLINE constexpr year_month_weekday_last& year_month_weekday_last::operator -= (const months& m) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE constexpr year_month_weekday_last& year_month_weekday_last::operator -= (const months& m) SGE_NOEXCEPT {
         *this = *this - m;
         return *this;
     }
-    ELOO_FORCE_INLINE constexpr year_month_weekday_last& year_month_weekday_last::operator += (const years& y) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE constexpr year_month_weekday_last& year_month_weekday_last::operator += (const years& y) SGE_NOEXCEPT {
         *this = *this + y;
         return *this;
     }
-    ELOO_FORCE_INLINE constexpr year_month_weekday_last& year_month_weekday_last::operator -= (const years& y) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE constexpr year_month_weekday_last& year_month_weekday_last::operator -= (const years& y) SGE_NOEXCEPT {
         *this = *this - y;
         return *this;
     }
@@ -1245,116 +1245,116 @@ namespace eastl::chrono {
 
     // year_month
 
-    ELOO_NODISCARD constexpr year_month operator / (const year& y, const month& m) ELOO_NOEXCEPT { return year_month{ y, m }; }
-    ELOO_NODISCARD constexpr year_month operator / (int y, const month& m) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr year_month operator / (const year& y, const month& m) SGE_NOEXCEPT { return year_month{ y, m }; }
+    SGE_NODISCARD constexpr year_month operator / (int y, const month& m) SGE_NOEXCEPT {
         return year_month{ year{ static_cast<unsigned int>(y) }, m };
     }
-    ELOO_NODISCARD constexpr year_month operator / (const year& y, int m) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr year_month operator / (const year& y, int m) SGE_NOEXCEPT {
         return year_month{ y, month{ static_cast<unsigned int>(m) } };
     }
 
 
     // month_day
 
-    ELOO_NODISCARD constexpr month_day operator / (const month& m, const day& d) ELOO_NOEXCEPT { return month_day{ m, d }; }
-    ELOO_NODISCARD constexpr month_day operator / (int m, const day& d) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr month_day operator / (const month& m, const day& d) SGE_NOEXCEPT { return month_day{ m, d }; }
+    SGE_NODISCARD constexpr month_day operator / (int m, const day& d) SGE_NOEXCEPT {
         return month_day{ month{ static_cast<unsigned int>(m) }, d };
     }
 
 
     // month_day_last
 
-    ELOO_NODISCARD constexpr month_day_last operator / (const month& m, last_spec) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr month_day_last operator / (const month& m, last_spec) SGE_NOEXCEPT {
         return month_day_last{ m };
     }
-    ELOO_NODISCARD constexpr month_day_last operator / (last_spec, const month& m) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr month_day_last operator / (last_spec, const month& m) SGE_NOEXCEPT {
         return m / last;
     }
-    ELOO_NODISCARD constexpr month_day_last operator / (int m, last_spec) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr month_day_last operator / (int m, last_spec) SGE_NOEXCEPT {
         return month{ static_cast<unsigned int>(m) } / last;
     }
-    ELOO_NODISCARD constexpr month_day_last operator / (last_spec, int m) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr month_day_last operator / (last_spec, int m) SGE_NOEXCEPT {
         return month{ static_cast<unsigned int>(m) } / last;
     }
 
 
     // month_weekday
 
-    ELOO_NODISCARD constexpr month_weekday operator / (const month& m, const weekday_indexed& wdi) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr month_weekday operator / (const month& m, const weekday_indexed& wdi) SGE_NOEXCEPT {
         return month_weekday{ m, wdi };
     }
-    ELOO_NODISCARD constexpr month_weekday operator / (int m, const weekday_indexed& wdi) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr month_weekday operator / (int m, const weekday_indexed& wdi) SGE_NOEXCEPT {
         return month_weekday{ month{ static_cast<unsigned int>(m) }, wdi };
     }
-    ELOO_NODISCARD constexpr month_weekday operator / (const month& m, int wdi) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr month_weekday operator / (const month& m, int wdi) SGE_NOEXCEPT {
         return month_weekday{ m, weekday_indexed{ weekday{ static_cast<unsigned int>(wdi) }, 1 } };
     }
 
 
     // month_weekday_last
 
-    ELOO_NODISCARD constexpr month_weekday_last operator / (const month& m, const weekday_last& wdl) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr month_weekday_last operator / (const month& m, const weekday_last& wdl) SGE_NOEXCEPT {
         return month_weekday_last{ m, wdl };
     }
-    ELOO_NODISCARD constexpr month_weekday_last operator / (int m, const weekday_last& wdl) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr month_weekday_last operator / (int m, const weekday_last& wdl) SGE_NOEXCEPT {
         return month{ static_cast<unsigned int>(m) } / wdl;
     }
 
 
     // year_month_day
 
-    ELOO_NODISCARD constexpr year_month_day operator / (const year_month& ym, const day& d) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr year_month_day operator / (const year_month& ym, const day& d) SGE_NOEXCEPT {
         return year_month_day{ ym.year(), ym.month(), d };
     }
-    ELOO_NODISCARD constexpr year_month_day operator / (const year_month& ym, int d) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr year_month_day operator / (const year_month& ym, int d) SGE_NOEXCEPT {
         return year_month_day{ ym.year(), ym.month(), day{ static_cast<unsigned int>(d) } };
     }
-    ELOO_NODISCARD constexpr year_month_day operator / (const year& y, const month_day& md) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr year_month_day operator / (const year& y, const month_day& md) SGE_NOEXCEPT {
         return year_month_day{ y, md.month(), md.day() };
     }
-    ELOO_NODISCARD constexpr year_month_day operator / (int y, const month_day& md) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr year_month_day operator / (int y, const month_day& md) SGE_NOEXCEPT {
         return year_month_day{ year{ static_cast<unsigned int>(y) }, md.month(), md.day() };
     }
 
 
     // year_month_day_last
 
-    ELOO_NODISCARD constexpr year_month_day_last operator / (const year_month& ym, last_spec) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr year_month_day_last operator / (const year_month& ym, last_spec) SGE_NOEXCEPT {
         return year_month_day_last{ ym.year(), month_day_last{ ym.month() } };
     }
-    ELOO_NODISCARD constexpr year_month_day_last operator / (last_spec, const year_month& ym) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr year_month_day_last operator / (last_spec, const year_month& ym) SGE_NOEXCEPT {
         return ym / last;
     }
-    ELOO_NODISCARD constexpr year_month_day_last operator / (const year& y, const month_day_last& mdl) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr year_month_day_last operator / (const year& y, const month_day_last& mdl) SGE_NOEXCEPT {
         return year_month_day_last{ y, mdl };
     }
-    ELOO_NODISCARD constexpr year_month_day_last operator / (int y, const month_day_last& mdl) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr year_month_day_last operator / (int y, const month_day_last& mdl) SGE_NOEXCEPT {
         return year_month_day_last{ year{ static_cast<unsigned int>(y) }, mdl };
     }
 
 
     // year_month_weekday
 
-    ELOO_NODISCARD constexpr year_month_weekday operator / (const year_month& ym, const weekday_indexed& wdi) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr year_month_weekday operator / (const year_month& ym, const weekday_indexed& wdi) SGE_NOEXCEPT {
         return year_month_weekday{ ym.year(), ym.month(), wdi };
     }
-    ELOO_NODISCARD constexpr year_month_weekday operator / (const year& y, const month_weekday mw) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr year_month_weekday operator / (const year& y, const month_weekday mw) SGE_NOEXCEPT {
         return year_month_weekday{ y, mw.month(), mw.weekday_indexed() };
     }
-    ELOO_NODISCARD constexpr year_month_weekday operator / (int y, const month_weekday mw) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr year_month_weekday operator / (int y, const month_weekday mw) SGE_NOEXCEPT {
         return year_month_weekday{ year{ static_cast<unsigned int>(y) }, mw.month(), mw.weekday_indexed() };
     }
 
 
     // year_month_weekday_last
 
-    ELOO_NODISCARD constexpr year_month_weekday_last operator / (const year_month& ym, const weekday_last& wdl) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr year_month_weekday_last operator / (const year_month& ym, const weekday_last& wdl) SGE_NOEXCEPT {
         return year_month_weekday_last{ ym.year(), ym.month(), wdl };
     }
-    ELOO_NODISCARD constexpr year_month_weekday_last operator / (const year& y, const month_weekday_last mwl) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr year_month_weekday_last operator / (const year& y, const month_weekday_last mwl) SGE_NOEXCEPT {
         return year_month_weekday_last{ y, mwl.month(), mwl.weekday_last() };
     }
-    ELOO_NODISCARD constexpr year_month_weekday_last operator / (int y, const month_weekday_last mwl) ELOO_NOEXCEPT {
+    SGE_NODISCARD constexpr year_month_weekday_last operator / (int y, const month_weekday_last mwl) SGE_NOEXCEPT {
         return year_month_weekday_last{ year{ static_cast<unsigned int>(y) }, mwl.month(), mwl.weekday_last() };
     }
 
@@ -1384,8 +1384,8 @@ namespace eastl::chrono {
     inline constexpr month November{ 11 };
     inline constexpr month December{ 12 };
 #else
-namespace eloo::helper::chrono {
-#endif // defined(ELOO_USE_EXTRA_CHRONO_TYPES)
+namespace sge::helper::chrono {
+#endif // defined(SGE_USE_EXTRA_CHRONO_TYPES)
 
     ///////////////////////////////////////////////////////////////////////////////
     // convert any std time_point to eastl time_point
@@ -1395,7 +1395,7 @@ namespace eloo::helper::chrono {
     namespace ec = ::eastl::chrono;
 
     template <class _STDTimePoint, class _EASTLDuration>
-    ELOO_FORCE_INLINE ELOO_NODISCARD constexpr ec::time_point<ec::system_clock, _EASTLDuration> std_to_eastl(const _STDTimePoint& stdtp) ELOO_NOEXCEPT {
+    SGE_FORCE_INLINE SGE_NODISCARD constexpr ec::time_point<ec::system_clock, _EASTLDuration> std_to_eastl(const _STDTimePoint& stdtp) SGE_NOEXCEPT {
         // Get nanoseconds in std::chrono form
         const auto sinceEpoch = sc::clock_cast<sc::system_clock>(stdtp).time_since_epoch();
         const auto scns = sc::duration_cast<sc::nanoseconds>(sinceEpoch).count();
@@ -1414,7 +1414,7 @@ namespace eloo::helper::chrono {
     // now as string
     //////////////////////////////////////////////////////////////////////////////
 
-    ELOO_FORCE_INLINE ELOO_NODISCARD ::eastl::string now_as_string() {
+    SGE_FORCE_INLINE SGE_NODISCARD ::eastl::string now_as_string() {
         const auto now = sc::system_clock::now();
         const ::std::time_t t = sc::system_clock::to_time_t(now);
         char buf[64];

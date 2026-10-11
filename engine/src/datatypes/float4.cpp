@@ -1,7 +1,7 @@
 #include "maths/math.h"
 #include "utility/managed_memory_block.h"
 
-using namespace eloo;
+using namespace sge;
 
 namespace {
     constexpr int MEMORY_BLOCK_INITIAL_SIZE = 50;
@@ -12,14 +12,10 @@ namespace {
 
 float4::id_t float4::create(float x, float y, float z, float w) {
     id_t id = gMemoryBlockX.push(x);
-    ELOO_ASSERT_FATAL(id == gMemoryBlockY.push(y), "ID mismatch between X and Y memory blocks.");
-    ELOO_ASSERT_FATAL(id == gMemoryBlockZ.push(z), "ID mismatch between X and Z memory blocks.");
-    ELOO_ASSERT_FATAL(id == gMemoryBlockW.push(w), "ID mismatch between X and W memory blocks.");
+    SGE_ASSERT_FATAL(id == gMemoryBlockY.push(y), "ID mismatch between X and Y memory blocks.");
+    SGE_ASSERT_FATAL(id == gMemoryBlockZ.push(z), "ID mismatch between X and Z memory blocks.");
+    SGE_ASSERT_FATAL(id == gMemoryBlockW.push(w), "ID mismatch between X and W memory blocks.");
     return id;
-}
-
-float4::id_t float4::create(const values& vals) {
-    return create(vals.x(), vals.y(), vals.z(), vals.w());
 }
 
 bool float4::release(id_t id) {
@@ -33,14 +29,12 @@ bool float4::release(id_t id) {
     return true;
 }
 
-bool float4::try_get_values(id_t id, float4::values& vals) {
+bool float4::try_get_values(id_t id, float &x, float &y, float &z, float &w) {
     if (is_valid(id)) {
-        vals = {
-            gMemoryBlockX.get(id),
-            gMemoryBlockY.get(id),
-            gMemoryBlockZ.get(id),
-            gMemoryBlockW.get(id)
-        };
+        x = gMemoryBlockX.get(id);
+        y = gMemoryBlockY.get(id);
+        z = gMemoryBlockZ.get(id);
+        w = gMemoryBlockW.get(id);
         return true;
     }
     return false;
@@ -233,3 +227,4 @@ float4::values& float4::values::operator -= (float val) {
     *this = *this - val;
     return *this;
 }
+bool float4::is_valid(id_t id) { return gMemoryBlockX.is_valid(id) && gMemoryBlockY.is_valid(id) && gMemoryBlockZ.is_valid(id) && gMemoryBlockW.is_valid(id); }

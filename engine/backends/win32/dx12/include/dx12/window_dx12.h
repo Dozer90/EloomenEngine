@@ -18,7 +18,7 @@ using WPARAM  = std::uintptr_t;
 using LPARAM  = std::intptr_t;
 using LRESULT = std::intptr_t;
 
-namespace eloo {
+namespace sge {
     class window_dx12 : public window_interface {
     public:
         window_dx12(HINSTANCE instance,

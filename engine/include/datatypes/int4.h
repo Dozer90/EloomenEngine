@@ -5,8 +5,8 @@
 #include <EASTL/numeric_limits.h>
 #include <EASTL/type_traits.h>
 
-namespace eloo::int4 {
-    ELOO_DECLARE_ID_T;
+namespace sge::int4 {
+    SGE_DECLARE_ID_T;
 
     // OOP style container for int2
     struct values {
@@ -94,4 +94,4 @@ namespace eloo::int4 {
     const int& const_w(id_t id);
 };
 
-using int4_v = eloo::int4::values;
+using int4_v = sge::int4::values;

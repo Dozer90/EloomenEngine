@@ -9,7 +9,7 @@
 #include <memory>
 
 
-namespace eloo {
+namespace sge {
     template <typename T, int InitialSize, float ExpansionScalar = 0.5f>
     class managed_memory_block {
     public:
@@ -18,7 +18,7 @@ namespace eloo {
             if constexpr (eastl::is_trivially_constructible_v<T>) {
                 memset(mData.data(), 0, InitialSize * sizeof(T));
             } else {
-                std::uninitialized_fill(mData.begin(), mData.end(), T());
+                std::fill(mData.begin(), mData.end(), T());
             }
         }
 
@@ -38,8 +38,8 @@ namespace eloo {
             return id;
         }
 
-        size_t push(T val) {
-            return push(std::move(val));
+        size_t push(const T &val) {
+            return push(T(val));
         }
 
         size_t push(T&& val) {
@@ -58,18 +58,18 @@ namespace eloo {
             while (mSize + count > mData.size()) {
                 expand();
             }
-            memccpy(mData.data() + mSize, src, 0, count * sizeof(T));
+            memcpy(mData.data() + mSize, src, count * sizeof(T));
             mSize += count;
             return mSize - count; // Return the starting index of the copied elements
         }
 
         bool remove(size_t id) {
             if (!is_valid(id)) {
-                ELOO_ASSERT_FALSE("Cannot remove invalid id %i from managed_memory_block.", id);
+                SGE_ASSERT_FALSE("Cannot remove invalid id %i from managed_memory_block.", id);
                 return false;
             }
             if (!mUnusedIDs.insert(id).second) {
-                ELOO_ASSERT_FALSE("ID %i is already in managed_memory_block's pool. This should not happen.", id);
+                SGE_ASSERT_FALSE("ID %i is already in managed_memory_block's pool. This should not happen.", id);
                 return false;
             }
             mData[id] = T();
@@ -89,27 +89,27 @@ namespace eloo {
         }
 
         T& get(size_t index) {
-            ELOO_ASSERT(index < mSize, "Index out of range");
+            SGE_ASSERT(index < mSize, "Index out of range");
             return mData[index];
         }
 
         const T& get(size_t index) const {
-            ELOO_ASSERT(index < mSize, "Index out of range");
+            SGE_ASSERT(index < mSize, "Index out of range");
             return mData[index];
         }
 
         T& operator[](size_t index) {
-            ELOO_ASSERT(index < mSize, "Index out of range");
+            SGE_ASSERT(index < mSize, "Index out of range");
             return get(index);
         }
 
         const T& operator[](size_t index) const {
-            ELOO_ASSERT(index < mSize, "Index out of range");
+            SGE_ASSERT(index < mSize, "Index out of range");
             return get(index);
         }
 
         void set(size_t index, T val) {
-            ELOO_ASSERT(index < mSize, "Index out of range");
+            SGE_ASSERT(index < mSize, "Index out of range");
             mData[index] = val;
         }
 
@@ -125,7 +125,7 @@ namespace eloo {
             if constexpr (eastl::is_trivially_constructible_v<T>) {
                 memset(mData.data() + oldSize, 0, sizeExpansion * sizeof(T));
             } else {
-                std::uninitialized_fill(mData.begin() + oldSize, mData.end(), T());
+                std::fill(mData.begin() + oldSize, mData.end(), T());
             }
         }
 
@@ -145,12 +145,12 @@ namespace eloo {
             if constexpr (eastl::is_trivially_constructible_v<T>) {
                 memset(mData.data(), 0, InitialSize * ElementCount * sizeof(T));
             } else {
-                std::uninitialized_fill(mData.begin(), mData.end(), T());
+                std::fill(mData.begin(), mData.end(), T());
             }
         }
 
         size_t push(std::initializer_list<T> values) {
-            ELOO_ASSERT_FATAL(values.size() == ElementCount, "Invalid number of values provided to push");
+            SGE_ASSERT_FATAL(values.size() == ElementCount, "Invalid number of values provided to push");
 
             size_t id = mSize;
             if (!mUnusedIDs.empty()) {
@@ -190,27 +190,27 @@ namespace eloo {
         }
 
         T& get(size_t id, size_t elementOffset) {
-            ELOO_ASSERT(is_valid(id), "ID is not valid");
+            SGE_ASSERT(is_valid(id), "ID is not valid");
             return mData[id * ElementCount + elementOffset];
         }
 
         const T& get(size_t id, size_t elementOffset) const {
-            ELOO_ASSERT(is_valid(id), "ID is not valid");
+            SGE_ASSERT(is_valid(id), "ID is not valid");
             return mData[id * ElementCount + elementOffset];
         }
 
         T* operator[](size_t id) {
-            ELOO_ASSERT(is_valid(id), "ID is not valid");
+            SGE_ASSERT(is_valid(id), "ID is not valid");
             return &get(id, 0);
         }
 
         const T* operator[](size_t id) const {
-            ELOO_ASSERT(is_valid(id), "ID is not valid");
+            SGE_ASSERT(is_valid(id), "ID is not valid");
             return &get(id, 0);
         }
 
         void set(size_t id, size_t elementOffset, T val) {
-            ELOO_ASSERT(is_valid(id), "ID is not valid");
+            SGE_ASSERT(is_valid(id), "ID is not valid");
             mData[id * ElementCount + elementOffset] = val;
         }
 

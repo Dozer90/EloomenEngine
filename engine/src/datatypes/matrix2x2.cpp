@@ -4,7 +4,7 @@
 
 #include "utility/managed_memory_block.h"
 
-using namespace eloo;
+using namespace sge;
 
 namespace {
     constexpr int MEMORY_BLOCK_INITIAL_SIZE = 50;
@@ -40,20 +40,20 @@ bool matrix2x2::try_get_values(id_t id, matrix2x2::values& vals) {
 }
 
 float& matrix2x2::cell(id_t id, int index) {
-    ELOO_ASSERT(is_valid(id), "ID is invalid.");
-    ELOO_ASSERT(index >= 0 && index < CELL_COUNT, "Element offset is out of range.");
+    SGE_ASSERT(is_valid(id), "ID is invalid.");
+    SGE_ASSERT(index >= 0 && index < CELL_COUNT, "Element offset is out of range.");
     return gMemoryBlock.get(id, index);
 }
 float& matrix2x2::cell(id_t id, int row, int column) {
-    ELOO_ASSERT(is_valid(id), "ID is invalid.");
-    ELOO_ASSERT(row >= 0 && row < ROW_COUNT, "Row index is out of range.");
-    ELOO_ASSERT(column >= 0 && column < COLUMN_COUNT, "Column index is out of range.");
+    SGE_ASSERT(is_valid(id), "ID is invalid.");
+    SGE_ASSERT(row >= 0 && row < ROW_COUNT, "Row index is out of range.");
+    SGE_ASSERT(column >= 0 && column < COLUMN_COUNT, "Column index is out of range.");
     return gMemoryBlock.get(id, row * COLUMN_COUNT + column);
 }
 
 float2::values matrix2x2::row(id_t id, int row) {
-    ELOO_ASSERT(is_valid(id), "ID is invalid.");
-    ELOO_ASSERT(row >= 0 && row < ROW_COUNT, "Row index is out of range.");
+    SGE_ASSERT(is_valid(id), "ID is invalid.");
+    SGE_ASSERT(row >= 0 && row < ROW_COUNT, "Row index is out of range.");
     return {
         gMemoryBlock.get(id, row * COLUMN_COUNT + 0),
         gMemoryBlock.get(id, row * COLUMN_COUNT + 1)
@@ -61,8 +61,8 @@ float2::values matrix2x2::row(id_t id, int row) {
 }
 
 float2::values matrix2x2::column(id_t id, int column) {
-    ELOO_ASSERT(is_valid(id), "ID is invalid.");
-    ELOO_ASSERT(column >= 0 && column < COLUMN_COUNT, "Column index is out of range.");
+    SGE_ASSERT(is_valid(id), "ID is invalid.");
+    SGE_ASSERT(column >= 0 && column < COLUMN_COUNT, "Column index is out of range.");
     return {
         gMemoryBlock.get(id, 0 * COLUMN_COUNT + column),
         gMemoryBlock.get(id, 1 * COLUMN_COUNT + column)
@@ -70,20 +70,20 @@ float2::values matrix2x2::column(id_t id, int column) {
 }
 
 const float& matrix2x2::const_cell(id_t id, int index) {
-    ELOO_ASSERT(is_valid(id), "ID is invalid.");
-    ELOO_ASSERT(index >= 0 && index < CELL_COUNT, "Element offset is out of range.");
+    SGE_ASSERT(is_valid(id), "ID is invalid.");
+    SGE_ASSERT(index >= 0 && index < CELL_COUNT, "Element offset is out of range.");
     return gMemoryBlock.get(id, index);
 }
 const float& matrix2x2::const_cell(id_t id, int row, int column) {
-    ELOO_ASSERT(is_valid(id), "ID is invalid.");
-    ELOO_ASSERT(row >= 0 && row < ROW_COUNT, "Row index is out of range.");
-    ELOO_ASSERT(column >= 0 && column < COLUMN_COUNT, "Column index is out of range.");
+    SGE_ASSERT(is_valid(id), "ID is invalid.");
+    SGE_ASSERT(row >= 0 && row < ROW_COUNT, "Row index is out of range.");
+    SGE_ASSERT(column >= 0 && column < COLUMN_COUNT, "Column index is out of range.");
     return gMemoryBlock.get(id, row * COLUMN_COUNT + column);
 }
 
 const float2::values matrix2x2::const_row(id_t id, int row) {
-    ELOO_ASSERT(is_valid(id), "ID is invalid.");
-    ELOO_ASSERT(row >= 0 && row < ROW_COUNT, "Row index is out of range.");
+    SGE_ASSERT(is_valid(id), "ID is invalid.");
+    SGE_ASSERT(row >= 0 && row < ROW_COUNT, "Row index is out of range.");
     return {
         gMemoryBlock.get(id, row * COLUMN_COUNT + 0),
         gMemoryBlock.get(id, row * COLUMN_COUNT + 1)
@@ -91,8 +91,8 @@ const float2::values matrix2x2::const_row(id_t id, int row) {
 }
 
 const float2::values matrix2x2::const_column(id_t id, int column) {
-    ELOO_ASSERT(is_valid(id), "ID is invalid.");
-    ELOO_ASSERT(column >= 0 && column < COLUMN_COUNT, "Column index is out of range.");
+    SGE_ASSERT(is_valid(id), "ID is invalid.");
+    SGE_ASSERT(column >= 0 && column < COLUMN_COUNT, "Column index is out of range.");
     return {
         gMemoryBlock.get(id, 0 * COLUMN_COUNT + column),
         gMemoryBlock.get(id, 1 * COLUMN_COUNT + column)
@@ -104,7 +104,7 @@ const float2::values matrix2x2::const_column(id_t id, int column) {
 // Values container
 
 float2::values matrix2x2::values::row(int row) {
-    ELOO_ASSERT(row >= 0 && row < ROW_COUNT, "Row index is out of range.");
+    SGE_ASSERT(row >= 0 && row < ROW_COUNT, "Row index is out of range.");
     return {
         mCells[row * COLUMN_COUNT + 0],
         mCells[row * COLUMN_COUNT + 1]
@@ -112,7 +112,7 @@ float2::values matrix2x2::values::row(int row) {
 }
 
 float2::values matrix2x2::values::column(int column) {
-    ELOO_ASSERT(column >= 0 && column < 2, "Column index is out of range.");
+    SGE_ASSERT(column >= 0 && column < 2, "Column index is out of range.");
     return {
         mCells[0 * COLUMN_COUNT + column],
         mCells[1 * COLUMN_COUNT + column]
@@ -120,7 +120,7 @@ float2::values matrix2x2::values::column(int column) {
 }
 
 const float2::values matrix2x2::values::row(int row) const {
-    ELOO_ASSERT(row >= 0 && row < ROW_COUNT, "Row index is out of range.");
+    SGE_ASSERT(row >= 0 && row < ROW_COUNT, "Row index is out of range.");
     return {
         mCells[row * COLUMN_COUNT + 0],
         mCells[row * COLUMN_COUNT + 1]
@@ -128,7 +128,7 @@ const float2::values matrix2x2::values::row(int row) const {
 }
 
 const float2::values matrix2x2::values::column(int column) const {
-    ELOO_ASSERT(column >= 0 && column < COLUMN_COUNT, "Column index is out of range.");
+    SGE_ASSERT(column >= 0 && column < COLUMN_COUNT, "Column index is out of range.");
     return {
         mCells[0 * COLUMN_COUNT + column],
         mCells[1 * COLUMN_COUNT + column]
@@ -136,12 +136,12 @@ const float2::values matrix2x2::values::column(int column) const {
 }
 
 float& matrix2x2::values::cell(int index) {
-    ELOO_ASSERT(index >= 0 && index < CELL_COUNT, "Index is out of range.");
+    SGE_ASSERT(index >= 0 && index < CELL_COUNT, "Index is out of range.");
     return mCells[index];
 }
 
 const float& matrix2x2::values::cell(int index) const {
-    ELOO_ASSERT(index >= 0 && index < CELL_COUNT, "Index is out of range.");
+    SGE_ASSERT(index >= 0 && index < CELL_COUNT, "Index is out of range.");
     return mCells[index];
 }
 

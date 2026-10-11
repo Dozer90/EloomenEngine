@@ -23,10 +23,10 @@
     f4Var.x(), f4Var.y(), f4Var.z(), f4Var.w()
 
 
-namespace eloo::float4 {
-    ELOO_DECLARE_ID_T;
+namespace sge::float4 {
+    SGE_DECLARE_ID_T;
 
-    // OOP style container for float2
+    // OOP style container for float4
     struct values {
     private:
         float mX, mY, mZ, mW;
@@ -95,14 +95,12 @@ namespace eloo::float4 {
     inline static constexpr values RIGHT    { 1.0f, 0.0f, 0.0f, 0.0f };
     inline static constexpr values UP       { 0.0f, 1.0f, 0.0f, 0.0f };
     inline static constexpr values FORWARD  { 0.0f, 0.0f, 1.0f, 0.0f };
+    inline static constexpr values ORIGIN   { 0.0f, 0.0f, 0.0f, 1.0f };
 
     id_t create(float x = 0.0f, float y = 0.0f, float z = 0.0f, float w = 0.0f);
-    id_t create(const values& vals);
-    bool release(id_t id);
-
+    bool try_get_values(id_t id, float &x, float &y, float &z, float &w);
     bool is_valid(id_t id);
-
-    bool try_get_values(id_t id, values& vals);
+    bool release(id_t id);
 
     float& x(id_t id);
     float& y(id_t id);
@@ -115,4 +113,4 @@ namespace eloo::float4 {
     const float& const_w(id_t id);
 };
 
-using float4_v = eloo::float4::values;
+using float4_v = sge::float4::values;

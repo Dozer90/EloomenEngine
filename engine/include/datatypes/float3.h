@@ -22,8 +22,8 @@
     f3Var.x(), f3Var.y(), f3Var.z()
 
 
-namespace eloo::float3 {
-    ELOO_DECLARE_ID_T;
+namespace sge::float3 {
+    SGE_DECLARE_ID_T;
 
     // OOP style container for float2
     struct values {
@@ -93,12 +93,9 @@ namespace eloo::float3 {
     inline static constexpr values FORWARD  { 0.0f, 0.0f, 1.0f };
 
     id_t create(float x = 0.0f, float y = 0.0f, float z = 0.0f);
-    id_t create(const values& vals);
-    bool release(id_t id);
-
     bool is_valid(id_t id);
-
-    bool try_get_values(id_t id, values& vals);
+    bool try_get_values(id_t id, float &x, float &y, float &z);
+    bool release(id_t id);
 
     float& x(id_t id);
     float& y(id_t id);
@@ -109,4 +106,4 @@ namespace eloo::float3 {
     const float& const_z(id_t id);
 };
 
-using float3_v = eloo::float3::values;
+using float3_v = sge::float3::values;

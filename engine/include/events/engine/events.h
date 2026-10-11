@@ -4,46 +4,46 @@
 
 #include "utility/observer.h"
 
-#define ELOO_DEFINE_EVENT_DEFINITIONS               \
+#define SGE_DEFINE_EVENT_DEFINITIONS               \
 /* Window events */                                 \
-ELOO_DEFINE_EVENT_WITH_DATA(window_resized)         \
-ELOO_DEFINE_EVENT          (window_opened)          \
-ELOO_DEFINE_EVENT          (window_closed)          \
-ELOO_DEFINE_EVENT          (window_minimized)       \
-ELOO_DEFINE_EVENT          (window_maximized)       \
-ELOO_DEFINE_EVENT_WITH_DATA(window_focus_changed)   \
-ELOO_DEFINE_EVENT_WITH_DATA(window_moved)           \
+SGE_DEFINE_EVENT_WITH_DATA(window_resized)         \
+SGE_DEFINE_EVENT          (window_opened)          \
+SGE_DEFINE_EVENT          (window_closed)          \
+SGE_DEFINE_EVENT          (window_minimized)       \
+SGE_DEFINE_EVENT          (window_maximized)       \
+SGE_DEFINE_EVENT_WITH_DATA(window_focus_changed)   \
+SGE_DEFINE_EVENT_WITH_DATA(window_moved)           \
 /* Input events */                                  \
-ELOO_DEFINE_EVENT_WITH_DATA(key_pressed)            \
-ELOO_DEFINE_EVENT_WITH_DATA(key_released)           \
-ELOO_DEFINE_EVENT_WITH_DATA(mouse_button_pressed)   \
-ELOO_DEFINE_EVENT_WITH_DATA(mouse_button_released)  \
-ELOO_DEFINE_EVENT_WITH_DATA(mouse_moved)            \
-ELOO_DEFINE_EVENT_WITH_DATA(mouse_scrolled)         \
+SGE_DEFINE_EVENT_WITH_DATA(key_pressed)            \
+SGE_DEFINE_EVENT_WITH_DATA(key_released)           \
+SGE_DEFINE_EVENT_WITH_DATA(mouse_button_pressed)   \
+SGE_DEFINE_EVENT_WITH_DATA(mouse_button_released)  \
+SGE_DEFINE_EVENT_WITH_DATA(mouse_moved)            \
+SGE_DEFINE_EVENT_WITH_DATA(mouse_scrolled)         \
 /* Filesystem events */                             \
-ELOO_DEFINE_EVENT_WITH_DATA(directory_created)      \
-ELOO_DEFINE_EVENT_WITH_DATA(directory_modified)     \
-ELOO_DEFINE_EVENT_WITH_DATA(directory_removed)      \
-ELOO_DEFINE_EVENT_WITH_DATA(file_created)           \
-ELOO_DEFINE_EVENT_WITH_DATA(file_modified)          \
-ELOO_DEFINE_EVENT_WITH_DATA(file_removed)           \
+SGE_DEFINE_EVENT_WITH_DATA(directory_created)      \
+SGE_DEFINE_EVENT_WITH_DATA(directory_modified)     \
+SGE_DEFINE_EVENT_WITH_DATA(directory_removed)      \
+SGE_DEFINE_EVENT_WITH_DATA(file_created)           \
+SGE_DEFINE_EVENT_WITH_DATA(file_modified)          \
+SGE_DEFINE_EVENT_WITH_DATA(file_removed)           \
 
 
-namespace eloo::events::engine
+namespace sge::events::engine
 {
-#define ELOO_DEFINE_EVENT(x) x,
-#define ELOO_DEFINE_EVENT_WITH_DATA(x) x,
+#define SGE_DEFINE_EVENT(x) x,
+#define SGE_DEFINE_EVENT_WITH_DATA(x) x,
     enum event_id {
-        ELOO_DEFINE_EVENT_DEFINITIONS
+        SGE_DEFINE_EVENT_DEFINITIONS
         count
     };
-#undef ELOO_DEFINE_EVENT
-#undef ELOO_DEFINE_EVENT_WITH_DATA
+#undef SGE_DEFINE_EVENT
+#undef SGE_DEFINE_EVENT_WITH_DATA
 
-#define ELOO_DEFINE_EVENT(x) observer<> on_##x;
-#define ELOO_DEFINE_EVENT_WITH_DATA(x) observer<x##_data> on_##x;
-    ELOO_DEFINE_EVENT_DEFINITIONS
-#undef ELOO_DEFINE_EVENT
-#undef ELOO_DEFINE_EVENT_WITH_DATA
-#undef ELOO_DEFINE_EVENT_DEFINITIONS
+#define SGE_DEFINE_EVENT(x) inline observer<> on_##x;
+#define SGE_DEFINE_EVENT_WITH_DATA(x) inline observer<x##_data> on_##x;
+    SGE_DEFINE_EVENT_DEFINITIONS
+#undef SGE_DEFINE_EVENT
+#undef SGE_DEFINE_EVENT_WITH_DATA
+#undef SGE_DEFINE_EVENT_DEFINITIONS
 }

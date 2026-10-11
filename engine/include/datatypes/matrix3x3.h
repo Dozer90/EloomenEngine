@@ -36,8 +36,8 @@
     matVar[matrix3x3::R3C1], matVar[matrix3x3::R3C2], matVar[matrix3x3::R3C3]
 
 
-namespace eloo::matrix3x3 {
-    ELOO_DECLARE_ID_T;
+namespace sge::matrix3x3 {
+    SGE_DECLARE_ID_T;
 
     enum cell_index {
         R1C1, R1C2, R1C3,
@@ -155,4 +155,4 @@ namespace eloo::matrix3x3 {
     const float3::values const_column(id_t id, int index);
 }
 
-using matrix3x3_v = eloo::matrix3x3::values;
+using matrix3x3_v = sge::matrix3x3::values;

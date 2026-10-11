@@ -8,19 +8,22 @@
 #include <cstdio>
 
 
-namespace eloo::filesystem {
+namespace sge::filesystem {
 
     // ==============================================================================
     // Input (read) file stream
 
     struct ifstream {
     protected:
+        streaming::data_vector mBuffer;
         eastl::unique_ptr<streaming::istream> i;
         FILE* mFileHandle = nullptr;
 
     public:
         ifstream(const path_t& filePath);
         ~ifstream();
+        ifstream(const ifstream&) = delete;
+        ifstream& operator=(const ifstream&) = delete;
     };
 
 
@@ -36,7 +39,10 @@ namespace eloo::filesystem {
         ofstream(const path_t& filePath);
         ~ofstream();
 
-        virtual void_r flush() = 0;
+        void_r write(const char* data, size_t size);
+        void_r flush();
+        ofstream(const ofstream&) = delete;
+        ofstream& operator=(const ofstream&) = delete;
     };
 
 
@@ -52,6 +58,8 @@ namespace eloo::filesystem {
         iofstream(const path_t& filePath);
         ~iofstream();
 
-        virtual void_r flush() = 0;
+        void_r flush();
+        iofstream(const iofstream&) = delete;
+        iofstream& operator=(const iofstream&) = delete;
     };
 }

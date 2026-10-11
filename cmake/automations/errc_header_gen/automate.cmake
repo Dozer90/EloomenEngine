@@ -9,7 +9,7 @@ file(MAKE_DIRECTORY ${_errc_output_dir})
 
 file(GLOB_RECURSE _errc_json_files
     CONFIGURE_DEPENDS
-    "${ELOO_CURRENT_AUTOMATION_DIR}/data/*.json"
+    "${SGE_CURRENT_AUTOMATION_DIR}/data/*.json"
 )
 
 set(GENERATED_ERRC_HEADERS)
@@ -36,10 +36,10 @@ foreach(_json_file IN LISTS _errc_json_files)
 
     list(APPEND GENERATED_ERRC_HEADERS ${_new_errc_h})
 
-    file(RELATIVE_PATH ELOO_DATA_SOURCE_FILE "${CMAKE_SOURCE_DIR}" "${_json_file}")
+    file(RELATIVE_PATH SGE_DATA_SOURCE_FILE "${CMAKE_SOURCE_DIR}" "${_json_file}")
 
     configure_file(
-        "${ELOO_CURRENT_AUTOMATION_DIR}/errc.h.in"
+        "${SGE_CURRENT_AUTOMATION_DIR}/errc.h.in"
         "${_new_errc_h}"
         @ONLY
     )

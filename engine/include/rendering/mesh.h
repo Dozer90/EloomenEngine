@@ -13,8 +13,8 @@
 // #define MATERIALS_IMPLEMENTED
 
 
-namespace eloo::mesh {
-    ELOO_DECLARE_ID_T;
+namespace sge::mesh {
+    SGE_DECLARE_ID_T;
 
     struct vertex {
         float3::values position;            // Position in 3D space
@@ -36,14 +36,14 @@ namespace eloo::mesh {
         eastl::vector<submesh_section> sections; // Sections of the mesh, each with its own material and indices
     };
 
-    id_t create(const mesh::data& meshData, renderer_interface* renderer) ELOO_NOEXCEPT;
-    bool release(id_t id, renderer_interface* renderer) ELOO_NOEXCEPT;
+    id_t create(const mesh::data& meshData, renderer_interface* renderer) SGE_NOEXCEPT;
+    bool release(id_t id, renderer_interface* renderer) SGE_NOEXCEPT;
 
-    bool is_valid(id_t id, int submesh = 0) ELOO_NOEXCEPT;
+    bool is_valid(id_t id, int submesh = 0) SGE_NOEXCEPT;
 
-    bool try_get_data(id_t id, data& meshData) ELOO_NOEXCEPT;
+    bool try_get_data(id_t id, data& meshData) SGE_NOEXCEPT;
 
 #if defined(MATERIALS_IMPLEMENTED)
-    bool try_set_material(id_t id, id_t materialID, int submeshIndex) ELOO_NOEXCEPT;
+    bool try_set_material(id_t id, id_t materialID, int submeshIndex) SGE_NOEXCEPT;
 #endif
 }

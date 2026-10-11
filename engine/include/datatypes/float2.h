@@ -20,8 +20,8 @@
     f2Var.x(), f2Var.y()
 
 
-namespace eloo::float2 {
-    ELOO_DECLARE_ID_T;
+namespace sge::float2 {
+    SGE_DECLARE_ID_T;
 
     // OOP style container for float2
     struct values {
@@ -86,12 +86,9 @@ namespace eloo::float2 {
     inline static constexpr values UP       { 0.0f, 1.0f };
 
     id_t create(float x = 0.0f, float y = 0.0f);
-    id_t create(const values& vals);
-    bool release(id_t id);
-
     bool is_valid(id_t id);
-
-    bool try_get_values(id_t id, values& vals);
+    bool try_get_values(id_t id, float& x, float& y);
+    bool release(id_t id);
 
     float& x(id_t id);
     float& y(id_t id);
@@ -100,4 +97,4 @@ namespace eloo::float2 {
     const float& const_y(id_t id);
 };
 
-using float2_v = eloo::float2::values;
+using float2_v = sge::float2::values;

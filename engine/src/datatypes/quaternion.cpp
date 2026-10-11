@@ -1,7 +1,7 @@
 #include "maths/math.h"
 #include "utility/managed_memory_block.h"
 
-using namespace eloo;
+using namespace sge;
 
 namespace {
     constexpr int MEMORY_BLOCK_INITIAL_SIZE = 50;
@@ -12,19 +12,19 @@ namespace {
 
 quaternion::id_t quaternion::create(float x, float y, float z, float w) {
     id_t id = gMemoryBlockX.push(x);
-    ELOO_ASSERT_FATAL(id == gMemoryBlockY.push(y), "ID mismatch between X and Y memory blocks.");
-    ELOO_ASSERT_FATAL(id == gMemoryBlockZ.push(z), "ID mismatch between X and Z memory blocks.");
-    ELOO_ASSERT_FATAL(id == gMemoryBlockW.push(w), "ID mismatch between X and W memory blocks.");
+    SGE_ASSERT_FATAL(id == gMemoryBlockY.push(y), "ID mismatch between X and Y memory blocks.");
+    SGE_ASSERT_FATAL(id == gMemoryBlockZ.push(z), "ID mismatch between X and Z memory blocks.");
+    SGE_ASSERT_FATAL(id == gMemoryBlockW.push(w), "ID mismatch between X and W memory blocks.");
     return id;
 }
 quaternion::id_t quaternion::create(const float4::values& vals) {
     return create(vals.x(), vals.y(), vals.z(), vals.w());
 }
-quaternion::id_t quaternion::create(float eulerX, float eulerY, float eulerZ) {
+quaternion::id_t quaternion::create_from_euler(float eulerX, float eulerY, float eulerZ) {
     return create(math::quaternion::create_from_euler(eulerX, eulerY, eulerZ));
 }
-quaternion::id_t quaternion::create(const float3::values& euler) {
-    return create(euler.x(), euler.y(), euler.z());
+quaternion::id_t quaternion::create_from_euler(const float3::values& euler) {
+    return create_from_euler(euler.x(), euler.y(), euler.z());
 }
 quaternion::id_t quaternion::create(const quaternion::values& vals) {
     return create(vals.x(), vals.y(), vals.z(), vals.w());
@@ -254,3 +254,4 @@ quaternion::values& quaternion::values::operator -= (float val) {
     *this = *this - val;
     return *this;
 }
+bool quaternion::is_valid(id_t id) { return gMemoryBlockX.is_valid(id) && gMemoryBlockY.is_valid(id) && gMemoryBlockZ.is_valid(id) && gMemoryBlockW.is_valid(id); }

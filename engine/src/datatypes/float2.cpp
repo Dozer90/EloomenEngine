@@ -1,7 +1,7 @@
 #include "maths/math.h"
 #include "utility/managed_memory_block.h"
 
-using namespace eloo;
+using namespace sge;
 
 namespace {
     constexpr int MEMORY_BLOCK_INITIAL_SIZE = 50;
@@ -12,12 +12,8 @@ namespace {
 
 float2::id_t float2::create(float x, float y) {
     id_t id = gMemoryBlockX.push(x);
-    ELOO_ASSERT_FATAL(id == gMemoryBlockY.push(y), "ID mismatch between X and Y memory blocks");
+    SGE_ASSERT_FATAL(id == gMemoryBlockY.push(y), "ID mismatch between X and Y memory blocks");
     return id;
-}
-
-inline float2::id_t float2::create(const values& vals) {
-    return create(vals.x(), vals.y());
 }
 
 bool float2::release(id_t id) {
@@ -29,19 +25,17 @@ bool float2::release(id_t id) {
     return true;
 }
 
-inline bool float2::try_get_values(id_t id, float2::values& vals) {
+bool float2::try_get_values(id_t id, float &x, float &y) {
     if (is_valid(id)) {
-        vals = {
-            gMemoryBlockX.get(id),
-            gMemoryBlockY.get(id)
-        };
+        x = gMemoryBlockX.get(id);
+        y = gMemoryBlockY.get(id);
         return true;
     }
     return false;
 }
 
-inline float& float2::x(id_t id) { return gMemoryBlockX.get(id); }
-inline float& float2::y(id_t id) { return gMemoryBlockY.get(id); }
+float& float2::x(id_t id) { return gMemoryBlockX.get(id); }
+float& float2::y(id_t id) { return gMemoryBlockY.get(id); }
 
 inline const float& float2::const_x(id_t id) { return gMemoryBlockX.get(id); }
 inline const float& float2::const_y(id_t id) { return gMemoryBlockY.get(id); }
@@ -190,3 +184,4 @@ float2::values& float2::values::operator -= (float val) {
     *this = *this - val;
     return *this;
 }
+bool float2::is_valid(id_t id) { return gMemoryBlockX.is_valid(id) && gMemoryBlockY.is_valid(id); }

@@ -7,17 +7,17 @@
 #include <EASTL/vector.h>
 #include <EASTL/unique_ptr.h>
 
-namespace eloo::streaming {
+namespace sge::streaming {
 
     using data_t            = serialization::data_t;
     using data_span         = serialization::data_span;
     using data_vector       = serialization::data_vector;
 
-    using void_r            = ELOO_DECLARE_RESULT_TYPE(void);
+    using void_r            = SGE_DECLARE_RESULT_TYPE(void);
     using data_span_r       = serialization::data_span_r;
 
     constexpr data_t NEWLINE_CHAR = static_cast<streaming::data_t>('\n');
-    constexpr size_t OSTREAM_EXPANSION_FACTOR = 1.4f; // Factor by which the buffer size will be increased when it needs to expand
+    constexpr double OSTREAM_EXPANSION_FACTOR = 1.4;
     constexpr size_t OSTREAM_DEFAULT_BUFFER_SIZE = 1024; // Initial size of the stream if it is empty
 
 
@@ -36,14 +36,14 @@ namespace eloo::streaming {
 
         //$ Get the current position in the stream.
         //$ return: size_t => The current position in the stream.
-        size_t tell() const ELOO_NOEXCEPT {
+        size_t tell() const SGE_NOEXCEPT {
             return position;
         }
 
         //$ Set the current position in the stream.
         //$ arg0:   size_t newPosition => The new position to set in the stream.
         //$ return: void_r => Result of the seek operation.
-        void_r seek(size_t newPosition) ELOO_NOEXCEPT;
+        void_r seek(size_t newPosition) SGE_NOEXCEPT;
 
         // -------------------------------------------
 
@@ -58,7 +58,7 @@ namespace eloo::streaming {
         std::expected<T, std::error_code> read() {
             constexpr size_t SIZE_OF_T = sizeof(T);
             const auto r = read(SIZE_OF_T);
-            ELOO_RETURN_ERRC_IF_FUNC_FAILED(r);
+            SGE_RETURN_ERRC_IF_FUNC_FAILED(r);
             return serialization::deserialize<T>(*r);
         }
 
@@ -71,7 +71,7 @@ namespace eloo::streaming {
         template <typename T>
         void_r operator >> (T& obj) {
             const auto r = read<T>();
-            ELOO_RETURN_ERRC_IF_FUNC_FAILED(r);
+            SGE_RETURN_ERRC_IF_FUNC_FAILED(r);
             obj = eastl::move(*r);
             return {};
         }
@@ -79,7 +79,7 @@ namespace eloo::streaming {
         //$ op:     Deserialize and read an object from the stream.
         //$ return: void_r => Result of the read operation.
         template <typename T>
-        static void_r operator << (T& obj, istream& i) {
+        friend void_r operator << (T& obj, istream& i) {
             return i >> obj;
         }
     };
@@ -109,11 +109,13 @@ namespace eloo::streaming {
             return data_span(buffer.data(), position);
         }
 
+        const data_vector* storage() const { return &buffer; }
+
         // -------------------------------------------
 
         //$ Get the current position in the stream.
         //$ return: size_t => The current position in the stream.
-        size_t tell() const ELOO_NOEXCEPT {
+        size_t tell() const SGE_NOEXCEPT {
             return position;
         }
 
@@ -151,7 +153,8 @@ namespace eloo::streaming {
         //$ return: void_r => Result of the write operation.
         template <typename T>
         void_r write(const T& obj) {
-            ELOO_RETURN_ERRC_IF_FUNC_FAILED(serialization::serialize_to_buffer(obj, buffer.data(), buffer.size(), position));
+            SGE_RETURN_ERRC_IF_FUNC_FAILED(ensure_data_can_fit(sizeof(T)));
+            SGE_RETURN_ERRC_IF_FUNC_FAILED(serialization::serialize_to_buffer(obj, buffer.data(), buffer.size(), position));
             return {};
         }
 
@@ -169,13 +172,13 @@ namespace eloo::streaming {
         //$ return: void_r => Result of the write operation.
         template <typename T>
         void_r operator << (const T& obj) {
-            return o.write(obj);
+            return write(obj);
         }
 
         //$ op:     Serialize and write an object to the stream followed by a newline character.
         //$ return: void_r => Result of the write operation.
         template <typename T>
-        static void_r operator >> (const T& obj, ostream& o) {
+        friend void_r operator >> (const T& obj, ostream& o) {
             return o.write(obj);
         }
 
@@ -202,7 +205,7 @@ namespace eloo::streaming {
 
         //$ Get the current position in the input stream.
         //$ return: size_t => The current position in the input stream.
-        size_t tellg() const ELOO_NOEXCEPT {
+        size_t tellg() const SGE_NOEXCEPT {
             return i->tell();
         }
 
@@ -251,7 +254,7 @@ namespace eloo::streaming {
         //$ op:     Deserialize and read an object from the input stream.
         //$ return: void_r => Result of the read operation.
         template <typename T>
-        static void_r operator << (T& obj, iostream& io) {
+        friend void_r operator << (T& obj, iostream& io) {
             return io >> obj;
         }
 
@@ -261,7 +264,7 @@ namespace eloo::streaming {
 
         //$ Get the current position in the output stream.
         //$ return: size_t => The current position in the output stream.
-        size_t tellp() const ELOO_NOEXCEPT {
+        size_t tellp() const SGE_NOEXCEPT {
             return o->tell();
         }
 
@@ -318,7 +321,7 @@ namespace eloo::streaming {
         //$ op:     Serialize and write an object to the output stream.
         //$ return: void_r => Result of the write operation.
         template <typename T>
-        static void_r operator >> (const T& obj, iostream& io) {
+        friend void_r operator >> (const T& obj, iostream& io) {
             return io << obj;
         }
 

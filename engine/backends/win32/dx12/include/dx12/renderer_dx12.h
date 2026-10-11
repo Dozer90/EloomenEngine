@@ -4,9 +4,12 @@
 
 #include "utility/defines.h"
 #include "datatypes/int2.h"
+#include "events/engine/events.h"
+#include <optional>
+#include <EASTL/vector.h>
 
+#include <directx/d3d12.h>
 #include <wrl/client.h>
-#include <d3d12.h>
 #include <dxgi1_6.h>
 
 /* ====================================
@@ -22,7 +25,7 @@ UAV = Unordered Access View
 
 using Microsoft::WRL::ComPtr;
 
-namespace eloo {
+namespace sge {
     class window_interface;
     class window_dx12;
 
@@ -33,6 +36,7 @@ namespace eloo {
         renderer_dx12& operator=(const renderer_dx12&) = delete;
         renderer_dx12(renderer_dx12&&) = delete;
         renderer_dx12& operator=(renderer_dx12&&) = delete;
+        ~renderer_dx12();
 
         virtual inline constexpr const char* renderer_name() const override  { return "DirectX"; }
         virtual inline constexpr const char* platform_name() const override  { return "Windows"; }
@@ -42,6 +46,15 @@ namespace eloo {
         virtual inline constexpr unsigned patch_version()    const override  { return 0; }
 
         virtual void render(const window_interface* wnd) override;
+
+        vertex_buffer::id_t create_vertex_buffer(const void* data, size_t byteSize, bool dynamic = false) override;
+        index_buffer::id_t create_index_buffer(const void* data, size_t byteSize, bool dynamic = false) override;
+        void destroy_vertex_buffer(vertex_buffer::id_t id) override;
+        void destroy_index_buffer(index_buffer::id_t id) override;
+        bool register_mesh(mesh::id_t id) override;
+        bool deregister_mesh(mesh::id_t id) override;
+        bool submit_for_draw(mesh::id_t id) override;
+        bool submit_for_draw(mesh::id_t id, const entity::id_t& owner) override;
 
     private:
         bool initilize_factory();
@@ -61,6 +74,11 @@ namespace eloo {
         static constexpr UINT               BACK_BUFFER_COUNT = 2;
 
         // Options
+        std::optional<observer<events::engine::window_resized_data>::id_t> mResizeSubscription;
+        UINT mRenderTargetDescriptorSize = 0;
+        UINT64 mNextFenceValue = 0;
+        eastl::vector<ComPtr<ID3D12Resource>> mVertexBuffers;
+        eastl::vector<ComPtr<ID3D12Resource>> mIndexBuffers;
         bool                                mVsyncEnabled = true;
         bool                                mTearingEnabled = false;
         bool                                mTearingSupported = false;
@@ -74,13 +92,25 @@ namespace eloo {
 
         ComPtr<ID3D12DescriptorHeap>        mRTVHeap;
 
-        ComPtr<ID3D12CommandAllocator>      mCommandAllocator[FRAME_COUNT];
+        ComPtr<ID3D12CommandAllocator>      mCommandAllocator[BACK_BUFFER_COUNT];
         ComPtr<ID3D12GraphicsCommandList>   mCommandList;
         ComPtr<ID3D12Fence>                 mFence;
-        UINT64                              mFenceValue[FRAME_COUNT] = {};
-        HANDLE                              mFenceEvent = nullptr;
+        UINT64                              mFenceValue[BACK_BUFFER_COUNT] = {};
+        struct fence_event {
+            HANDLE handle = nullptr;
+            fence_event() = default;
+            fence_event(const fence_event&) = delete;
+            fence_event& operator=(const fence_event&) = delete;
+            ~fence_event() { if (handle) { CloseHandle(handle); } }
+            operator HANDLE() const { return handle; }
+            fence_event& operator=(HANDLE value) {
+                if (handle) { CloseHandle(handle); }
+                handle = value;
+                return *this;
+            }
+        } mFenceEvent;
 
-        ComPtr<ID3D12Resource>              mBackBuffers[FRAME_COUNT];
+        ComPtr<ID3D12Resource>              mBackBuffers[BACK_BUFFER_COUNT];
 
         ComPtr<ID3D12RootSignature>         mRootSignature;
         ComPtr<ID3D12PipelineState>         mPipelineState;

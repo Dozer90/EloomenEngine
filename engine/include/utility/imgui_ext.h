@@ -1,24 +1,17 @@
 #pragma once
 
-#if !defined(ELOO_IMGUI_IS_ENABLED)
+#if !defined(SGE_IMGUI_IS_ENABLED)
 #define IMGUI_MUTABLE constexpr
 #else
 #define IMGUI_MUTABLE
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 
-#define IM_VEC2_CLASS_EXTRA \
-    ImVec2(const eloo::float2::values& f) { x = f.x(); y = f.y(); } \
-    operator eloo::float2::values() const { return eloo::float2::values(x, y); }
-
-#define IM_VEC4_CLASS_EXTRA \
-    ImVec4(const eloo::float4::values& f) { x = f.x(); y = f.y(); z = f.z(); w = f.w(); } \
-    operator eloo::float4::values() const { return eloo::float4::values(x, y, z, w); }
-
 #include "datatypes/float2.h"
 #include "datatypes/float4.h"
 
 #include <imgui.h>
+#include <imgui_internal.h>
 
 #include <EASTL/array.h>
 #include <EASTL/stack.h>
@@ -131,8 +124,8 @@ static constexpr float2_v BottomRight   { 1.0f, 1.0f };
 
 struct Transform {
     float2_v mPiviot = Piviots::TopLeft;
-    float2_v mPosition = ImVec2(0.0f, 0.0f);
-    float2_v mScale = ImVec2(1.0f, 1.0f);
+    float2_v mPosition {0.0f, 0.0f};
+    float2_v mScale {1.0f, 1.0f};
     float mRotation = 0.0f;
     float mShear = 0.0f;
 };

@@ -1,8 +1,12 @@
 #pragma once
 
-#include "datatypes/half.h"
+#include <cstdint>
+#include <limits>
 
-namespace eloo::math {
+#include <EASTL/type_traits.h>
+#include <EASTL/numeric_limits.h>
+
+namespace sge::math {
     namespace f64 {
         constexpr float64_t E                      = 2.71828182845904523536028747135266249775724709369995;
         constexpr float64_t LOG2E                  = 1.44269504088896340735992468100189213742664595415299;
@@ -66,36 +70,4 @@ namespace eloo::math {
         constexpr float32_t CLOSE_REL_TOLERANCE    = 1e-6;
         constexpr float32_t CLOSE_ABS_TOLERANCE    = 1e-8;
     }
-
-    namespace f16 {
-        constexpr float16_t E                      = float16_t(f32::E);
-        constexpr float16_t LOG2E                  = float16_t(f32::LOG2E);
-        constexpr float16_t LOG10E                 = float16_t(f32::LOG10E);
-        constexpr float16_t LN2                    = float16_t(f32::LN2);
-        constexpr float16_t LN10                   = float16_t(f32::LN10);
-        constexpr float16_t LN10_2                 = float16_t(f32::LN10_2);
-        constexpr float16_t SQRT2                  = float16_t(f32::SQRT2);
-        constexpr float16_t SQRT3                  = float16_t(f32::SQRT3);
-        constexpr float16_t SQRT5                  = float16_t(f32::SQRT5);
-        constexpr float16_t RSQRT2                 = float16_t(f32::RSQRT2);
-        constexpr float16_t RSQRT3                 = float16_t(f32::RSQRT3);
-        constexpr float16_t RSQRT5                 = float16_t(f32::RSQRT5);
-        constexpr float16_t PHI                    = float16_t(f32::PHI);
-        constexpr float16_t GOLDEN_RATIO           = float16_t(f32::GOLDEN_RATIO);
-        constexpr float16_t GOLDEN_RATIO_CONJUGATE = float16_t(f32::GOLDEN_RATIO_CONJUGATE);
-        constexpr float16_t EULER_MASCHERONI       = float16_t(f32::EULER_MASCHERONI);
-        constexpr float16_t CATALAN                = float16_t(f32::CATALAN);
-        constexpr float16_t APERY                  = float16_t(f32::APERY);
-        constexpr float16_t PI                     = float16_t(f32::PI);
-        constexpr float16_t TWO_PI                 = float16_t(f32::TWO_PI);
-        constexpr float16_t TAU                    = float16_t(f32::TAU);
-        constexpr float16_t TWO_THIRD_TAU          = float16_t(f32::TWO_THIRD_TAU);
-        constexpr float16_t HALF_PI                = float16_t(f32::HALF_PI);
-        constexpr float16_t QUARTER_PI             = float16_t(f32::QUARTER_PI);
-        constexpr float16_t DEG_TO_RAD             = float16_t(f32::DEG_TO_RAD);
-        constexpr float16_t RAD_TO_DEG             = float16_t(f32::RAD_TO_DEG);
-        constexpr float16_t EPSILON                = 0.00097656_h;
-        constexpr float16_t CLOSE_REL_TOLERANCE    = float16_t(1e-3);
-        constexpr float16_t CLOSE_ABS_TOLERANCE    = float16_t(1e-5);
-    }
-} // namespace eloo::math::Consts
+} // namespace sge::math::Consts

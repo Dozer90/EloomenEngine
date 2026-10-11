@@ -2,7 +2,7 @@
 
 #include "maths/math.h"
 
-//using namespace eloo;
+//using namespace sge;
 //
 //matrix4x4::values Camera::get_view_matrix() const {
 //	return math::matrix::create_view(mTransform.position(), mTransform.forward(), math::float3::up());

@@ -1,4 +1,4 @@
-#if defined(ELOO_IMGUI_IS_ENABLED)
+#if defined(SGE_IMGUI_IS_ENABLED)
 
 #include "utility/imgui_ext.h"
 #include "utility/colour.h"
@@ -8,7 +8,7 @@
 using namespace ImGuiEx;
 
 void Shapes::Line::Draw(Canvas& canvas) const {
-	if (mP1 == mP2 || mStyle.mBorderThickness <= 0.0f || eloo::colour::get_a(mStyle.mBorderColour) <= 0.0f) {
+	if (mP1 == mP2 || mStyle.mBorderThickness <= 0.0f || sge::colour::get_a(mStyle.mBorderColour) <= 0.0f) {
 		return;
 	}
 
@@ -18,7 +18,7 @@ void Shapes::Line::Draw(Canvas& canvas) const {
 }
 
 void Shapes::Path::Draw(Canvas& canvas) const {
-	if (mPoints.size() < 2 || mStyle.mBorderThickness <= 0.0f || eloo::colour::get_a(mStyle.mBorderColour) <= 0.0f) {
+	if (mPoints.size() < 2 || mStyle.mBorderThickness <= 0.0f || sge::colour::get_a(mStyle.mBorderColour) <= 0.0f) {
 		return;
 	}
 
@@ -33,10 +33,10 @@ void Shapes::Path::Draw(Canvas& canvas) const {
 void Shapes::Triangle::Draw(Canvas& canvas) const {
 	ImDrawList* drawList = canvas.GetDrawList();
 	ImVec2 offset = canvas.GetPosition();
-	if (eloo::colour::get_a(mStyle.mFillColour) > 0.0f) {
+	if (sge::colour::get_a(mStyle.mFillColour) > 0.0f) {
 		drawList->AddTriangleFilled(offset + mPoints[0], offset + mPoints[1], offset + mPoints[2], mStyle.mFillColour);
 	}
-	if (mStyle.mBorderThickness > 0.0f && eloo::colour::get_a(mStyle.mBorderColour) > 0.0f) {
+	if (mStyle.mBorderThickness > 0.0f && sge::colour::get_a(mStyle.mBorderColour) > 0.0f) {
 		drawList->AddTriangle(offset + mPoints[0], offset + mPoints[1], offset + mPoints[2], mStyle.mBorderColour, mStyle.mBorderThickness);
 	}
 }
@@ -44,10 +44,10 @@ void Shapes::Triangle::Draw(Canvas& canvas) const {
 void Shapes::Rectangle::Draw(Canvas& canvas) const {
 	ImDrawList* drawList = canvas.GetDrawList();
 	ImVec2 offset = canvas.GetPosition();
-	if (eloo::colour::get_a(mStyle.mFillColour) > 0.0f) {
+	if (sge::colour::get_a(mStyle.mFillColour) > 0.0f) {
 		drawList->AddRectFilled(offset + mMin, offset + mMax, mStyle.mFillColour);
 	}
-	if (mStyle.mBorderThickness > 0.0f && eloo::colour::get_a(mStyle.mBorderColour) > 0.0f) {
+	if (mStyle.mBorderThickness > 0.0f && sge::colour::get_a(mStyle.mBorderColour) > 0.0f) {
 		drawList->AddRectFilled(offset + mMin, offset + mMax, mStyle.mBorderColour, mStyle.mBorderThickness);
 	}
 }
@@ -55,10 +55,10 @@ void Shapes::Rectangle::Draw(Canvas& canvas) const {
 void Shapes::Ellipse::Draw(Canvas& canvas) const {
 	ImDrawList* drawList = canvas.GetDrawList();
 	ImVec2 offset = canvas.GetPosition();
-	if (eloo::colour::get_a(mStyle.mFillColour) > 0.0f) {
+	if (sge::colour::get_a(mStyle.mFillColour) > 0.0f) {
 		drawList->AddEllipseFilled(offset + mOrigin, mSize, mStyle.mFillColour);
 	}
-	if (mStyle.mBorderThickness > 0.0f && eloo::colour::get_a(mStyle.mBorderColour) > 0.0f) {
+	if (mStyle.mBorderThickness > 0.0f && sge::colour::get_a(mStyle.mBorderColour) > 0.0f) {
 		drawList->AddEllipseFilled(offset + mOrigin, mSize, mStyle.mBorderColour, mStyle.mBorderThickness);
 	}
 }

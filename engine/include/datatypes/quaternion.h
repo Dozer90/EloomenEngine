@@ -5,8 +5,8 @@
 #include "datatypes/float3.h"
 #include "datatypes/float4.h"
 
-namespace eloo::quaternion {
-    ELOO_DECLARE_ID_T;
+namespace sge::quaternion {
+    SGE_DECLARE_ID_T;
 
     // OOP style container for quaternion
     struct values {
@@ -74,8 +74,8 @@ namespace eloo::quaternion {
 
     id_t create(float x = 0.0f, float y = 0.0f, float z = 0.0f, float w = 1.0f);
     id_t create(const float4::values& vals);
-    id_t create(float eulerX = 0.0f, float eulerY = 0.0f, float eulerZ = 0.0f);
-    id_t create(const float3::values& vals);
+    id_t create_from_euler(float eulerX = 0.0f, float eulerY = 0.0f, float eulerZ = 0.0f);
+    id_t create_from_euler(const float3::values& vals);
     id_t create(const values& vals);
     bool release(id_t id);
 
@@ -94,4 +94,4 @@ namespace eloo::quaternion {
     const float& const_w(id_t id);
 };
 
-using quaternion_v = eloo::quaternion::values;
+using quaternion_v = sge::quaternion::values;

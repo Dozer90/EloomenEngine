@@ -22,8 +22,9 @@
 #include <system_error>
 #include <expected>
 
-namespace eloo::localization {
+namespace sge::localization {
     enum class errc : uint8_t {
+        success = 0,
         temp,
         _count
     };
@@ -33,6 +34,7 @@ namespace eloo::localization {
             const char* name() const noexcept override { return "Localization"; }
             std::string message(int ev) const override {
                 switch(static_cast<errc>(ev)) {
+                    case errc::success: return "Success";
                     case errc::temp: return "No errors yet";
                     default: return "Unknown error";
                 }
@@ -44,14 +46,14 @@ namespace eloo::localization {
 }
 
 namespace std {
-    template <> struct is_error_code_enum<eloo::localization::errc> : true_type {};
+    template <> struct is_error_code_enum<sge::localization::errc> : true_type {};
 }
 
 
 
-#if !defined (ELOO_DECLARE_RESULT_TYPE)
-#define ELOO_DECLARE_RESULT_TYPE(_t) std::expected<_t, std::error_code>;
-#define ELOO_RETURN_ERRC_IF(_cond, _e) if (_cond) { return std::unexpected(_e); }
-#define ELOO_RETURN_ERRC_IF_FAILED(_e) if (!_e) { return std::unexpected(_e); }
-#define ELOO_RETURN_ERRC_IF_FUNC_FAILED(_r) ELOO_RETURN_ERRC_IF(!(_r), _r.error())
+#if !defined (SGE_DECLARE_RESULT_TYPE)
+#define SGE_DECLARE_RESULT_TYPE(_t) std::expected<_t, std::error_code>;
+#define SGE_RETURN_ERRC_IF(_cond, _e) if (_cond) { return std::unexpected(_e); }
+#define SGE_RETURN_ERRC_IF_FAILED(_e) if ((_e) != errc::success) { return std::unexpected(_e); }
+#define SGE_RETURN_ERRC_IF_FUNC_FAILED(_r) SGE_RETURN_ERRC_IF(!(_r), _r.error())
 #endif

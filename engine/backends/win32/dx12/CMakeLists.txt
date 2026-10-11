@@ -1,8 +1,8 @@
 # DIRECTX 12
 
-if (ELOO_RENDERER_BACKEND STREQUAL "DX12")
+if (SGE_RENDERER_BACKEND STREQUAL "DX12")
 
-    add_library(EloomEngine_Backend_DX12 STATIC
+    add_library(ShineGE_Backend_DX12 STATIC
         "${CMAKE_CURRENT_SOURCE_DIR}/src/renderer_dx12.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/window_dx12.cpp"
     )
@@ -11,14 +11,18 @@ if (ELOO_RENDERER_BACKEND STREQUAL "DX12")
     ###########################################
     # Include Directories
 
-    target_include_directories(EloomEngine_Backend_DX12
+    target_include_directories(ShineGE_Backend_DX12
         PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            ${ELOO_PUBLIC_INCLUDE_DIRECTORIES}
-            ${ELOO_PUBLIC_SYSTEM_INCLUDE_DIRECTORIES}
+            ${SGE_PUBLIC_INCLUDE_DIRECTORIES}
+            ${SGE_PUBLIC_SYSTEM_INCLUDE_DIRECTORIES}
         PRIVATE
-            ${ELOO_PRIVATE_INCLUDE_DIRECTORIES}
-            ${ELOO_PRIVATE_SYSTEM_INCLUDE_DIRECTORIES}
+            ${SGE_PRIVATE_INCLUDE_DIRECTORIES}
+            ${SGE_PRIVATE_SYSTEM_INCLUDE_DIRECTORIES}
+    )
+
+    target_compile_definitions(ShineGE_Backend_DX12
+        PRIVATE NOMINMAX ${SGE_PRIVATE_DEFINES} ${SGE_PUBLIC_DEFINES}
     )
 
 
@@ -27,7 +31,7 @@ if (ELOO_RENDERER_BACKEND STREQUAL "DX12")
 
     FetchContent_Declare(DirectXHeaders
         GIT_REPOSITORY  https://github.com/microsoft/DirectX-Headers.git
-        GIT_TAG         main
+        GIT_TAG         461ef5138bd30922b44fbad77c4e47662812d2d5
     )
     FetchContent_MakeAvailable(DirectXHeaders)
 
@@ -42,26 +46,20 @@ if (ELOO_RENDERER_BACKEND STREQUAL "DX12")
     ###########################################
     # Finalization
 
-    target_link_libraries(EloomEngine_Backend_DX12 PRIVATE Microsoft::DirectX-Headers)
+    target_link_libraries(ShineGE_Backend_DX12 PUBLIC Microsoft::DirectX-Headers PRIVATE d3d12 dxgi d3dcompiler)
 
     add_library(dxcompiler SHARED IMPORTED GLOBAL)
     set_target_properties(dxcompiler PROPERTIES
-        IMPORTED_IMPLIB    "${DXShaderCompiler_SOURCE_DIR}/lib/dxcompiler.lib"
-        IMPORTED_LOCATION  "${DXShaderCompiler_SOURCE_DIR}/bin/dxcompiler.dll"
+        IMPORTED_IMPLIB    "${dxshadercompiler_SOURCE_DIR}/lib/x64/dxcompiler.lib"
+        IMPORTED_LOCATION  "${dxshadercompiler_SOURCE_DIR}/bin/x64/dxcompiler.dll"
     )
 
-    target_link_libraries(EloomEngine PRIVATE EloomEngine_Backend_DX12)
-    target_compile_definitions(EloomEngine_Backend_DX12 PUBLIC ELOO_BACKEND_DX12)
+    target_link_libraries(sge PRIVATE ShineGE_Backend_DX12)
+    target_compile_definitions(ShineGE_Backend_DX12 PUBLIC SGE_BACKEND_DX12)
 
 
     ###########################################
     # Commands
 
-    add_custom_command(TARGET EloomEngine_Backend_DX12 POST_BUILD
-        COMMENT "Copying dxcompiler.dll for shader hot-reloading"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            $<TARGET_FILE:dxcompiler>
-            $<TARGET_FILE_DIR:EloomEngine_Backend_DX12>
-    )
 
 endif()

@@ -5,11 +5,11 @@
 #include <EASTL/functional.h>
 #include <EASTL/unordered_map.h>
 
-namespace eloo {
+namespace sge {
     template <typename... Args>
     class observer {
     public:
-        ELOO_DECLARE_ID_T;
+        SGE_DECLARE_ID_T;
 
     public:
         using callback_t = eastl::function<void(Args...)>;
@@ -24,10 +24,6 @@ namespace eloo {
             return subscribe(callback_t(fn));
         }
 
-        template <typename T>
-        id_t subscribe(callback_t fn, T* obj) {
-            return subscribe(callback_t([obj, fn](Args... args) { fn(obj, args...); }));
-        }
 
         template <typename T>
         id_t subscribe(void (T::*fn)(Args...), T* obj) {
@@ -35,8 +31,7 @@ namespace eloo {
         }
 
         void unsubscribe(id_t id) {
-            auto it = eastl::remove(mCallbacks.begin(), mCallbacks.end(), id);
-            mCallbacks.erase(it, mCallbacks.end());
+            mCallbacks.erase(static_cast<size_t>(id));
         }
 
         void unsubscribe_all() {
@@ -51,6 +46,6 @@ namespace eloo {
 
     private:
         size_t mNextID = 0;
-        eastl::unordered_map<id_t, callback_t> mCallbacks;
+        eastl::unordered_map<size_t, callback_t> mCallbacks;
     };
 }

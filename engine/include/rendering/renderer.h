@@ -5,7 +5,7 @@
 
 #include <EASTL/unique_ptr.h>
 
-namespace eloo {
+namespace sge {
     using renderer_ptr = eastl::unique_ptr<renderer_interface>;
     renderer_ptr create_renderer(window_interface* wnd);
 }
