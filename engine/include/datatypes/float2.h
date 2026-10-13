@@ -1,6 +1,7 @@
 #pragma once
 
 #include "utility/defines.h"
+#include "memory.h"
 
 #include <EASTL/numeric_limits.h>
 #include <EASTL/type_traits.h>
@@ -21,7 +22,6 @@
 
 
 namespace sge::float2 {
-    SGE_DECLARE_ID_T;
 
     // OOP style container for float2
     struct values {
@@ -59,8 +59,8 @@ namespace sge::float2 {
         friend values operator - (const values& lhs, float rhs);
 
     public:
-        values& operator = (const values& other);
-        values& operator = (float values);
+        values& operator = (const values& other) SGE_NOEXCEPT;
+        values& operator = (float values) SGE_NOEXCEPT;
 
         values& operator + ();
         values& operator - ();
@@ -77,6 +77,8 @@ namespace sge::float2 {
         values& operator -= (const values& other);
         values& operator -= (float values);
     };
+
+    using id_t = sge::dense_storage<float2::values>::handle_t;
 
     template <typename T> concept storage_t = eastl::is_same_v<T, values>;
 

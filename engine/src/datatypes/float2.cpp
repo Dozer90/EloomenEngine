@@ -1,44 +1,59 @@
 #include "maths/math.h"
-#include "utility/managed_memory_block.h"
+#include "memory.h"
+
+#include <stdexcept>
 
 using namespace sge;
 
 namespace {
-    constexpr int MEMORY_BLOCK_INITIAL_SIZE = 50;
-    constexpr float MEMORY_BLOCK_EXPANSION = 0.7f;
-    using memblock_t = managed_memory_block<float, MEMORY_BLOCK_INITIAL_SIZE, MEMORY_BLOCK_EXPANSION>;
-    static memblock_t gMemoryBlockX, gMemoryBlockY;
+    dense_storage<float2::values> gStorage;
+
+    float2::values &require_value(float2::id_t id) {
+        auto *value = gStorage.try_get(id);
+
+        if (!value) {
+            throw std::out_of_range("Invalid float2 handle");
+        }
+
+        return *value;
+    }
 }
 
 float2::id_t float2::create(float x, float y) {
-    id_t id = gMemoryBlockX.push(x);
-    SGE_ASSERT_FATAL(id == gMemoryBlockY.push(y), "ID mismatch between X and Y memory blocks");
-    return id;
+    return gStorage.create(values{ x, y });
 }
 
 bool float2::release(id_t id) {
-    if (!is_valid(id)) {
-        return false;
-    }
-    gMemoryBlockX.remove(id);
-    gMemoryBlockY.remove(id);
-    return true;
+    return gStorage.remove(id);
 }
 
 bool float2::try_get_values(id_t id, float &x, float &y) {
-    if (is_valid(id)) {
-        x = gMemoryBlockX.get(id);
-        y = gMemoryBlockY.get(id);
-        return true;
+    const auto *value = gStorage.try_get(id);
+
+    if (!value) {
+        return false;
     }
-    return false;
+
+    x = value->x();
+    y = value->y();
+    return true;
 }
 
-float& float2::x(id_t id) { return gMemoryBlockX.get(id); }
-float& float2::y(id_t id) { return gMemoryBlockY.get(id); }
+float &float2::x(id_t id) {
+    return require_value(id).x();
+}
 
-inline const float& float2::const_x(id_t id) { return gMemoryBlockX.get(id); }
-inline const float& float2::const_y(id_t id) { return gMemoryBlockY.get(id); }
+float &float2::y(id_t id) {
+    return require_value(id).y();
+}
+
+const float &float2::const_x(id_t id) {
+    return require_value(id).x();
+}
+
+const float &float2::const_y(id_t id) {
+    return require_value(id).y();
+}
 
 
 ///////////////////////////////////////////////////////
@@ -132,12 +147,12 @@ float2::values float2::operator - (const float2::values& lhs, float rhs) {
 ///////////////////////////////////////////////////////
 // Assignment and manipulation float2::operators
 
-float2::values& float2::values::operator = (const values& other) {
+float2::values& float2::values::operator = (const values& other) SGE_NOEXCEPT {
     this->mX = other.mX;
     this->mY = other.mY;
     return *this;
 }
-float2::values& float2::values::operator = (float val) {
+float2::values& float2::values::operator = (float val) SGE_NOEXCEPT {
     this->mX = val;
     this->mY = val;
     return *this;
@@ -184,4 +199,7 @@ float2::values& float2::values::operator -= (float val) {
     *this = *this - val;
     return *this;
 }
-bool float2::is_valid(id_t id) { return gMemoryBlockX.is_valid(id) && gMemoryBlockY.is_valid(id); }
+
+bool float2::is_valid(id_t id) {
+    return gStorage.is_valid(id);
+}
